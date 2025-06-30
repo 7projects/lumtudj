@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Spotify AI-like Preporuke</title>
+</head>
+<body>
+  <h2>Spotify Preporuke na osnovi audio značajki</h2>
+  <p><strong>Seed pjesma:</strong> Rick Astley - Never Gonna Give You Up</p>
+  <pre id="output">Učitavanje...</pre>
+
+  <script>
+    const accessToken = 'BQCjmV4TYAm9C0ByK4NOd7RrFJx9mjqnp6pG8uYLKqh6k99pfxIzVX4Ohsxi204tIa3wyd4HSlcOVStZRSaYIfP4aUdT0p1dnbN4pZ_JYS7PHJYd0yIj3Q6HsGHBLjb0W3wO207NkWRvwQEbhOxjqE4ckTdKUdqKbLaV9l48GgZLDSDYAoE3Aj5doiZvEBiKYj6RafOfbRSvNA_DwRz9vFeMZFgOpN-HxWqxVljMHS5XhqkgTEIXBvKNKEMAtRlT7OFx4qVF'; // 🎟️ Zalijepi svoj token ovdje
+    const seedTrackId = '4uLU6hMCjMI75M1A2tKUQC'; // Rick Astley
+
+    const headers = {
+      'Authorization': `Bearer ${accessToken}`
+    };
+
+    async function getAudioFeatures(trackId) {
+      const res = await fetch(`https://api.spotify.com/v1/audio-features/${trackId}`, { headers });
+      return res.json();
+    }
+
+    async function getPopTracks() {
+      const res = await fetch(`https://api.spotify.com/v1/search?q=genre:pop&type=track&limit=20`, { headers });
+      const data = await res.json();
+      return data.tracks.items;
+    }
+
+    async function getBatchAudioFeatures(trackIds) {
+      const ids = trackIds.join(',');
+      const res = await fetch(`https://api.spotify.com/v1/audio-features?ids=${ids}`, { headers });
+      const data = await res.json();
+      return data.audio_features;
+    }
+
+    function calculateSimilarity(seed, candidate) {
+      const keys = ['energy', 'danceability', 'valence', 'tempo'];
+      let sum = 0;
+      keys.forEach(k => {
+        const diff = (seed[k] || 0) - (candidate[k] || 0);
+        sum += diff * diff;
+      });
+      return Math.sqrt(sum);
+    }
+
+    async function generateRecommendations() {
+      const output = document.getElementById('output');
+      output.textContent = 'Učitavam podatke...';
+
+      try {
+        const seedFeatures = await getAudioFeatures(seedTrackId);
+        const candidates = await getPopTracks();
+        const candidateIds = candidates.map(t => t.id);
+        const candidateFeatures = await getBatchAudioFeatures(candidateIds);
+
+        const scored = candidates.map((track, i) => ({
+          track,
+          similarity: calculateSimilarity(seedFeatures, candidateFeatures[i])
+        }));
+
+        scored.sort((a, b) => a.similarity - b.similarity);
+
+        const resultText = scored.slice(0, 5).map(({ track }, idx) =>
+          `${idx + 1}. ${track.name} - ${track.artists.map(a => a.name).join(', ')}`
+        ).join('\n');
+
+        output.textContent = 'Top preporuke:\n' + resultText;
+
+      } catch (err) {
+        output.textContent = 'Greška: ' + err.message;
+        console.error(err);
+      }
+    }
+
+    generateRecommendations();
+  <
