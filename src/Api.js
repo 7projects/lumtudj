@@ -1,14 +1,49 @@
 
+import { time } from 'framer-motion';
 import { generateRandomString, generateCodeChallenge } from './pkceUtils';
 
 const BASE_URL = 'https://api.spotify.com/v1';
+// const FIREBASE_FUNCTIONS_URL = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5001/lumtudj-dfd38/us-central1/api' : 'https://us-central1-lumtudj-dfd38.cloudfunctions.net/api';
+const FIREBASE_FUNCTIONS_URL = 'https://us-central1-lumtudj-dfd38.cloudfunctions.net/api'; //samo produkcija
 
-const getToken = () => {
+const REDIRECT_URI = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://lumtudj.net';
+const CLIENT_ID = '6b690613cc6d481d97a3b75c2c0cf947';
+
+const getToken = async () => {
+  await validateToken();
   return localStorage.getItem('token');
 }
 
+function shouldRefreshToken() {
+  if (tokenExpirationTimeLeft() <= 900000) { // 15min prije isteka refreshaj token! 3540000 - 59min
+    return true;
+  }
+  return false;
+}
+
+function tokenExpirationTimeLeft() {
+  const expiration = parseInt(localStorage.getItem("token_expiry"), 10);
+  if (!expiration) return 0;
+  const now = Date.now();
+  const timeLeft = expiration - now;
+  return timeLeft;
+}
+
+async function validateToken() {
+  if (shouldRefreshToken()) {
+    let token = localStorage.getItem('token');
+    if (!token) return;
+    // alert("Token is expired or about to expire. Please refresh the page to re-authenticate.");
+    await refreshAccessToken();
+  }
+}
+
+const errorHandler = async (response) => {
+
+}
+
 async function request(endpoint, options = {}) {
-  let accessToken = getToken();
+  let accessToken = await getToken();
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
@@ -17,10 +52,9 @@ async function request(endpoint, options = {}) {
     ...options,
   });
 
-  debugger;
   if (!response.ok) {
     const error = await response.json();
-    throw new Error(error.error?.message || 'Spotify API error');
+    errorHandler();
   }
 
   return response.json();
@@ -29,8 +63,6 @@ async function request(endpoint, options = {}) {
 let codeVerifierGlobal = '';
 
 const getAuthUrl = async () => {
-  const clientId = '6b690613cc6d481d97a3b75c2c0cf947';
-  const redirectUri = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://vsprojects.net';
 
   const codeVerifier = generateRandomString(128);
   const codeChallenge = await generateCodeChallenge(codeVerifier);
@@ -56,9 +88,9 @@ const getAuthUrl = async () => {
 
   const params = new URLSearchParams({
     response_type: 'code',
-    client_id: clientId,
+    client_id: CLIENT_ID,
     scope: scopes.join(' '),
-    redirect_uri: redirectUri,
+    redirect_uri: REDIRECT_URI,
     code_challenge_method: 'S256',
     code_challenge: codeChallenge,
   });
@@ -66,6 +98,25 @@ const getAuthUrl = async () => {
   return `https://accounts.spotify.com/authorize?${params.toString()}`;
 };
 
+const playTrack = async (id) => {
+  const deviceId = localStorage.getItem('deviceId');
+  const response = await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      uris: ['spotify:track:' + id]
+    })
+  })
+
+  if (!response.ok) {
+    errorHandler();
+  }
+
+  return response;
+}
 
 const search = async (query) => {
   let data = await request(`/search?q=${query}&type=track`);
@@ -81,10 +132,13 @@ const getPlaylists = async () => {
 
   while (url) {
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${getToken()}` }
+      headers: { Authorization: `Bearer ${await getToken()}` }
     });
 
-    if (!response.ok) throw new Error('Failed to fetch playlists');
+    if (!response.ok) {
+      errorHandler();
+      return;
+    }
 
     const data = await response.json();
 
@@ -102,27 +156,160 @@ const getPlaylists = async () => {
     url = data.next; // Spotify gives the next page URL, or null
   }
 
+  const myShazamTracks = playlists.filter(p => p.name == "My Shazam Tracks");
+
+  if (myShazamTracks && myShazamTracks.length > 0) {
+    localStorage.setItem("myShazamTracksID", myShazamTracks[0].id);
+  }
+
   //remove from playlists where name = 'My Shazam Tracks'
-  // playlists = playlists.filter(playlist => playlist.name !== 'My Shazam Tracks');
+  playlists = playlists.filter(playlist => playlist.name !== 'My Shazam Tracks');
 
   return playlists;
 };
 
-const getTracks = async (playlistID) => {
-  let tracks = [];
-  let url = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?limit=100`;
+const getAlbums = async () => {
+  // let data = await request('/me/playlists');
+
+  ;
+  let albums = [];
+
+  let url = 'https://api.spotify.com/v1/me/albums?limit=50';
 
   while (url) {
     const response = await fetch(url, {
-      headers: { Authorization: `Bearer ${getToken()}` }
+      headers: { Authorization: `Bearer ${await getToken()}` }
     });
 
-    if (!response.ok) throw new Error(`Failed to fetch tracks for playlist ${playlistID}`);
+    if (!response.ok) {
+      errorHandler();
+      return;
+    }
+
+    const data = await response.json();
+
+    console.log(data);
+
+    const simplified = data.items.map(item => ({
+      id: item.album.id,
+      addedAt: item.added_at,
+      name: item.album.name,
+      artists: item.album.artists,
+      releaseDate: item.album.release_date,
+      count: item.album.total_tracks,
+      albumUrl: item.album.external_urls.spotify,
+      images: item.album.images,
+      tracks: [],
+      uri: item.album.uri
+    }));
+
+    albums.push(...simplified);
+
+    ;
+    let tracks = await getAlbumTracks(albums[0].id);
+
+    url = data.next; // Spotify gives the next page URL, or null
+  }
+
+  console.log(albums);
+  return albums;
+};
+
+const getTracks = async (playlistID, limit) => {
+  let tracks = [];
+  let url = `https://api.spotify.com/v1/playlists/${playlistID}/tracks?limit=` + (limit || "100");
+
+  while (url) {
+    const response = await fetch(url, {
+      headers: { Authorization: `Bearer ${await getToken()}` }
+    });
+
+    if (!response.ok) {
+      errorHandler();
+      return;
+    }
 
     const data = await response.json();
     tracks.push(...data.items.map(item => item.track));
+
+    if (limit)
+      return tracks;
+
     url = data.next;
   }
+
+  return tracks;
+};
+
+const getArtistTopTracks = async (id) => {
+  let tracks = [];
+  let url = `https://api.spotify.com/v1/artists/${id}/top-tracks?market=US`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${await getToken()}` }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    return;
+  }
+
+  const data = await response.json();
+  tracks.push(...data.tracks);
+
+  return tracks;
+};
+
+const getArtistInfo = async (id) => {
+  const url = `https://api.spotify.com/v1/artists/${id}`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${await getToken()}` }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    return;
+  }
+
+  const data = await response.json();
+  return data;
+};
+
+const getArtistAlbums = async (id) => {
+  let albums = [];
+  let url = `https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single,appears_on,compilation&market=US&limit=50`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${await getToken()}` }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    return;
+  }
+
+  const data = await response.json();
+  albums.push(...data.items);
+
+  return albums;
+};
+
+const getAlbumTracks = async (albumId) => {
+  let tracks = [];
+  let url = `https://api.spotify.com/v1/albums/${albumId}/tracks?market=US&limit=50`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${await getToken()}` }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    return;
+  }
+
+  const data = await response.json();
+  tracks.push(...data.items);
 
   return tracks;
 };
@@ -151,6 +338,31 @@ const updatePlaylists = async (playlists, callback) => {
   return fullPlaylists;
 }
 
+const getFullAlbums = async (callback) => {
+  const albums = await getAlbums();
+  return await updateAlbums(albums, callback);
+};
+
+const updateAlbums = async (albums, callback) => {
+  const fullAlbums = [];
+
+  let index = 0;
+  if (callback)
+    callback(index, albums.length);
+
+  for (const album of albums) {
+    const tracks = await getAlbumTracks(album.id);
+    index += 1;
+    if (callback)
+      callback(index, albums.length);
+
+    fullAlbums.push({ ...album, tracks });
+  }
+
+  ;
+  return fullAlbums;
+}
+
 
 const getTopTracks = async () => {
   let data = await request('/me/top/tracks?limit=30&time_range=long_term');
@@ -162,13 +374,17 @@ const getRecentTracks = async () => {
   return data.items.map(item => item.track);
 };
 
+
 const getRecommendations = async (track) => {
-  const token = getToken();
+  const token = await getToken();
   const headers = { Authorization: `Bearer ${token}` };
   const limit = 10; // Number of recommendations to return
   async function fetchJSON(url) {
     const res = await fetch(url, { headers });
-    if (!res.ok) throw new Error(`Fetch failed: ${res.status} for ${url}`);
+    if (!res.ok) {
+      errorHandler();
+      return;
+    }
     return res.json();
   }
 
@@ -250,7 +466,7 @@ const addTrackToPlaylist = async (playlist, track) => {
   const response = await fetch(url, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${await getToken()}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
@@ -259,6 +475,8 @@ const addTrackToPlaylist = async (playlist, track) => {
   });
 
   if (!response.ok) {
+    errorHandler();
+
     const error = await response.json();
     console.error('Failed to add track:', error);
   } else {
@@ -271,7 +489,7 @@ const removeTrackFromPlaylist = async (playlist, track) => {
   const response = await fetch(url, {
     method: 'DELETE',
     headers: {
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${await getToken()}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
@@ -284,6 +502,7 @@ const removeTrackFromPlaylist = async (playlist, track) => {
   });
 
   if (!response.ok) {
+    errorHandler();
     const error = await response.json();
     console.error('Failed to add track:', error);
   } else {
@@ -292,25 +511,25 @@ const removeTrackFromPlaylist = async (playlist, track) => {
 };
 
 const refreshAccessToken = async () => {
-  alert("Refreshing token...");
+
+  let token = localStorage.getItem('token');
+  if (!token) return;
+
+  // alert("Refreshing token...");
 
   const refreshToken = localStorage.getItem('refresh_token');
-  const clientId = '6b690613cc6d481d97a3b75c2c0cf947';
+  const userId = localStorage.getItem('userId');
+  const timeLeft = tokenExpirationTimeLeft();
 
-  const body = new URLSearchParams({
-    grant_type: 'refresh_token',
-    refresh_token: refreshToken,
-    client_id: clientId
-  });
-
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body
-  });
-
+  const response = await fetch(
+    FIREBASE_FUNCTIONS_URL + '/refresh_token',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ refresh_token: refreshToken, userId: userId })
+    }
+  );
+  ;
   const data = await response.json();
 
   if (data.access_token) {
@@ -319,17 +538,60 @@ const refreshAccessToken = async () => {
     if (data.refresh_token) {
       localStorage.setItem('refresh_token', data.refresh_token);
     }
-    alert("Token refreshed successfully!");
+    // alert("Token refreshed successfully!");
+
+    if (timeLeft < 1) {
+      window.location.reload();
+    }
+
   } else {
     console.error("Failed to refresh token:", data);
     alert("Failed to refresh token. See console for details.");
   }
+
+  return data;
 };
+
+const getAccessTokenByAuthorizationCode = async (code) => {
+
+  const response = await fetch(
+    FIREBASE_FUNCTIONS_URL + '/access_token',
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        client_id: CLIENT_ID,
+        code: code,
+        code_verifier: localStorage.getItem('code_verifier'),
+        redirect_uri: REDIRECT_URI
+      })
+    }
+  );
+
+  ;
+  const data = await response.json();
+  if (data.access_token) {
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('token_expiry', Date.now() + data.expires_in * 1000);
+
+    if (data.refresh_token) {
+      localStorage.setItem('refresh_token', data.refresh_token);
+    }
+
+  } else {
+    console.error("Failed to refresh token:", data);
+    alert("Failed to refresh token. See console for details.");
+  }
+  return data;
+}
 
 export default {
   getToken,
+  shouldRefreshToken,
+  tokenExpirationTimeLeft,
   getAuthUrl,
   search,
+  playTrack,
   getPlaylists,
   getTracks,
   getRecentTracks,
@@ -340,7 +602,14 @@ export default {
   updatePlaylists,
   addTrackToPlaylist,
   removeTrackFromPlaylist,
-  refreshAccessToken
+  refreshAccessToken,
+  getAccessTokenByAuthorizationCode,
+  getAlbums,
+  getFullAlbums,
+  getArtistTopTracks,
+  getArtistAlbums,
+  getAlbumTracks,
+  getArtistInfo
 };
 
 

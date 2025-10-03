@@ -1,7 +1,8 @@
 // database.js
 const DB_NAME = 'SpotifyPlaylistsDB';
-const DB_VERSION = 3.3;
+const DB_VERSION = 4
 const PLAYLISTS_STORE_NAME = 'playlists';
+const ALBUMS_STORE_NAME = 'albums';
 const BACKGROUND_PLAYLISTS_STORE_NAME = 'backgroundPlaylists';
 const HISTORY_STORE_NAME = 'history';
 
@@ -17,6 +18,10 @@ function openDB() {
        const db = event.target.result;
       if (!db.objectStoreNames.contains(PLAYLISTS_STORE_NAME)) {
         db.createObjectStore(PLAYLISTS_STORE_NAME, { keyPath: 'id' });
+      }
+
+      if (!db.objectStoreNames.contains(ALBUMS_STORE_NAME)) {
+        db.createObjectStore(ALBUMS_STORE_NAME, { keyPath: 'id' });
       }
 
       if (!db.objectStoreNames.contains(BACKGROUND_PLAYLISTS_STORE_NAME)) {
@@ -57,6 +62,22 @@ export async function savePlaylists(playlists) {
   db.close();
 }
 
+export async function saveAlbums(albums) {
+  const db = await openDB();
+  const tx = db.transaction(ALBUMS_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(ALBUMS_STORE_NAME);
+
+  for (const album of albums) {
+    await new Promise((resolve, reject) => {
+      const request = store.put(album);
+      request.onsuccess = resolve;
+      request.onerror = reject;
+    });
+  }
+
+  db.close();
+}
+
 export async function loadBackgroundPlaylists() {
   const db = await openDB();
   const tx = db.transaction(BACKGROUND_PLAYLISTS_STORE_NAME, 'readonly');
@@ -78,7 +99,7 @@ export async function saveBackgroundPlaylists(playlists) {
   const store = tx.objectStore(BACKGROUND_PLAYLISTS_STORE_NAME);
   // Clear all records in the store
   const clearRequest = store.clear();
-  debugger;
+
   for (const playlist of playlists) {
     await new Promise((resolve, reject) => {
       const request = store.put(playlist);
@@ -99,7 +120,6 @@ export async function addToHistory(track) {
 
   const addRequest = store.add(track);
 
-  debugger;
   db.close();
 }
 
@@ -140,6 +160,39 @@ export async function loadPlaylistById(id) {
   return playlist;
 }
 
+export async function loadAlbums() {
+  const db = await openDB();
+  const tx = db.transaction(ALBUMS_STORE_NAME, 'readonly');
+  const store = tx.objectStore(ALBUMS_STORE_NAME);
+
+  const albums = await new Promise((resolve, reject) => {
+    const request = store.getAll();
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+
+  db.close();
+  return albums;
+}
+
+export async function loadAlbumById(id) {
+  const db = await openDB();
+  const tx = db.transaction(ALBUMS_STORE_NAME, 'readonly');
+  const store = tx.objectStore(ALBUMS_STORE_NAME);
+
+  const album = await new Promise((resolve, reject) => {
+    const request = store.getAll();
+    request.onsuccess = () => {
+      const result = request.result.find(a => a.id === id); // match by field
+      resolve(result);
+    };
+    request.onerror = () => reject(request.error);
+  });
+
+  db.close();
+  return album;
+}
+
 export async function getHistory() {
   const db = await openDB();
   const tx = db.transaction(HISTORY_STORE_NAME, 'readonly');
@@ -157,10 +210,26 @@ export async function getHistory() {
 /**
  * Delete all playlists from IndexedDB.
  */
-export async function clearPlaylists() {
+export async function clearDatabase() {
   const db = await openDB();
+
   const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readwrite');
   const store = tx.objectStore(PLAYLISTS_STORE_NAME);
   await store.clear();
+
+  const tx2 = db.transaction(ALBUMS_STORE_NAME, 'readwrite');
+  const store2 = tx2.objectStore(ALBUMS_STORE_NAME);
+  await store2.clear();
+
+  const tx3 = db.transaction(BACKGROUND_PLAYLISTS_STORE_NAME, 'readwrite');
+  const store3 = tx3.objectStore(BACKGROUND_PLAYLISTS_STORE_NAME);
+  await store3.clear();
+
+  const tx4 = db.transaction(HISTORY_STORE_NAME, 'readwrite');
+  const store4 = tx4.objectStore(HISTORY_STORE_NAME);
+  await store4.clear();
+
   db.close();
 }
+
+

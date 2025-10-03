@@ -16,41 +16,112 @@ import ShuffleIcon from '@mui/icons-material/Shuffle';
 
 import { isMobile } from '../util';
 
-const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onError, onNext }) => {
-    const [deviceId, setDeviceId] = useState(null);
+function useConstructor(callback) {
+    const hasRun = useRef(false);
+    if (!hasRun.current) {
+        callback();
+        hasRun.current = true;
+    }
+}
+
+const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onError, onNext }) => {
+
     const [track, setTrack] = useState(null);
     const [position, setPosition] = useState(0);
     const [duration, setDuration] = useState(100);
-
-    const [player, setPlayer] = useState(null);
-
-    const [initialized, setInitialized] = useState(false);
-
     const [isReady, setIsReady] = useState(false);
     const playerRef = useRef(null);
-
+    const tickRef = useRef(null);
     const [playerState, setPlayerState] = useState("trackEnded");
+    const playerStateRef = useRef(playerState);
+    playerStateRef.current = playerState;
+
+
+    const stateChangedRef = useRef(stateChanged);
+    stateChangedRef.current = stateChanged;
+
+    const tick = async () => {
+
+        // console.log("tick");
+        // console.log("playerStateRef.current: " + playerStateRef.current);
+
+        if (playerRef.current) {
+            const state = await playerRef.current.getCurrentState();
+            if (playerStateRef.current == "playing") {
+                if (state) {
+                    setPosition(state.position);
+                    setDuration(state.duration);
+                }
+            }
+
+            //provjera da li je kraj pjesme
+            if (playerStateRef.current == "playing") {
+                console.log("provjera kraj pjesme");
+                const positionMs = state.position;
+                const positionSec = Math.floor(positionMs / 1000);
+
+                const durationMs = state.duration;
+                const durationSec = Math.floor(durationMs / 1000);
+
+                if (state && (positionSec > durationSec - 5 || positionMs > durationSec * 1000)) {
+                    // Optional: check if the same track is still playing
+                    // or if there is no track at all
+                    if (playerStateRef.current !== "trackEnded") {
+                        setPlayerState("trackEnded")
+                        stopUniverse();
+                        playerStateRef.current = "trackEnded"
+                        if (stateChangedRef) {
+                            stateChangedRef.current("trackEnded");
+                        }
+                    }
+                }
+            }
+        }
+
+        if (tickRef.current) {
+            clearTimeout(tickRef.current);
+        }
+
+        tickRef.current = setTimeout(() => {
+            tick();
+        }, 1000);
+
+
+    }
+
+    useConstructor(async () => {
+        //start Tick
+        tick();
+    });
+
+
+    const tokenRef = useRef(token);
+
 
     // Load the SDK script ONCE
     useEffect(() => {
-        const existingScript = document.getElementById('spotify-player');
-        if (!existingScript) {
-            const script = document.createElement('script');
-            script.id = 'spotify-player';
-            script.src = 'https://sdk.scdn.co/spotify-player.js';
-            script.async = true;
-            document.body.appendChild(script);
+
+        alert("token channged u playeru:");
+
+        tokenRef.current = token;
+
+        if (playerRef.current) {
+            //dobili smo novi refresh token 
+            alert("update token");
+            playerRef.current._options.getOAuthToken = cb => cb(token);
+            
         }
-
-        initialize();
-
+        else {
+            initializePlayer();
+        }
     }, [token]);
 
 
     const initializePlayer = () => {
+
         const player = new window.Spotify.Player({
             name: 'My Spotify Player',
-            getOAuthToken: cb => cb(token),
+            getOAuthToken: cb => cb(tokenRef.current),
             volume: 0.5,
         });
 
@@ -58,7 +129,7 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
             alert("Player not found");
         }
 
-     
+
 
         // Store player in ref (not state)
         playerRef.current = player;
@@ -98,13 +169,15 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                 track_window: { current_track }
             } = state;
 
-         
+
 
             if (paused == false) {
                 if (playerState !== "playing") {
                     setPlayerState("playing");
+                    startUniverse();
+                    playerStateRef.current = "playing";
                     if (stateChanged) {
-                        stateChanged("playing");
+                        // stateChanged("playing");
                     }
                 }
             }
@@ -112,8 +185,10 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
             if (paused == true) {
                 if (playerState !== "paused") {
                     setPlayerState("paused");
+                    stopUniverse();
+                    playerStateRef.current = "paused";
                     if (stateChanged) {
-                        stateChanged("paused");
+                        // stateChanged("paused");
                     }
                 }
             }
@@ -129,46 +204,12 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
         player.connect();
     }
 
-    const initialize = () => {
-        // Spotify sets this when the SDK is ready
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            initializePlayer();
-        };
-    }
-
     useEffect(() => {
+        if (!token)
+            pauseTrack();
+
         const interval = setInterval(async () => {
-            if (playerRef.current) {
 
-                let state = null;
-
-                if (playerState !== "playing" || playerState === "fadingOut")
-                    return;
-
-                state = await playerRef.current.getCurrentState();
-
-                if (state) {
-                    setPosition(state.position);
-                    setDuration(state.duration);
-
-                    const positionMs = state.position;
-                    const positionSec = Math.floor(positionMs / 1000);
-
-                    const durationMs = state.duration;
-                    const durationSec = Math.floor(durationMs / 1000);
-
-                    if (state && (positionSec > durationSec - 5 || positionMs > durationSec * 1000)) {
-                        // Optional: check if the same track is still playing
-                        // or if there is no track at all
-                        if (playerState !== "trackEnded") {
-                            setPlayerState("trackEnded")
-                            if (stateChanged) {
-                                stateChanged("trackEnded");
-                            }
-                        }
-                    }
-                }
-            }
         }, 1000);
 
         return () => clearInterval(interval); // cleanup
@@ -180,17 +221,17 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
 
         if (isReady && player) {
             setTrack(trackid);
-         
+
             if (trackid && trackid.id)
                 playTrack(trackid.id);
         } else {
-            initialize();
+            initializePlayer();
         }
     }, [trackid]);
 
     const resumeTrack = async (e) => {
         e.stopPropagation();
-        if(locked) return;
+        if (locked) return;
         const player = playerRef.current;
         if (isReady && player) {
             try {
@@ -205,8 +246,10 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
     }
 
     const pauseTrack = (e) => {
-        e.stopPropagation();
-        if(locked) return;
+        if (e)
+            e.stopPropagation();
+
+        if (locked) return;
         fetch('https://api.spotify.com/v1/me/player/pause', {
             method: 'PUT',
             headers: {
@@ -216,6 +259,8 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
         });
 
         setPlayerState("paused");
+        playerStateRef.current = "paused";
+        stopUniverse();
     };
 
     const setVolume = (vol) => {
@@ -240,6 +285,7 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                 player.setVolume(to);
                 if (callback) callback();
             }
+
         }, FADE_INTERVAL);
     };
 
@@ -263,24 +309,26 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                 })
             })
 
-            if (!response.ok) {
-                debugger;
-                if (onError) {
-                    onError(response);
-                }
-            }
 
-            if (currentVolume)
-                player.setVolume(currentVolume);
+            // if (!response.ok) {
+            //     if (onError) {
+            //         onError(response);
+            //     }
+            // }
+
+            // if (currentVolume)
+            //     player.setVolume(currentVolume);
+
+
             // setPlayerState("playing");
             // Then fade back in
             // fadeVolume(player, 0, TARGET_VOLUME);
 
         } catch (e) {
             initializePlayer();
-            //alert("err-" + JSON.stringify(e));
+            alert("err-" + JSON.stringify(e));
             if (onError) {
-                onError(e);
+                // onError(e);
             }
         }
     }
@@ -291,35 +339,61 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
         const player = playerRef.current;
 
         setPosition(0);
+        setDuration(1);
 
-        if (playerState === "playing") {
-            // Start by fading out
-            setPlayerState("fadingOut");
-            player.getVolume().then(currentVolume => {
-                fadeVolume(player, currentVolume, 0, () => {
-                    // After fade out, start new track
+        try {
 
-                    playSpotify(id).then(() => {
+            if (playerState === "playing") {
+                // Start by fading out
+                setPlayerState("fadingOut");
+                playerStateRef.current = "fadingOut";
+                setDuration(1);
+                setPosition(0);
+                player.getVolume().then(currentVolume => {
+                    fadeVolume(player, currentVolume, 0, () => {
+                        // After fade out, start new track
 
-                        if (isMobile())
-                            player.setVolume(1);
-                        else
-                            player.setVolume(currentVolume);
+                        fetch('https://api.spotify.com/v1/me/player/pause', {
+                            method: 'PUT',
+                            headers: {
+                                Authorization: `Bearer ${token}`,
+                                'Content-Type': 'application/json'
+                            }
+                        }).then(() => {
 
-                        setPlayerState("playing");
-                        // Then fade back in
-                        // fadeVolume(player, 0, TARGET_VOLUME);
+
+                            playSpotify(id).then(() => {
+
+                                if (isMobile())
+                                    player.setVolume(1);
+                                else
+                                    player.setVolume(currentVolume);
+
+                                setPlayerState("playing");
+                                playerStateRef.current = "playing";
+                                startUniverse();
+                                // Then fade back in
+                                // fadeVolume(player, 0, TARGET_VOLUME);
+                            });
+
+                        }
+                        )
+
+
                     });
                 });
-            });
-        } else {
-            playSpotify(id);
+            } else {
+                playSpotify(id);
+            }
+        } catch (e) {
+            alert("err-" + JSON.stringify(e));
         }
     };
 
     // When the user clicks the progress bar
     const seek = async (e) => {
 
+        e.stopPropagation();
         const progressBar = document.getElementById('progressBar');
         const rect = progressBar.getBoundingClientRect();
         const clickX = e.clientX - rect.left;
@@ -331,7 +405,6 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
 
         const duration = state.duration;
         const newPosition = percent * duration;
-
 
         setPosition(newPosition)
         // Seek to the new position
@@ -348,29 +421,51 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
 
     const prev = (e) => {
         e.stopPropagation();
-        if(locked) return;
+        if (locked) return;
         setPosition(0)
         // Seek to the new position
         playerRef.current.seek(0);
     }
 
+    const startUniverse = () => {
+        return;
+        const box = document.querySelector('#universe');
+        box.style.animation = 'fadeIn 5s forwards';
+    }
+
+    const stopUniverse = () => {
+        const box = document.querySelector('#universe');
+        if (box)
+            box.style.animation = 'fadeOut 5s forwards';
+    }
 
     return (
-        <div style={{ width: '100%', textAlign: 'center' }} onClick={onClick}>
+        <div style={{ width: '100%', textAlign: 'center', bottom: 0, position: "absolute" }} onClick={onClick}>
             {/* <div className='player-artist'>{track && track.artists && track.artists.map(a => a.name).join(", ").toString().toUpperCase()}</div>
             <div className='player-song'>{track && track.name && track.name.toUpperCase()}</div> */}
+            <div id="universe">
+                <div id='stars'></div>
+                <div id='stars2'></div>
+                <div id='stars3'></div>
+            </div>
+
+            {/* <div className='universe'>
+                <div className="stars"></div>
+                <div className="stars"></div>
+                <div className="stars"></div>
+            </div> */}
 
             {isMobile() ?
                 <>
-                    <table style={{ width: '100%' }}>
+                    <table style={{ width: '100%', height: '100%' }}>
                         <tbody>
                             <tr>
-                                <td>
-                                    <TrackRow playlists={playlists} forPlayer track={track} />
+                                <td style={{ minHeight: 30 }}>
+                                    <TrackRow playlists={playlists} hideImage forPlayer track={track} />
                                 </td>
                             </tr>
                             <tr>
-                                <td style={{ paddingTop: 5, paddingRight: '5px', paddingLeft: '5px', paddingBottom: '10px' }}>
+                                <td style={{ paddingTop: 1, paddingRight: '5px', paddingLeft: '5px', paddingBottom: '1px' }}>
                                     {/* <input
                                         className='range-mobile'
                                         type="range"
@@ -384,17 +479,46 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                                         }}
                                         style={{ width: '100%' , display: 'block' }}
                                     /> */}
-                                    <div className='player-progress-bar' id="progressBar" onClick={seek}>
-                                        <div className='player-progress-bar-fill' style={{ width: `${(position / duration) * 100}%` }}></div>
+                                    <div className='player-progress-bar-mobile' id="progressBar" onClick={seek}>
+                                        <div className='player-progress-bar-fill-mobile' style={{ width: `${(position / duration) * 100}%` }}></div>
                                     </div>
                                 </td>
                             </tr>
                             <tr>
                                 <td>
-                                    <button className='player-button' onClick={prev}><SkipPreviousIcon /></button>
-                                    {playerState != "playing" ? <button className='player-button' onClick={resumeTrack}><PlayCircleOutlineIcon /></button> : null}
-                                    {playerState == "playing" ? <button className='player-button' onClick={pauseTrack}><PauseCircleOutlineIcon /></button> : null}
-                                    <button className='player-button' onClick={next}><SkipNextIcon /></button>
+
+                                    <table style={{ width: "100%", tableLayout: "fixed", borderSpacing: 3 }}>
+                                        <tbody>
+                                            <tr>
+                                                <td className='player-button-mobile' style={{ fontSize: 12 }}>
+                                                    {formatTime(position)}
+                                                </td>
+                                                <td className={3 == 1 ? 'tab-selected' : 'player-button-mobile'} style={{ height: 30 }} onClick={prev}>
+                                                    <SkipPreviousIcon></SkipPreviousIcon>
+                                                </td>
+                                                {playerState != "playing" ?
+                                                    <td className={1 == 2 ? 'tab-selected' : 'player-button-mobile'} onClick={resumeTrack}>
+                                                        <PlayCircleOutlineIcon></PlayCircleOutlineIcon>
+                                                    </td> :
+                                                    <td className={1 == 2 ? 'tab-selected' : 'player-button-mobile'} onClick={pauseTrack}>
+                                                        <PauseCircleOutlineIcon></PauseCircleOutlineIcon>
+                                                    </td>}
+                                                <td className={1 == 3 ? 'tab-selected' : 'player-button-mobile'} onClick={next}>
+                                                    <SkipNextIcon></SkipNextIcon>
+                                                </td>
+                                                <td className='player-button-mobile' style={{ fontSize: 12 }}>
+                                                    {formatTime(duration)}
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                    {/* <button className='player-button-mobile' onClick={prev}><SkipPreviousIcon className='player-button-mobile-icon' /></button>
+                                    {playerState != "playing" ? <button className='player-button-mobile' onClick={resumeTrack}><PlayCircleOutlineIcon className='player-button-mobile-icon'  /></button> : null}
+                                    {playerState == "playing" ? <button className='player-button-mobile' onClick={pauseTrack}><PauseCircleOutlineIcon className='player-button-mobile-icon'  /></button> : null}
+                                    <button className='player-button-mobile' onClick={next}><SkipNextIcon className='player-button-mobile-icon'  /></button> */}
+
+
                                     {/* <button className='player-button' onClick={resumeTrack}><RepeatIcon /></button>
                                     <button className='player-button' onClick={resumeTrack}><ShuffleIcon /></button>
                                     <button className='player-button' onClick={resumeTrack}><AutoFixHighIcon /></button> */}
@@ -418,7 +542,7 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                             <tbody>
                                 <tr>
                                     <td style={{ width: "30%", textAlign: "left" }}>
-                                        <TrackRow playlists={playlists} forPlayer track={track} />
+                                        <TrackRow playlists={playlists} hideImage forPlayer track={track} />
                                     </td>
                                     <td>
                                         <table style={{ width: '100%' }}>
@@ -428,24 +552,29 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                                                         <span>{formatTime(position)}</span>
                                                     </td>
                                                     <td>
-                                                        <input
+                                                        {/* <input
                                                             type="range"
                                                             min="0"
                                                             max={duration}
                                                             value={position}
                                                             onClick={(e) => e.stopPropagation()}
                                                             onChange={(e) => {
-                                                                if(locked) return;
+                                                                if (locked) return;
                                                                 const seekTo = Number(e.target.value);
                                                                 setPosition(seekTo);
                                                                 playerRef.current.seek(seekTo);
                                                                 e.stopPropagation();
                                                             }}
                                                             style={{ width: '100%' }}
-                                                        />
+                                                        /> */}
+
+                                                        <div className='player-progress-bar' id="progressBar" onClick={seek}>
+                                                            <div className='player-progress-bar-fill' style={{ width: `${(position / duration) * 100}%` }}></div>
+                                                        </div>
                                                     </td>
                                                     <td style={{ textAlign: "left", padding: 10, width: "40px" }}>
                                                         <span>{formatTime(duration)}</span>
+
                                                     </td>
                                                 </tr>
                                                 <tr>
@@ -454,13 +583,16 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                                                     </td>
                                                     <td>
                                                         <div className='player-buttons'>
-                                                            <div  className='player-button' onClick={prev}><SkipPreviousIcon/></div>
+                                                            <div className='player-button' onClick={prev}><SkipPreviousIcon /></div>
                                                             {playerState != "playing" ? <div className='player-button' onClick={resumeTrack}><PlayCircleOutlineIcon /></div> : null}
                                                             {playerState == "playing" ? <div className='player-button' onClick={pauseTrack}><PauseCircleOutlineIcon /></div> : null}
                                                             <div className='player-button' onClick={next}><SkipNextIcon /></div>
+                                                            {/* <br></br>
+                                                            player state: {playerState} */}
                                                             {/* <button className='player-button' onClick={resumeTrack}><RepeatIcon /></button>
                                                         <button className='player-button' onClick={resumeTrack}><ShuffleIcon /></button>
                                                         <button className='player-button' onClick={resumeTrack}><AutoFixHighIcon /></button> */}
+
                                                         </div>
 
 
@@ -473,19 +605,19 @@ const Player = ({locked, token, trackid, onClick, playlists, stateChanged, onErr
                                         </table>
                                     </td>
                                     <td style={{ width: "30%", textAlign: "right", paddingRight: 20 }}>
-                                       
-                                            <input
-                                                type="range"
-                                                min={0}
-                                                max={100}
-                                                onClick={(e) => e.stopPropagation()}
-                                                onChange={(e) => {
-                                                    setVolume(e.target.value * 0.01);
-                                                    e.stopPropagation();
-                                                }}
-                                                style={{ width: '100%', maxWidth: '120px' }}
-                                            />
-                                        
+
+                                        <input
+                                            type="range"
+                                            min={0}
+                                            max={100}
+                                            onClick={(e) => e.stopPropagation()}
+                                            onChange={(e) => {
+                                                setVolume(e.target.value * 0.01);
+                                                e.stopPropagation();
+                                            }}
+                                            style={{ width: '100%', maxWidth: '120px' }}
+                                        />
+
                                     </td>
                                 </tr>
                             </tbody>

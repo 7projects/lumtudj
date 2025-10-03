@@ -1,27 +1,60 @@
 
 import React, { useEffect, useState, useRef } from 'react';
-import { formatTime } from '../util';
-import { ShuffleOn } from '@mui/icons-material';
+import { formatTime, isMobile } from '../util';
+import { AssistWalker, ShuffleOn } from '@mui/icons-material';
 import { Shuffle } from '@mui/icons-material';
+import { useLongPress } from 'use-long-press';
+import { useSwipeable } from 'react-swipeable';
 
-const PlaylistRow = ({ playlist, onClick, onDoubleClick, bulbOn, onBulbClick, selected }) => {
+const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick, selected, bulbCheckOn, onBulbCheckClick, icon, onLongPress, onSwipedLeft, onSwipedRight, album = false }) => {
+
+  const swipeHandler = useSwipeable({
+    onSwipedLeft: () => { if (onSwipedLeft) onSwipedLeft() },
+    onSwipedRight: () => { if (onSwipedRight) onSwipedRight() },
+    // onSwipedUp: () => alert('Swiped up!'),
+    // onSwipedDown: () => alert('Swiped down!'),
+    preventDefaultTouchmoveEvent: true,
+    trackMouse: true
+  });
+
+  const longPressHandler = useLongPress(
+    (e) => {
+      e.preventDefault();      // 👈 blocks the synthetic click after touchend
+      e.stopPropagation();     // 👈 prevents bubbling
+
+      if (isMobile() && onLongPress) {
+        onLongPress(playlist, bulbOn);
+
+      }
+    },
+    {
+      // extra safety: cancel synthetic click entirely
+      captureEvent: true,       // ensures we get the raw event
+      cancelOnMovement: true,   // prevents misfires when finger moves
+    }
+  );
+
   return (
     playlist &&
-    <div className={selected ? 'playlists-row-selected' : 'playlists-row'} key={playlist.id} onClick={() => onClick && onClick(playlist.id)} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
+    <div id={id} {...longPressHandler()} {...swipeHandler} className={selected && !isMobile() ? 'playlists-row-selected' : 'playlists-row'} key={playlist.id} onClick={() => onClick && onClick(playlist.id)} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
       <table style={{ width: "100%" }}>
         <tbody>
           <tr>
             <td style={{ width: 20 }}>
-              <div className="playlists-image">
-                <img style={{ width: 30 }} src={playlist.images && playlist.images[2] ? playlist.images[2].url : playlist.images && playlist.images[0].url} />
-              </div>
+              {icon ? icon :
+                <div>
+                  <img className="playlists-image" src={playlist.images && playlist.images[2] ? playlist.images[2].url : playlist.images && playlist.images[0].url} />
+                </div>
+              }
+
+
             </td>
-            <td>
+            <td style={{ width: "70%" }}>
               <table style={{ width: "100%", padding: 4 }}>
                 <tbody>
                   <tr>
                     <td>
-                      <div className="playlists-name">
+                      <div className={isMobile() ? "playlists-name-mobile" : "playlist-name"}>
                         {playlist.name}
                       </div>
                     </td>
@@ -31,76 +64,82 @@ const PlaylistRow = ({ playlist, onClick, onDoubleClick, bulbOn, onBulbClick, se
                   </tr>
                   <tr>
                     <td colSpan={2}>
-                      <div className="playlists-count">
-                        {(playlist.count ? playlist.count : playlist.tracks.total) + " songs (" + playlist.tracks.filter(x => x.datePlayed).length + " played)"}
-                      </div>
+                      {album ?
+                        <div className="playlists-count" style={{ fontStyle: "italic", fontSize: 12 }}>
+                          {playlist.artists[0].name}
+                        </div> :
+                        <div className="playlists-count">
+                          {(playlist.count ? playlist.count : playlist.tracks.total) + " songs (" + playlist.tracks.filter(x => x.datePlayed).length + " played)"}
+                        </div>}
                     </td>
                   </tr>
                 </tbody>
               </table>
             </td>
-            <td className="playlists-bulb-container" onClick={(e) => { e.stopPropagation(); onBulbClick(playlist, bulbOn); }}>
-              {/* {true ?
-                <div className={bulbOn ? "check" : "bulbOff"} onClick={(e) => { e.stopPropagation(); onBulbClick(playlist, bulbOn) }}></div> :
-                null} */}
 
+
+            {/* {isMobile() ?
+              <td>
+                {true ?
+                  <div className={bulbCheckOn ? "check" : "bulbOff"} onClick={(e) => { e.stopPropagation(); onBulbCheckClick(playlist, bulbCheckOn) }}></div> :
+                  null}
+              </td> : null} */}
+
+            <td className="playlists-bulb-container" onClick={(e) => { e.stopPropagation(); onBulbClick(playlist, bulbOn); }}>
               {/* {bulbOn ? <ShuffleOn className="bulbOn"  onClick={(e) => { e.stopPropagation(); onBulbClick(playlist, bulbOn); }}></ShuffleOn> :
                 <Shuffle  className="bulbOff"  onClick={(e) => { e.stopPropagation(); onBulbClick(playlist, bulbOn); }}></Shuffle>} */}
-              <svg className={bulbOn ? "bulbOnColor" : "bulbOffColor"}
-                version="1.1"
-                id="Capa_1"
-                xmlns="http://www.w3.org/2000/svg"
-                xmlnsXlink="http://www.w3.org/1999/xlink"
-                viewBox="-6.03 -6.03 72.38 72.38"
-                width="32px"
-                height="32px"
-                fill="#010002"
-              >
-                <g id="SVGRepo_bgCarrier" strokeWidth="0" />
-                <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round" />
-                <g id="SVGRepo_iconCarrier">
+
+              <svg fill="#000000" className={bulbOn ? "bulbOnColor" : "bulbOffColor"} height="32px" width="32px" version="1.1" id="Layer_1"
+                viewBox="0 0 512.107 512.107"  >
+                <g>
                   <g>
-                    <g>
-                      <path
-                         className={bulbOn ? "bulbOnColor" : "bulbOffColor"}
-                        d="M27.038,22.108c0.103,0.133,0.213,0.244,0.326,0.346c0.11,3.194-0.193,8.194-0.337,9.745 
-               l8.946-0.057c0.016-0.164,0.264-2.842,0.359-5.912c0.566,0.49,1.137,0.978,1.699,1.475c1.887,1.664,4.256,0.003,3.935-2.29 
-               c-0.289-2.061-0.36-4.154-0.919-6.169c-0.744-2.681-4.618-1.851-4.624,0.569c-0.052-0.056-0.104-0.106-0.154-0.163 
-               c-0.101-0.113-0.203-0.202-0.308-0.289c-0.709-1.79-2.521-2.985-4.541-2.822c-0.758,0.061-1.456,0.31-2.056,0.693 
-               c-1.919-2.946-3.326-6.131-4.316-9.556c-0.844-2.914-5.238-1.223-4.399,1.676C21.984,13.973,24.097,18.295,27.038,22.108z"
-                      />
-                      <ellipse  className={bulbOn ? "bulbOnColor" : "bulbOffColor"} cx="11.113" cy="37.41" rx="2.772" ry="0.744" />
-                      <ellipse  className={bulbOn ? "bulbOnColor" : "bulbOffColor"} cx="27.263" cy="37.41" rx="2.773" ry="0.744" />
-                      <path
-                         className={bulbOn ? "bulbOnColor" : "bulbOffColor"}
-                        d="M59.56,33.174l-59.049-0.03L0,42.607l60.314,0.029L59.56,33.174z M11.389,39.1 
-               c-3.265,0-5.912-0.711-5.912-1.59c0-0.877,2.647-1.588,5.912-1.588c3.266,0,5.913,0.711,5.913,1.588 
-               C17.302,38.389,14.655,39.1,11.389,39.1z M27.263,39.1c-3.266,0-5.913-0.711-5.913-1.59c0-0.877,2.647-1.588,5.913-1.588 
-               c3.265,0,5.913,0.711,5.913,1.588C33.176,38.389,30.528,39.1,27.263,39.1z M37.793,39.832h-1.139v-5.163h1.139V39.832z 
-               M40.955,39.832h-1.14v-5.163h1.14V39.832z M44.371,39.832h-1.137v-5.163h1.137V39.832z M47.662,39.832h-1.14v-5.163h1.14V39.832z 
-               M50.827,39.832h-1.14v-5.163h1.14V39.832z M53.799,39.832H52.66v-5.163h1.139V39.832z"
-                      />
-                      <polygon className={bulbOn ? "bulbOnColor" : "bulbOffColor"} points="0.002,43.181 0.509,54.721 59.556,54.721 60.316,43.181" />
-                      <rect x="36.858" y="35.372" width="0.715" height="1.202" style={{ fill: '#010002' }} />
-                      <rect x="40.035" y="37.743" width="0.711" height="1.202" style={{ fill: '#010002' }} />
-                      <rect x="43.438" y="35.056" width="0.715" height="1.203" style={{ fill: '#010002' }} />
-                      <rect x="46.737" y="36.542" width="0.715" height="1.201" style={{ fill: '#010002' }} />
-                      <rect x="49.86" y="35.056" width="0.715" height="1.203" style={{ fill: '#010002' }} />
-                      <rect x="52.832" y="34.897" width="0.715" height="1.201" style={{ fill: '#010002' }} />
-                      <path
-                         className={bulbOn ? "bulbOnColor" : "bulbOffColor"}
-                        d="M28.756,14.262v0.041c0,0.558,0.454,1.011,1.013,1.011c0.545,0,0.986-0.432,1.009-0.97 
-               c0.783,1.562,2.506,2.519,4.328,2.247c1.391-0.206,2.516-1.082,3.102-2.25c0.021,0.54,0.465,0.973,1.012,0.973 
-               c0.561,0,1.012-0.453,1.012-1.011v-0.041c0.365,0,0.661-0.295,0.661-0.661v-2.645c0-0.364-0.296-0.662-0.661-0.662v-0.04 
-               c0-0.383-0.217-0.712-0.527-0.884c-0.723-2.189-2.779-3.775-5.207-3.775c-2.426,0-4.486,1.586-5.208,3.775 
-               c-0.313,0.172-0.53,0.501-0.53,0.884v0.04c-0.364,0-0.661,0.297-0.661,0.662v2.645C28.095,13.966,28.391,14.262,28.756,14.262z 
-               M34.493,6.607c1.881,0,3.49,1.168,4.15,2.814c-0.266,0.183-0.438,0.487-0.438,0.832v0.352c-0.787-1.558-2.504-2.512-4.324-2.241 
-               c-1.389,0.207-2.512,1.078-3.1,2.242v-0.353c0-0.345-0.175-0.649-0.438-0.832C31.002,7.775,32.614,6.607,34.493,6.607z"
-                      />
-                    </g>
+                    <path d="M384,133.338c-59.2,0-98.773,62.187-136.96,122.24c-35.2,55.253-71.573,112.427-119.04,112.427
+        c-58.88,0-106.667-47.787-106.667-106.667S69.12,154.671,128,154.671c46.827,0,75.2,39.467,83.733,53.333h-62.08
+        c-5.333,0-10.133,3.84-10.88,9.067c-0.96,6.613,4.16,12.267,10.56,12.267h85.333c5.867,0,10.667-4.8,10.667-10.667v-85.013
+        c0-5.333-3.84-10.133-9.067-10.88c-6.613-0.96-12.267,4.16-12.267,10.56v54.507c-14.613-20.587-46.293-54.613-96-54.613
+        C57.28,133.338,0,190.618,0,261.338s57.28,128,128,128c59.2,0,98.773-62.187,136.96-122.24
+        c35.2-55.253,71.467-112.427,119.04-112.427c58.88,0,106.667,47.787,106.667,106.667S442.88,368.005,384,368.005
+        c-56.96,0-85.653-46.187-86.827-48.107c-2.987-5.013-9.6-6.72-14.613-3.627c-5.013,3.093-6.72,9.6-3.627,14.613
+        c1.387,2.347,35.84,58.56,105.173,58.56c70.72,0,128-57.28,128-128C512.107,190.725,454.72,133.338,384,133.338z"/>
                   </g>
                 </g>
               </svg>
+
+              {/* <svg className={bulbOn ? "bulbOnColor" : "bulbOffColor"}  width="40px" height="40px" viewBox="0 0 104 104" version="1.1" >
+                <g id="3.Multimedia" stroke="none" stroke-width="1" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
+                  <g id="Multimedia-(Color)" transform="translate(-1898.000000, -903.000000)" stroke="#263238" stroke-width="3.5">
+                    <g id="50-multimeda-shuffle-mix" transform="translate(1900.000000, 905.000000)">
+                      <circle id="Layer-1"  cx="50" cy="50" r="50">
+
+                      </circle>
+                      <path d="M50.315918,50.9160156 L47.6176758,42.5 C46.2752571,38.3578644 40.7110735,35 35.1870117,35 L22,35" id="Layer-2">
+
+                      </path>
+                      <path d="M50,50 L52.4306641,57.5 C53.7730828,61.6421356 59.3372663,65 64.8613281,65 L74.8613281,65" id="Layer-3">
+
+                      </path>
+                      <path d="M46.4071159,60 C44.122084,62.9883429 39.6694969,65.1447465 35.2426757,65.1447465 L22,65.1447465" id="Layer-4">
+
+                      </path>
+                      <path d="M54,39.9039153 C56.3357877,37.0412346 60.6671632,35 64.9741488,35 L74.9741488,35" id="Layer-5">
+
+                      </path>
+                      <polyline id="Layer-6" points="70 59 80 65 70 71">
+
+                      </polyline>
+                      <polyline id="Layer-7" points="70 29 80 35 70 41">
+
+                      </polyline>
+                    </g>
+                  </g>
+                </g>
+              </svg> */}
+
+
+
+
+
+
             </td>
           </tr>
         </tbody>
