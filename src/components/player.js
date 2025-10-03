@@ -574,7 +574,6 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                                     </td>
                                                     <td style={{ textAlign: "left", padding: 10, width: "40px" }}>
                                                         <span>{formatTime(duration)}</span>
-
                                                     </td>
                                                 </tr>
                                                 <tr>

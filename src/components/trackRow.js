@@ -5,6 +5,7 @@ import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import { useLongPress } from 'use-long-press';
 import { useSwipeable } from 'react-swipeable';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
+import Marquee from 'react-fast-marquee';
 
 const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
@@ -135,11 +136,11 @@ const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMou
                                         <tr>
                                             <td>
 
-                                                <div className="song-artist" onClick={(e) =>{ onArtistClick && onArtistClick(track); e.stopPropagation(); e.preventDefault(); }}>
+                                                <span className="song-artist" onClick={(e) => { onArtistClick && onArtistClick(track); e.stopPropagation(); e.preventDefault(); }}>
                                                     {forInfo ? track && track.name :
                                                         track && track.artists && track.artists.map(a => a.name).join(", ")
                                                     }
-                                                </div>
+                                                </span>
                                             </td>
                                             {onAddToPlaylistButton ?
                                                 <td className='song-add-to-playlist' onClick={(e) => { e.stopPropagation(); onAddToPlaylistButton(track); }}>
@@ -152,15 +153,25 @@ const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMou
                                         {!forInfo ?
                                             <tr>
                                                 <td colSpan={2}>
-                                                    <div className="song-name">
+                                                    <span className="song-name">
+                                                        {/* {forPlayer ?
+                                                            <Marquee>{track.name}</Marquee>
+                                                            :
+                                                            track.name} */}
                                                         {track.name}
-                                                    </div>
+                                                    </span>
+                                                </td>
+                                            </tr> : null}
+                                        {!forInfo ?
+                                            <tr>
+                                                <td colSpan={2}>
                                                     <div className="song-release-date">
                                                         {track.album && track.album.release_date ? track.album.name : "Unknown album"}&nbsp;
                                                         ({track.album && track.album.release_date ? new Date(track.album.release_date).getFullYear() : "Unknown Release Date"})
                                                     </div>
                                                 </td>
                                             </tr> : null}
+
                                         <tr>
                                             <td colSpan={2}  >
                                                 <div className="song-release-date">

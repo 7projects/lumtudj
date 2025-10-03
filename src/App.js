@@ -889,7 +889,7 @@ function App() {
       await refreshAccessToken();
     }
 
-    startUniverse();
+    // startUniverse();
     addToHistory(track);
     setTrack(track);
     setSelectedTrack(track);
@@ -1337,7 +1337,9 @@ function App() {
 
 
   const onAlbumClick = async (album) => {
+    setLoadingTracks(true);
     let tracks = await api.getAlbumTracks(album.id);
+    setLoadingTracks(false);
     setTracks(tracks);
   }
 
@@ -1531,7 +1533,8 @@ function App() {
 
             {selectedArtist || loadingArtistInfo ?
               <div className='panel-dialog target' id="artist-info">
-
+              <div className="close-btn" onClick={() => {setSelectedArtist(null) }}>x</div>
+  
                 {loadingArtistInfo ? <div className='loader' style={{position: "absolute"}}></div> :
                   <>
                     <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
