@@ -6,7 +6,7 @@ import { useLongPress } from 'use-long-press';
 import { useSwipeable } from 'react-swipeable';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 
-const TrackRow = ({ track, forInfo, onClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const getTrackRowClass = () => {
         let clss = 'track-row';
@@ -135,7 +135,7 @@ const TrackRow = ({ track, forInfo, onClick, onDoubleClick, onMouseDown, index, 
                                         <tr>
                                             <td>
 
-                                                <div className="song-artist">
+                                                <div className="song-artist" onClick={(e) =>{ onArtistClick && onArtistClick(track); e.stopPropagation(); e.preventDefault(); }}>
                                                     {forInfo ? track && track.name :
                                                         track && track.artists && track.artists.map(a => a.name).join(", ")
                                                     }

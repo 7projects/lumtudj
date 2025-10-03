@@ -1206,7 +1206,7 @@ function App() {
           return isMobile() ?
             <TrackRow id={"tr" + tr.id} onLongPress={onTrackLongPress} onSwipedRight={() => onTrackSwippedRight(tr)} onPlClick={() => addToPlaylist(tr)} onContextMenu={handleContextMenu} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onClick={() => { setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
             :
-            <TrackRow id={"tr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+            <TrackRow id={"tr" + tr.id} onArtistClick={(tr)=>{ loadArtistInfo(tr); }} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
 
         }}
       />
@@ -1301,11 +1301,13 @@ function App() {
     setLoadingTracks(false);
   }
 
-  const [artist, setArtist] = useState();
-
-
+  const [selectedArtist, setSelectedArtist] = useState(null);
+  const [loadingArtistInfo, setLoadingArtistInfo] = useState(false);
 
   const loadArtistInfo = async (track) => {
+
+    setLoadingArtistInfo(true);
+    setSelectedArtist(null);
     const artistId = track?.artists?.[0]?.id;
     if (!artistId) return;
 
@@ -1321,12 +1323,13 @@ function App() {
       albums: albums
     };
 
-    setArtist(artist);
+    setSelectedArtist(artist);
+    setLoadingArtistInfo(false);
   }
 
   useEffect(() => {
     if (selectedTrack) {
-      loadArtistInfo(selectedTrack);
+      // loadArtistInfo(selectedTrack);
     }
   }, [selectedTrack]);
 
@@ -1526,46 +1529,48 @@ function App() {
               }}
             />
 
-            <div className='panel-dialog target' id="artist-info" >
-              <img className='artist-info-img' src={artist && artist.images && artist.images.length > 0 && artist.images[0].url} />
-              <div className='artist-info-name'>{artist && artist.name}</div>
+            {selectedArtist || loadingArtistInfo ?
+              <div className='panel-dialog target' id="artist-info">
 
-              <Tabs style={{ width: "100%" }}>
-                <TabList className="custom-tablist">
-                  <Tab className="custom-tab">
-                    Top Tracks
-                  </Tab>
-                  <Tab className="custom-tab">
-                    Albums
-                  </Tab>
-                </TabList>
+                {loadingArtistInfo ? <div className='loader' style={{position: "absolute"}}></div> :
+                  <>
+                    <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
+                    <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
+                    <Tabs style={{ width: "100%" }}>
+                      <TabList className="custom-tablist">
+                        <Tab className="custom-tab">
+                          Top Tracks
+                        </Tab>
+                        <Tab className="custom-tab">
+                          Albums
+                        </Tab>
+                      </TabList>
 
-                <TabPanel>
-                  {artist && artist.tracks.map((tr, index) => {
-                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                  })}
-                </TabPanel>
-                <TabPanel>
-                  {artist && artist.albums.map((a, index) => {
-                    return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
-                      <img
+                      <TabPanel>
+                        {selectedArtist && selectedArtist.tracks.map((tr, index) => {
+                          return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+                        })}
+                      </TabPanel>
+                      <TabPanel>
+                        {selectedArtist && selectedArtist.albums.map((a, index) => {
+                          return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
+                            <img
 
-                        className="artist-info-album-img"
-                        src={a.images && a.images[2] && a.images[2].url}
-                        alt={a.name}
-                      />
-                      <div className="artist-info-album-details">
-                        <div className="artist-info-album-name">{a.name}</div>
-                        <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
-                        <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
-                      </div>
-                    </div>
-                  })}
-                </TabPanel>
-              </Tabs>
+                              className="artist-info-album-img"
+                              src={a.images && a.images[2] && a.images[2].url}
+                              alt={a.name}
+                            />
+                            <div className="artist-info-album-details">
+                              <div className="artist-info-album-name">{a.name}</div>
+                              <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
+                              <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
+                            </div>
+                          </div>
+                        })}
+                      </TabPanel>
+                    </Tabs></>}
 
-
-            </div>
+              </div> : null}
 
             {menuPosition && (
               <div className="context-menu"
@@ -1704,7 +1709,7 @@ function App() {
 
 
                 : null} */}
-              <SpotifyPlayer onNext={nextTrack} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => setSelectedTrack(track)} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr) } locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
             </div>
           </div>
       )

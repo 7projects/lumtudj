@@ -12,6 +12,7 @@ export default function SpotifyPlayer({
   token,
   track,
   onClick,
+  onArtistClick,
   playlists,
   onNext,
   stateChanged
@@ -306,7 +307,7 @@ export default function SpotifyPlayer({
               <tbody>
                 <tr>
                   <td style={{ width: "30%", textAlign: "left" }}>
-                    <TrackRow playlists={playlists} forPlayer track={track} />
+                    <TrackRow playlists={playlists} onArtistClick={onArtistClick} forPlayer track={track} />
                   </td>
                   <td>
                     <table style={{ width: "100%" }}>

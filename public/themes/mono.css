@@ -938,6 +938,9 @@ code {
   font-weight: bold;
   font-size: 16px;
 }
+.song-artist:hover {
+  text-decoration: underline;
+}
 .song-duration {
   font-size: 10px;
   font-weight: bold;

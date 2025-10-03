@@ -590,12 +590,10 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                                             {/* <br></br>
                                                             player state: {playerState} */}
                                                             {/* <button className='player-button' onClick={resumeTrack}><RepeatIcon /></button>
-                                                        <button className='player-button' onClick={resumeTrack}><ShuffleIcon /></button>
-                                                        <button className='player-button' onClick={resumeTrack}><AutoFixHighIcon /></button> */}
+                                                            <button className='player-button' onClick={resumeTrack}><ShuffleIcon /></button>
+                                                            <button className='player-button' onClick={resumeTrack}><AutoFixHighIcon /></button> */}
 
                                                         </div>
-
-
                                                     </td>
                                                     <td>
 
