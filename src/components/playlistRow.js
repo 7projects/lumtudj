@@ -6,7 +6,7 @@ import { Shuffle } from '@mui/icons-material';
 import { useLongPress } from 'use-long-press';
 import { useSwipeable } from 'react-swipeable';
 
-const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick, selected, bulbCheckOn, onBulbCheckClick, icon, onLongPress, onSwipedLeft, onSwipedRight, album = false }) => {
+const PlaylistRow = ({ id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick, selected, bulbCheckOn, onBulbCheckClick, icon, onLongPress, onSwipedLeft, onSwipedRight, album = false }) => {
 
   const swipeHandler = useSwipeable({
     onSwipedLeft: () => { if (onSwipedLeft) onSwipedLeft() },
@@ -32,7 +32,7 @@ const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick,
       cancelOnMovement: true,   // prevents misfires when finger moves
     }
   );
- 
+
   return (
     playlist &&
     <div id={id} {...longPressHandler()} {...swipeHandler} className={selected ? 'item-row-selected' : 'item-row'} key={playlist.id} onClick={() => onClick && onClick(playlist.id)} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>

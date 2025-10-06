@@ -7,10 +7,11 @@ import { useSwipeable } from 'react-swipeable';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import Marquee from 'react-fast-marquee';
 
-const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const getTrackRowClass = () => {
         let clss = isMobile() ? 'item-row-mobile' : 'item-row';
+
 
         // if (playing)
         //     clss = 'track-row-selected track-row-playing'
@@ -21,6 +22,9 @@ const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMou
         if (forPlayer)
             clss = clss + " for-player";
 
+        if (forPlaylist)
+            clss = "";
+        
         return clss;
     }
 

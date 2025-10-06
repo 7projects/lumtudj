@@ -40,6 +40,80 @@ function useConstructor(callback) {
 
 }
 
+const ReorderableTrack = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={track}
+      dragListener={false}
+      dragControls={dragControls}
+      whileDrag={{ scale: 1.05 }}
+      layout="position"
+      className="p-3 bg-white rounded-lg shadow flex justify-between items-center"
+    >
+      <table style={{ width: "100%" }} className={isMobile() ? "item-row-mobile" : "item-row"}>
+        <tbody>
+          <tr>
+            {/* Main content cell */}
+            <td style={{ width: "auto" }}>
+              <TrackRow
+                track={track}
+                forInfo={forInfo}
+                onClick={onClick}
+                onArtistClick={onArtistClick}
+                onDoubleClick={onDoubleClick}
+                onMouseDown={onMouseDown}
+                index={index}
+                onDrop={onDrop}
+                selected={selected}
+                onContextMenu={onContextMenu}
+                playlists={playlists}
+                forPlaylist
+                forPlayer={forPlayer}
+                hideImage={hideImage}
+                playing={playing}
+                onPlClick={onPlClick}
+                id={id}
+                onAddToPlaylistButton={onAddToPlaylistButton}
+                onLongPress={onLongPress}
+                onSwipedLeft={onSwipedLeft}
+                onSwipedRight={onSwipedRight}
+              />
+            </td>
+
+            {/* Drag handle cell */}
+            <td
+              style={{
+                width: 40,
+                textAlign: "right",
+                verticalAlign: "middle",
+                display: isMobile() ? "table-cell" : "none",
+              }}
+            >
+              <motion.div
+                onPointerDown={(e) => dragControls.start(e)}
+                className="cursor-grab active:cursor-grabbing select-none"
+                style={{
+                  touchAction: "none",
+                  zIndex: 10,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  height: "100%",
+                }}
+              >
+                <DragHandleIcon />
+              </motion.div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </Reorder.Item>
+  );
+};
+
 function App() {
   const urlParams = new URLSearchParams(window.location.search)
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -1223,53 +1297,20 @@ function App() {
     </>
   }
 
-  const [playlist2, setPlaylist2] = React.useState([
-    { id: 1, name: "Track 1" },
-    { id: 2, name: "Track 2" },
-    { id: 3, name: "Track 3" },
-  ]);
-
   const getPlaylistPanel = () => {
-    // ✅ Nested component is fine
-    const ReorderableTrack = ({ tr }) => {
-      const dragControls = useDragControls();
-
-      return (
-        <Reorder.Item
-          value={tr} // must be the same object from playlist2
-          dragListener={false}
-          dragControls={dragControls}
-          whileDrag={{ scale: 1.05 }}
-          layout="position"
-          className="p-3 bg-white rounded-lg shadow flex justify-between items-center"
-        >
-          <span>{tr.name}</span>
-
-          <motion.div
-            onPointerDown={(e) => {
-              e.preventDefault();
-              dragControls.start(e);
-            }}
-            className="cursor-grab active:cursor-grabbing p-2 select-none"
-            style={{ touchAction: "none", zIndex: 10 }}
-          >
-            <DragHandleIcon />
-          </motion.div>
-        </Reorder.Item>
-      );
-    };
-
     return (
       <div className="p-4">
         <Reorder.Group
           axis="y"
-          values={playlist2} // ✅ must be the same object references
-          onReorder={setPlaylist2} // ✅ Framer Motion returns new order
-          className="list-none p-0 m-0 space-y-2 max-h-[70vh] overflow-y-auto"
+          values={playlist} // ✅ must be the same object references
+          onReorder={setPlaylist} // ✅ Framer Motion returns new order
+          className="reorder-group list-none p-0 m-0 space-y-2 max-h-[70vh] overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          {playlist2.map((tr) => (
-            <ReorderableTrack key={tr.id} tr={tr} />
+          {playlist.map((tr, index) => (
+            isMobile() ?
+              <ReorderableTrack key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+              <ReorderableTrack key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
           ))}
         </Reorder.Group>
       </div>
@@ -1567,7 +1608,7 @@ function App() {
                   {tab == 3 ? <td colSpan={6}>
                     {
 
-                      playlist2.length > 0 ?
+                      playlist.length > 0 ?
                         <div className='panel-playlist-mobile'>
                           {getPlaylistPanel()}
                         </div>
@@ -1725,11 +1766,14 @@ function App() {
                   getTracksPanel()
                 }
               </div>
-              <div className="panelss" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
+              <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
 
                 {
                   playlist.length > 0 ?
-                    getPlaylistPanel() :
+                    <div>
+                      {getPlaylistPanel()}
+                    </div>
+                    :
                     <div className='QueueMusicIcon'>
                       <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
 
