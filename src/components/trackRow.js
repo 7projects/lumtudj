@@ -10,13 +10,13 @@ import Marquee from 'react-fast-marquee';
 const TrackRow = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const getTrackRowClass = () => {
-        let clss = 'track-row';
+        let clss = isMobile() ? 'item-row-mobile' : 'item-row';
 
-        if (playing)
-            clss = 'track-row-selected track-row-playing'
+        // if (playing)
+        //     clss = 'track-row-selected track-row-playing'
 
         if (selected)
-            clss = 'track-row-selected'
+            clss = isMobile() ? 'item-row-selected-mobile' : "item-row-selected"
 
         if (forPlayer)
             clss = clss + " for-player";

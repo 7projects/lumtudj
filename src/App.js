@@ -1,5 +1,5 @@
 import logo from './logo.svg';
-import './App.css';
+
 import React, { useEffect, useState, useRef, cache } from "react";
 import axios from "axios";
 import Player from './components/player';
@@ -7,7 +7,7 @@ import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse } from './util';
-import { faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
+import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
 import Settings from '@mui/icons-material/Settings';
@@ -26,9 +26,10 @@ import PlaylistPicker from './components/playlistPicker';
 import AlbumIcon from '@mui/icons-material/Album';
 import SwipeRightIcon from '@mui/icons-material/SwipeRight';
 import SpotifyPlayer from './components/spotifyPlayer';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion";
 import Moveable from "react-moveable";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
+import DragHandleIcon from '@mui/icons-material/DragHandle';
 
 function useConstructor(callback) {
   const hasRun = useRef(false);
@@ -163,8 +164,8 @@ function App() {
     // }
 
     if (cachedPlaylists && cachedPlaylists.length > 0) {
-      setPlaylists(cachedPlaylists);
-      setFilteredPlaylists(cachedPlaylists);
+      setPlaylists([...cachedPlaylists]);
+      setFilteredPlaylists([...cachedPlaylists]);
     }
 
     if (cachedAlbums && cachedAlbums.length > 0) {
@@ -1061,6 +1062,10 @@ function App() {
     <path d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
   </svg>;
 
+  const myShazamTracksPlIconMobile = <svg fill="white" width="24px" height="24px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
+    <path d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
+  </svg>;
+
   const lastListenedPlIcon = <svg fill="white" width="32px" height="32px" viewBox="0 0 32 32" version="1.1" xmlns="http://www.w3.org/2000/svg">
     <path d="M12,24C5.4,24,0,18.6,0,12h2c0,5.5,4.5,10,10,10s10-4.5,10-10S17.5,2,12,2C8.4,2,5.1,3.9,3.3,7H8v2H0V1h2v4.4
      C4.2,2.1,8,0,12,0c6.6,0,12,5.4,12,12S18.6,24,12,24z M15.3,17.8L11,13.4V6h2v6.6l3.7,3.8L15.3,17.8z"/>
@@ -1109,20 +1114,20 @@ function App() {
 
   const getPlaylistsPanel = () => {
     return <>
-      {isMobile() ?
+      {isMobile() && false ?
         <>
           <PlaylistRow icon={myShazamTracksPlIcon} playlist={myShazamTracksPl} onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }} />
           <PlaylistRow icon={lastListenedPlIcon} playlist={lastListenedPl} onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }} />
           {/* <div className='playlist-divider-playlists'>PLAYLISTS</div> */}
         </> : null}
 
-      {!isMobile() ? <div className="input-search-wrapper">
+      {!isMobile() || true ? <div className="input-search-wrapper">
 
-        <input ref={inputRef} className="panel-input-search" placeholder="filter..." onFocus={(e) => e.target.select()} value={playlistsFilterText} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+        <input ref={inputRef} className="panel-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={playlistsFilterText} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
       </div> : null}
 
       <Virtuoso
-        className='panel-playlists'
+        className={isMobile() ? 'panel-playlists-mobile' : "panel-playlists"}
         style={{ marginTop: 5 }}
         totalCount={filteredPlaylists.length}
         initialTopMostItemIndex={playlistsScrollTop}
@@ -1132,9 +1137,9 @@ function App() {
         itemContent={(index) => {
           const p = filteredPlaylists[index];
           return isMobile() ?
-            <PlaylistRow onSwipedRight={() => addPlaylistToToPlaylist(p)} id={"tr" + p.id} onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { setCurrentTab("2"); getTracks(p.id); setSearchText(p.name); setSelectedPlaylistIndex(index) }} />
+            <PlaylistRow onSwipedRight={() => { return; addPlaylistToToPlaylist(p) }} id={"tr" + p.id} onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { setCurrentTab("2"); getTracks(p.id); setSearchText(p.name); setSelectedPlaylistIndex(index) }} />
             :
-            <PlaylistRow onSwipedRight={() => addPlaylistToToPlaylist(p)} id={"tr" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
+            <PlaylistRow onSwipedRight={() => { return; addPlaylistToToPlaylist(p) }} id={"tr" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
         }}
       />
 
@@ -1191,9 +1196,15 @@ function App() {
   }
 
   const getTracksPanel = () => {
-    return loadingTracks ? <div className='loader'></div> :
+    return loadingTracks ? <div className='loader'></div> : <>
+
+      {/* {!isMobile() ? <div className="input-search-wrapper">
+
+        <input ref={inputRef} className="panel-input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
+      </div> : null} */}
+
       <Virtuoso
-        className={isMobile() ? 'hideScrollbar' : ""}
+
         style={{ height: '100%' }}
         totalCount={tracks.length}
         initialTopMostItemIndex={isMobile() ? tracksScrollTop : 0}
@@ -1204,49 +1215,66 @@ function App() {
           const tr = tracks[index];
           if (!tr) return null;
           return isMobile() ?
-            <TrackRow id={"tr" + tr.id} onLongPress={onTrackLongPress} onSwipedRight={() => onTrackSwippedRight(tr)} onPlClick={() => addToPlaylist(tr)} onContextMenu={handleContextMenu} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onClick={() => { setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+            <TrackRow id={"tr" + tr.id} onLongPress={onTrackLongPress} onSwipedRight={() => { return; onTrackSwippedRight(tr) }} onPlClick={() => addToPlaylist(tr)} onContextMenu={handleContextMenu} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onClick={() => { setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
             :
-            <TrackRow id={"tr" + tr.id} onArtistClick={(tr)=>{ loadArtistInfo(tr); }} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-
+            <TrackRow id={"tr" + tr.id} onArtistClick={(tr) => { loadArtistInfo(tr); }} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
         }}
       />
+    </>
   }
+
+  const [playlist2, setPlaylist2] = React.useState([
+    { id: 1, name: "Track 1" },
+    { id: 2, name: "Track 2" },
+    { id: 3, name: "Track 3" },
+  ]);
 
   const getPlaylistPanel = () => {
+    // ✅ Nested component is fine
+    const ReorderableTrack = ({ tr }) => {
+      const dragControls = useDragControls();
 
-    return <Virtuoso
-      className={isMobile() ? 'hideScrollbar' : ""}
-      style={{ height: '100%' }}
-      totalCount={playlist.length}
-      initialTopMostItemIndex={playlistScrollTop}
-      rangeChanged={(range) => {
-        setPlaylistscrollTop(range.startIndex);
-      }}
-      itemContent={(index) => {
-        const tr = playlist[index];
-        return isMobile() ?
-          // id={tr.id + index}
-          <TrackRow id={"tr" + tr.id} onLongPress={onTrackLongPress} onSwipedRight={() => { removeTrackFromPlaylist(index, tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} />
-          :
-          <TrackRow playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+      return (
+        <Reorder.Item
+          value={tr} // must be the same object from playlist2
+          dragListener={false}
+          dragControls={dragControls}
+          whileDrag={{ scale: 1.05 }}
+          layout="position"
+          className="p-3 bg-white rounded-lg shadow flex justify-between items-center"
+        >
+          <span>{tr.name}</span>
 
-      }}
-    />
+          <motion.div
+            onPointerDown={(e) => {
+              e.preventDefault();
+              dragControls.start(e);
+            }}
+            className="cursor-grab active:cursor-grabbing p-2 select-none"
+            style={{ touchAction: "none", zIndex: 10 }}
+          >
+            <DragHandleIcon />
+          </motion.div>
+        </Reorder.Item>
+      );
+    };
 
-    return playlist && playlist.map((tr, index) => (
-      <div key={"pltrack" + index}>
-        {isMobile() ?
-          // <TrackRow hideImage playing={playPosition == "playlist" && playIndex == index && playState != "stopped"} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => onPlaylistTrackDoubleClick(tr, index)} /> :
-          // <TrackRow playing={playPosition == "playlist" && playIndex == index && playState != "stopped"} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
-
-          <TrackRow playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-          <TrackRow playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
-
-        }
+    return (
+      <div className="p-4">
+        <Reorder.Group
+          axis="y"
+          values={playlist2} // ✅ must be the same object references
+          onReorder={setPlaylist2} // ✅ Framer Motion returns new order
+          className="list-none p-0 m-0 space-y-2 max-h-[70vh] overflow-y-auto"
+          style={{ WebkitOverflowScrolling: "touch" }}
+        >
+          {playlist2.map((tr) => (
+            <ReorderableTrack key={tr.id} tr={tr} />
+          ))}
+        </Reorder.Group>
       </div>
-    ))
-  }
-
+    );
+  };
 
   const getLastListened = async () => {
 
@@ -1345,6 +1373,65 @@ function App() {
 
   return (
     <>
+      <Moveable
+        target={document.querySelector("#artist-info")}
+        draggable={true}
+        edge={false}
+
+        edgeDraggable={false}
+        startDragRotate={0}
+        throttleDragRotate={0}
+        renderDirections={[]}
+
+        onDrag={e => {
+          e.target.style.transform = e.transform;
+        }}
+      />
+
+      {selectedArtist || loadingArtistInfo ?
+        <div className='panel-dialog target' id="artist-info">
+          <div className="close-btn" onClick={() => { setSelectedArtist(null); setLoadingArtistInfo(false) }}>x</div>
+
+          {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
+            <>
+              <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
+              <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
+              <Tabs style={{ width: "100%" }}>
+                <TabList className="custom-tablist">
+                  <Tab className="custom-tab">
+                    Top Tracks
+                  </Tab>
+                  <Tab className="custom-tab">
+                    Albums
+                  </Tab>
+                </TabList>
+
+                <TabPanel>
+                  {selectedArtist && selectedArtist.tracks.map((tr, index) => {
+                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+                  })}
+                </TabPanel>
+                <TabPanel>
+                  {selectedArtist && selectedArtist.albums.map((a, index) => {
+                    return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
+                      <img
+
+                        className="artist-info-album-img"
+                        src={a.images && a.images[2] && a.images[2].url}
+                        alt={a.name}
+                      />
+                      <div className="artist-info-album-details">
+                        <div className="artist-info-album-name">{a.name}</div>
+                        <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
+                        <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
+                      </div>
+                    </div>
+                  })}
+                </TabPanel>
+              </Tabs></>}
+
+        </div> : null}
+
       <Snackbar
         message={snackbarMessage}
         show={snackbarMessage}
@@ -1403,9 +1490,9 @@ function App() {
                   <td className={tab == 1 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1) }}>
                     <PlaylistAddCheckIcon></PlaylistAddCheckIcon>
                   </td>
-                  <td className={tab == 1.5 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1.5) }}>
+                  {/* <td className={tab == 1.5 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1.5) }}>
                     <AlbumIcon></AlbumIcon>
-                  </td>
+                  </td> */}
                   <td className={tab == 2 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(2) }}>
                     <SearchIcon></SearchIcon>
                   </td>
@@ -1415,6 +1502,12 @@ function App() {
                   <td className='tab' onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     SHZM
                   </td> */}
+                  <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
+                    <HistoryIcon></HistoryIcon>
+                  </td>
+                  <td className='tab' onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
+                    {myShazamTracksPlIconMobile}
+                  </td>
                   <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
                     <PlaylistPlayIcon></PlaylistPlayIcon>
                   </td>
@@ -1424,7 +1517,7 @@ function App() {
 
                 </tr>
                 <tr>
-                  {tab == 1 ? <td colSpan={5} className='tab-panel'>
+                  {tab == 1 ? <td colSpan={6} className='tab-panel'>
                     <div className='panel-playlists-mobile'>
                       {loadingPlaylists ?
                         <>
@@ -1443,7 +1536,7 @@ function App() {
                     </div>
                   </td> : null}
 
-                  {tab == 1.5 ? <td colSpan={5} className='tab-panel'>
+                  {tab == 1.5 ? <td colSpan={6} className='tab-panel'>
                     <div className='panel-playlists-mobile'>
                       {loadingPlaylists ?
                         <>
@@ -1460,7 +1553,7 @@ function App() {
                     </div>
                   </td> : null}
 
-                  {tab == 2 ? <td colSpan={5} className='tab-panel'>
+                  {tab == 2 ? <td colSpan={6} className='tab-panel'>
 
                     <div className="input-search-wrapper">
                       <SearchIcon className="search-icon" />
@@ -1471,10 +1564,10 @@ function App() {
                     </div>
                   </td> : null}
 
-                  {tab == 3 ? <td colSpan={5}>
+                  {tab == 3 ? <td colSpan={6}>
                     {
 
-                      playlist.length > 0 ?
+                      playlist2.length > 0 ?
                         <div className='panel-playlist-mobile'>
                           {getPlaylistPanel()}
                         </div>
@@ -1489,7 +1582,7 @@ function App() {
                     }
                   </td> : null}
 
-                  {tab == 4 ? <td colSpan={5} className='tab-panel'>
+                  {tab == 4 ? <td colSpan={6} className='tab-panel'>
                     <button style={{ float: "right" }}>{time}</button>
                     <button style={{ float: "right" }} onClick={logout}>Logout</button>
                     <button style={{ float: "right" }} onClick={changeTheme}>Change theme</button>
@@ -1508,72 +1601,13 @@ function App() {
 
               {token ?
                 // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
-                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
 
                 : null}
             </div>
           </div >
           :
           <div className='layout' onMouseDown={closeMenu}>
-
-            <Moveable
-              target={document.querySelector("#artist-info")}
-              draggable={true}
-              edge={false}
-
-              edgeDraggable={false}
-              startDragRotate={0}
-              throttleDragRotate={0}
-              renderDirections={[]}
-
-              onDrag={e => {
-                e.target.style.transform = e.transform;
-              }}
-            />
-
-            {selectedArtist || loadingArtistInfo ?
-              <div className='panel-dialog target' id="artist-info">
-              <div className="close-btn" onClick={() => {setSelectedArtist(null) }}>x</div>
-  
-                {loadingArtistInfo ? <div className='loader' style={{position: "absolute"}}></div> :
-                  <>
-                    <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
-                    <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
-                    <Tabs style={{ width: "100%" }}>
-                      <TabList className="custom-tablist">
-                        <Tab className="custom-tab">
-                          Top Tracks
-                        </Tab>
-                        <Tab className="custom-tab">
-                          Albums
-                        </Tab>
-                      </TabList>
-
-                      <TabPanel>
-                        {selectedArtist && selectedArtist.tracks.map((tr, index) => {
-                          return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                        })}
-                      </TabPanel>
-                      <TabPanel>
-                        {selectedArtist && selectedArtist.albums.map((a, index) => {
-                          return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
-                            <img
-
-                              className="artist-info-album-img"
-                              src={a.images && a.images[2] && a.images[2].url}
-                              alt={a.name}
-                            />
-                            <div className="artist-info-album-details">
-                              <div className="artist-info-album-name">{a.name}</div>
-                              <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
-                              <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
-                            </div>
-                          </div>
-                        })}
-                      </TabPanel>
-                    </Tabs></>}
-
-              </div> : null}
 
             {menuPosition && (
               <div className="context-menu"
@@ -1652,7 +1686,6 @@ function App() {
                       <td style={{ width: 30, padding: 5 }}>
                         <img
                           src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
-
                           style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: 8 }}
                         />
                       </td>
@@ -1692,7 +1725,7 @@ function App() {
                   getTracksPanel()
                 }
               </div>
-              <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
+              <div className="panelss" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
 
                 {
                   playlist.length > 0 ?
@@ -1712,7 +1745,7 @@ function App() {
 
 
                 : null} */}
-              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr) } locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
             </div>
           </div>
       )

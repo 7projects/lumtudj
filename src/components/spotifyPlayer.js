@@ -6,6 +6,7 @@ import PauseCircleOutlineIcon from "@mui/icons-material/PauseCircleOutline";
 import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import Marquee from "react-fast-marquee";
+import { useLongPress } from 'use-long-press';
 
 export default function SpotifyPlayer({
   locked,
@@ -15,7 +16,8 @@ export default function SpotifyPlayer({
   onArtistClick,
   playlists,
   onNext,
-  stateChanged
+  stateChanged,
+  onLongPress
 }) {
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
@@ -122,6 +124,21 @@ export default function SpotifyPlayer({
       }
     };
   }, []);
+
+  const longPressHandler = useLongPress(
+    (e) => {
+      e.preventDefault();      // 👈 blocks the synthetic click after touchend
+      e.stopPropagation();     // 👈 prevents bubbling
+      if (isMobile() && onLongPress) {
+        onLongPress(track, e);
+      }
+    },
+    {
+      // extra safety: cancel synthetic click entirely
+      captureEvent: true,       // ensures we get the raw event
+      cancelOnMovement: true,   // prevents misfires when finger moves
+    }
+  );
 
   // Safe helper to get current state
   const getPlayerState = async () => {
@@ -232,7 +249,7 @@ export default function SpotifyPlayer({
   // Render mobile/desktop
   // -------------------------------
   return (
-    <div style={{ width: "100%", textAlign: "center", bottom: 0, position: "absolute" }} onClick={onClick}>
+    <div style={{ width: "100%", textAlign: "center", bottom: 0, position: "absolute" }} {...longPressHandler()} onClick={onClick}>
       {isMobile() ? (
         <table style={{ width: "100%", height: "100%" }}>
           <tbody>
@@ -301,51 +318,62 @@ export default function SpotifyPlayer({
           </tbody>
         </table>
       ) : (
-        <div style={{ textAlign: "center", width: "100%", display: "inline-block" }}>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: -10 }}>
+
+        <div className="parent">
+          <div className="div1">
+            <img
+              src={track && track.album && (track.album.images[2].url || track.album.images[1].url || track.album.images[0].url)}
+              style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: 8 }}
+            />
+          </div>
+          <div className="div2" style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
+            {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
+            {track && track.name}<br></br>
+            {playlists && playlists.map((p) =>
+              <div key={p.id} className='littleBulbOn'>
+
+              </div>
+            )
+            }
+          </div>
+          <div className="div3">
             <table style={{ width: "100%" }}>
               <tbody>
                 <tr>
-                  <td style={{ width: "30%", textAlign: "left" }}>
-                    <TrackRow playlists={playlists} onArtistClick={onArtistClick} forPlayer track={track} />
-                  </td>
+                  <td style={{ textAlign: "right", padding: 10, width: "40px" }}>{formatTime(position)}</td>
                   <td>
-                    <table style={{ width: "100%" }}>
-                      <tbody>
-                        <tr>
-                          <td style={{ textAlign: "right", padding: 10, width: "40px" }}>{formatTime(position)}</td>
-                          <td>
-                            <div className="player-progress-bar" id="progressBar" onClick={seek}>
-                              <div className="player-progress-bar-fill" style={{ width: `${(position / duration) * 100}%` }}></div>
-                            </div>
-                          </td>
-                          <td style={{ textAlign: "left", padding: 10, width: "40px" }}>{formatTime(duration)}</td>
-                        </tr>
-                        <tr>
-                          <td></td>
-                          <td>
-                            <div className="player-buttons">
-                              <div className="player-button" onClick={prev}><SkipPreviousIcon /></div>
-                              {paused ?
-                                <div className="player-button" onClick={resumeTrack}><PlayCircleOutlineIcon /></div> :
-                                <div className="player-button" onClick={pauseTrack}><PauseCircleOutlineIcon /></div>}
-                              <div className="player-button" onClick={next}><SkipNextIcon /></div>
-                            </div>
-                          </td>
-                          <td>
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div className="player-progress-bar" id="progressBar" onClick={seek}>
+                      <div className="player-progress-bar-fill" style={{ width: `${(position / duration) * 100}%` }}></div>
+                    </div>
                   </td>
-                  <td style={{ width: "30%", textAlign: "right", paddingRight: 20 }}>
-                    <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
-                  </td>
+                  <td style={{ textAlign: "left", padding: 10, width: "40px" }}>{formatTime(duration)}</td>
                 </tr>
               </tbody>
             </table>
           </div>
+          <div className="div4">
+            <div className="player-buttons">
+              <div className="player-button" onClick={prev}><SkipPreviousIcon /></div>
+              {paused ?
+                <div className="player-button" onClick={resumeTrack}><PlayCircleOutlineIcon /></div> :
+                <div className="player-button" onClick={pauseTrack}><PauseCircleOutlineIcon /></div>}
+              <div className="player-button" onClick={next}><SkipNextIcon /></div>
+            </div>
+          </div>
+          <div className="div5"> </div>
+          <div className="div6" style={{ paddingRight: 20 }}>
+            <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
+          </div>
+
+          {/* <Marquee style={{ fontSize: 73, position: "absolute", fontWeight: "bold", color: "#4545451c", zIndex: 1 }}>
+            {track && track.artists && track.artists.map(a => a.name).join(", ")}
+          </Marquee> */}
+
+
         </div>
+
+
+
       )}
     </div>
   );

@@ -24,7 +24,6 @@ const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick,
 
       if (isMobile() && onLongPress) {
         onLongPress(playlist, bulbOn);
-
       }
     },
     {
@@ -33,10 +32,10 @@ const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick,
       cancelOnMovement: true,   // prevents misfires when finger moves
     }
   );
-
+ 
   return (
     playlist &&
-    <div id={id} {...longPressHandler()} {...swipeHandler} className={selected && !isMobile() ? 'playlists-row-selected' : 'playlists-row'} key={playlist.id} onClick={() => onClick && onClick(playlist.id)} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
+    <div id={id} {...longPressHandler()} {...swipeHandler} className={selected ? 'item-row-selected' : 'item-row'} key={playlist.id} onClick={() => onClick && onClick(playlist.id)} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
       <table style={{ width: "100%" }}>
         <tbody>
           <tr>
@@ -46,8 +45,6 @@ const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick,
                   <img className="playlists-image" src={playlist.images && playlist.images[2] ? playlist.images[2].url : playlist.images && playlist.images[0].url} />
                 </div>
               }
-
-
             </td>
             <td style={{ width: "70%" }}>
               <table style={{ width: "100%", padding: 4 }}>
@@ -104,42 +101,6 @@ const PlaylistRow = ({id, playlist, onClick, onDoubleClick, bulbOn, onBulbClick,
                   </g>
                 </g>
               </svg>
-
-              {/* <svg className={bulbOn ? "bulbOnColor" : "bulbOffColor"}  width="40px" height="40px" viewBox="0 0 104 104" version="1.1" >
-                <g id="3.Multimedia" stroke="none" stroke-width="1" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
-                  <g id="Multimedia-(Color)" transform="translate(-1898.000000, -903.000000)" stroke="#263238" stroke-width="3.5">
-                    <g id="50-multimeda-shuffle-mix" transform="translate(1900.000000, 905.000000)">
-                      <circle id="Layer-1"  cx="50" cy="50" r="50">
-
-                      </circle>
-                      <path d="M50.315918,50.9160156 L47.6176758,42.5 C46.2752571,38.3578644 40.7110735,35 35.1870117,35 L22,35" id="Layer-2">
-
-                      </path>
-                      <path d="M50,50 L52.4306641,57.5 C53.7730828,61.6421356 59.3372663,65 64.8613281,65 L74.8613281,65" id="Layer-3">
-
-                      </path>
-                      <path d="M46.4071159,60 C44.122084,62.9883429 39.6694969,65.1447465 35.2426757,65.1447465 L22,65.1447465" id="Layer-4">
-
-                      </path>
-                      <path d="M54,39.9039153 C56.3357877,37.0412346 60.6671632,35 64.9741488,35 L74.9741488,35" id="Layer-5">
-
-                      </path>
-                      <polyline id="Layer-6" points="70 59 80 65 70 71">
-
-                      </polyline>
-                      <polyline id="Layer-7" points="70 29 80 35 70 41">
-
-                      </polyline>
-                    </g>
-                  </g>
-                </g>
-              </svg> */}
-
-
-
-
-
-
             </td>
           </tr>
         </tbody>

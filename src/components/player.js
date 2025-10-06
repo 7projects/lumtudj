@@ -602,7 +602,6 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                         </table>
                                     </td>
                                     <td style={{ width: "30%", textAlign: "right", paddingRight: 20 }}>
-
                                         <input
                                             type="range"
                                             min={0}
@@ -614,7 +613,6 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                             }}
                                             style={{ width: '100%', maxWidth: '120px' }}
                                         />
-
                                     </td>
                                 </tr>
                             </tbody>
