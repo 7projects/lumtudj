@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 
-import React, { useEffect, useState, useRef, cache } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import Player from './components/player';
 import TrackRow from './components/trackRow';
@@ -30,6 +30,8 @@ import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion
 import Moveable from "react-moveable";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
+// import { unstable_Activity, Activity as ActivityStable } from 'react';
+
 
 function useConstructor(callback) {
   const hasRun = useRef(false);
@@ -115,6 +117,8 @@ const ReorderableTrack = ({ track, forInfo, onClick, onArtistClick, onDoubleClic
 };
 
 function App() {
+  const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
+
   const urlParams = new URLSearchParams(window.location.search)
   const [token, setToken] = useState(localStorage.getItem("token"));
   // const [token, setToken] = useState(false);
@@ -168,13 +172,13 @@ function App() {
 
   const [showingPlaylistPicker, setShowingPlaylistPicker] = useState(false);
 
-  const [albumsScrollTop, setAlbumsScrollTop] = useState(0);
+  // const [albumsScrollTop, setAlbumsScrollTop] = useState(0);
 
-  const [tracksScrollTop, setTracksScrollTop] = useState(0);
+  // const [tracksScrollTop, setTracksScrollTop] = useState(0);
 
-  const [playlistsScrollTop, setPlaylistsScrollTop] = useState(0);
+  // const [playlistsScrollTop, setPlaylistsScrollTop] = useState(0);
 
-  const [playlistScrollTop, setPlaylistscrollTop] = useState(0);
+  // const [playlistScrollTop, setPlaylistscrollTop] = useState(0);
 
   const inputBuffer = useRef();
 
@@ -1204,10 +1208,10 @@ function App() {
         className={isMobile() ? 'panel-playlists-mobile' : "panel-playlists"}
         style={{ marginTop: 5 }}
         totalCount={filteredPlaylists.length}
-        initialTopMostItemIndex={playlistsScrollTop}
-        rangeChanged={(range) => {
-          setPlaylistsScrollTop(range.startIndex);
-        }}
+        // initialTopMostItemIndex={playlistsScrollTop}
+        // rangeChanged={(range) => {
+        //   setPlaylistsScrollTop(range.startIndex);
+        // }}
         itemContent={(index) => {
           const p = filteredPlaylists[index];
           return isMobile() ?
@@ -1238,10 +1242,10 @@ function App() {
       className={isMobile() ? 'hideScrollbar' : ""}
       style={{ height: '100%' }}
       totalCount={albums.length}
-      initialTopMostItemIndex={albumsScrollTop}
-      rangeChanged={(range) => {
-        setAlbumsScrollTop(range.startIndex);
-      }}
+      // initialTopMostItemIndex={albumsScrollTop}
+      // rangeChanged={(range) => {
+      //   setAlbumsScrollTop(range.startIndex);
+      // }}
       itemContent={(index) => {
         const p = albums[index];
         return isMobile() ?
@@ -1281,10 +1285,10 @@ function App() {
 
         style={{ height: '100%' }}
         totalCount={tracks.length}
-        initialTopMostItemIndex={isMobile() ? tracksScrollTop : 0}
-        rangeChanged={(range) => {
-          setTracksScrollTop(range.startIndex);
-        }}
+        // initialTopMostItemIndex={isMobile() ? tracksScrollTop : 0}
+        // rangeChanged={(range) => {
+        //   setTracksScrollTop(range.startIndex);
+        // }}
         itemContent={(index) => {
           const tr = tracks[index];
           if (!tr) return null;
@@ -1555,74 +1559,68 @@ function App() {
                   <td className={tab == 4 ? 'tab-selected' : 'tab'} style={{ width: 40 }} onClick={() => { setCurrentTab(4) }}>
                     <Settings style={{ color: "white" }}></Settings>
                   </td>
-
                 </tr>
                 <tr>
-                  {tab == 1 ? <td colSpan={6} className='tab-panel'>
-                    <div className='panel-playlists-mobile'>
-                      {loadingPlaylists ?
-                        <>
-                          <div className="loader-text">{loadingPlaylistsText}</div>
-                          <div className='loader'>
+                  <td colSpan={6} className='tab-panel'>
+                    <Activity mode={tab == "1" ? "visible" : "hidden"}>
+                      <div className='panel-playlists-mobile'>
+                        {loadingPlaylists ?
+                          <>
+                            <div className="loader-text">{loadingPlaylistsText}</div>
+                            <div className='loader'>
 
+                            </div>
+                          </>
+                          :
+                          <>
+                            {getPlaylistsPanel()}
+                            {/* {getAlbumsPanel()} */}
+                          </>}
+                      </div>
+                    </Activity>
+                    <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
+                      <div className='panel-playlists-mobile'>
+                        {loadingPlaylists ?
+                          <>
+                            <div className="loader-text">{loadingPlaylistsText}</div>
+                            <div className='loader'>
+
+                            </div>
+                          </>
+                          :
+                          <>
+                            {getAlbumsPanel()}
+                          </>}
+                      </div>
+                    </Activity>
+
+                    <Activity mode={tab == "2" ? "visible" : "hidden"}>
+                      <div className="input-search-wrapper">
+                        <SearchIcon className="search-icon" />
+                        <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
+                      </div>
+                      <div className="panel-search-mobile">
+                        {getTracksPanel()}
+                      </div>
+                    </Activity>
+
+                    <Activity mode={tab == "3" ? "visible" : "hidden"}>
+
+                      {
+                        playlist.length > 0 ?
+                          <div className='panel-playlist-mobile'>
+                            {getPlaylistPanel()}
                           </div>
-                        </>
-                        :
-                        <>
-                          {getPlaylistsPanel()}
+                          :
+                          <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
+                            <SwipeRightIcon style={{ fontSize: 50 }}></SwipeRightIcon>
 
-                          {/* {getAlbumsPanel()} */}
-                        </>}
-
-                    </div>
-                  </td> : null}
-
-                  {tab == 1.5 ? <td colSpan={6} className='tab-panel'>
-                    <div className='panel-playlists-mobile'>
-                      {loadingPlaylists ?
-                        <>
-                          <div className="loader-text">{loadingPlaylistsText}</div>
-                          <div className='loader'>
-
+                            <div style={{ fontSize: 20 }}>swipe right song<br></br> to add to queue</div>
                           </div>
-                        </>
-                        :
-                        <>
-                          {getAlbumsPanel()}
-                        </>}
+                      }
 
-                    </div>
-                  </td> : null}
-
-                  {tab == 2 ? <td colSpan={6} className='tab-panel'>
-
-                    <div className="input-search-wrapper">
-                      <SearchIcon className="search-icon" />
-                      <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
-                    </div>
-                    <div className="panel-search-mobile">
-                      {getTracksPanel()}
-                    </div>
-                  </td> : null}
-
-                  {tab == 3 ? <td colSpan={6}>
-                    {
-
-                      playlist.length > 0 ?
-                        <div className='panel-playlist-mobile'>
-                          {getPlaylistPanel()}
-                        </div>
-                        :
-                        <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
-                          <SwipeRightIcon style={{ fontSize: 50 }}></SwipeRightIcon>
-
-                          <div style={{ fontSize: 20 }}>swipe right song<br></br> to add to queue</div>
-                        </div>
-
-
-                    }
-                  </td> : null}
-
+                    </Activity>
+                  </td>
                   {tab == 4 ? <td colSpan={6} className='tab-panel'>
                     <button style={{ float: "right" }}>{time}</button>
                     <button style={{ float: "right" }} onClick={logout}>Logout</button>
@@ -1636,7 +1634,7 @@ function App() {
                 </tr>
 
               </tbody>
-            </table>
+            </table >
 
             <div className='footer-mobile player'>
 
