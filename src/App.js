@@ -6,7 +6,7 @@ import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
-import { loadThemeCSS, isMobile, fullscreen, startUniverse } from './util';
+import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid } from './util';
 import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
@@ -784,8 +784,11 @@ function App() {
 
   const addToPlaylist = (track, position) => {
 
+
+    let newTrack = {...track};
+
     if (isMobile())
-      flyToPlaylist(track);
+      flyToPlaylist(newTrack);
 
     let pl = [...playlist];
     if (dragSource == "playlist") {
@@ -794,29 +797,31 @@ function App() {
       } else {
         pl.splice(dragTrackIndex, 1);
       }
-
     }
 
+    newTrack.uid = newGuid();
+
     if (position || position == 0) {
-      pl.splice(position, 0, track);
+      pl.splice(position, 0, newTrack);
       setPlaylist(pl);
     }
     else {
-      pl.push(track);
+      pl.push(newTrack);
       setPlaylist(pl);
     }
 
     // if (isMobile()) {
     //   setSnackbarMessage("Added to  queue");
     // }
+
+    console.log(pl);
   };
 
   const addPlaylistToToPlaylist = (pl) => {
     if (isMobile())
       flyToPlaylist(pl);
 
-
-
+    pl.tracks.map(x => x.uid = newGuid());
 
     let pls = [...playlist, ...pl.tracks];
     setPlaylist(pls);
@@ -1301,7 +1306,7 @@ function App() {
     </>
   }
 
-  const getPlaylistPanel = () => {
+  const getPlaylistPanel = (pl) => {
     return (
       <div className="p-4">
         <Reorder.Group
@@ -1311,10 +1316,10 @@ function App() {
           className="reorder-group list-none p-0 m-0 space-y-2 max-h-[70vh] overflow-y-auto"
           style={{ WebkitOverflowScrolling: "touch" }}
         >
-          {playlist.map((tr, index) => (
+          {pl.map((tr, index) => (
             isMobile() ?
-              <ReorderableTrack key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-              <ReorderableTrack key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+              <ReorderableTrack key={tr.uid} pl={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+              <ReorderableTrack key={tr.uid} pl={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.id + index} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
           ))}
         </Reorder.Group>
       </div>
@@ -1609,7 +1614,7 @@ function App() {
                       {
                         playlist.length > 0 ?
                           <div className='panel-playlist-mobile'>
-                            {getPlaylistPanel()}
+                            {getPlaylistPanel(playlist)}
                           </div>
                           :
                           <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
