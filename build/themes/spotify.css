@@ -580,7 +580,6 @@ body {
   font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #222222;
   user-select: none;
   /* Standard */
   -webkit-user-select: none;
@@ -588,7 +587,7 @@ body {
   -moz-user-select: none;
   /* Firefox */
   -ms-user-select: none;
-  background-color: #353535;
+  background-color: #000000;
 }
 ::-webkit-scrollbar-corner {
   background: #1e1e1e;
@@ -604,7 +603,7 @@ body {
   background-size: cover;
   background-position: center;
   z-index: -1;
-  fill: #252525;
+  fill: #030303;
 }
 table,
 th,
@@ -626,8 +625,8 @@ td {
 }
 .context-menu {
   position: absolute;
-  background: #222222;
-  border: 1px solid #363636;
+  background: #000000;
+  border: 1px solid #161616;
   z-index: 1000;
   border-radius: 4px;
 }
@@ -638,7 +637,7 @@ td {
   border-radius: 4px;
 }
 .context-menu div:hover {
-  background-color: #3c3c3c;
+  background-color: #1a1a1a;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -665,7 +664,7 @@ code {
 }
 .footer {
   height: 100px;
-  background-color: #222222;
+  background-color: #000000;
   color: white;
   display: flex;
   align-items: center;
@@ -675,7 +674,7 @@ code {
 .panel {
   flex: 1 1 0;
   padding: 1px;
-  background-color: #2f2f2f;
+  background-color: #0d0d0d;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
@@ -686,7 +685,7 @@ code {
   overflow-y: auto;
   overflow-x: hidden;
   padding: 1px;
-  background-color: #2f2f2f;
+  background-color: #0d0d0d;
   width: 50%;
   text-wrap: auto;
   border-radius: 10px;
@@ -728,7 +727,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -743,11 +742,11 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
-  background-color: #484848;
+  background-color: #262626;
 }
 .playlists-row-mobile {
   background-color: transparent;
@@ -912,7 +911,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -928,7 +927,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -944,7 +943,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -961,7 +960,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -978,7 +977,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -993,11 +992,11 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
-  background-color: rgba(72, 72, 72, 0.2);
+  background-color: rgba(38, 38, 38, 0.2);
 }
 .track-row-playing {
   align-items: center;
@@ -1009,7 +1008,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #363636;
+  border-bottom: 1px solid #161616;
   background-color: transparent;
   color: #f1f1f1;
   cursor: pointer;
@@ -1178,9 +1177,9 @@ input[type="range"]::-webkit-slider-runnable-track {
   height: 40px;
 }
 button {
-  background-color: #3a3a3a;
+  background-color: #070707;
   border-radius: 5px;
-  border: 1px solid #212121;
+  border: 1px solid #000000;
   display: inline-block;
   cursor: pointer;
   color: #ffffff;
@@ -1191,7 +1190,7 @@ button {
   margin: 2px;
 }
 button:hover {
-  background-color: #545454;
+  background-color: #212121;
 }
 button:active {
   position: relative;
@@ -1240,7 +1239,7 @@ button:active {
   color: #e2e2e2;
 }
 .player-button:hover {
-  background-color: #272727;
+  background-color: #121212;
 }
 .player-button-mobile {
   margin: 0px;
@@ -1427,7 +1426,7 @@ button:active {
   border-radius: 5px;
 }
 .player {
-  background-color: #151515;
+  background-color: #000000;
   color: #e2e2e2;
   /* Background color */
   /* Space between lines */
@@ -1456,8 +1455,8 @@ button:active {
 }
 .selected-track-bulb-off {
   display: inline-block;
-  background-color: #3a3a3a;
-  border: 1px solid #212121;
+  background-color: #070707;
+  border: 1px solid #000000;
   color: #ffffff;
   margin: 2px;
   border-radius: 5px;
@@ -1466,7 +1465,7 @@ button:active {
   cursor: pointer;
 }
 .selected-track-bulb-off:hover {
-  background-color: #545454;
+  background-color: #212121;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root {
   color: #ffffff;
@@ -1542,11 +1541,11 @@ button:active {
   margin-left: 5px;
 }
 .player-progress-bar {
-  background-color: #030303;
+  background-color: #000000;
   width: 100%;
   height: 15px;
   border-radius: 5px 5px 5px 5px;
-  background-image: linear-gradient(to right, #484848 1px, #151515 1px), linear-gradient(to bottom, #484848 1px, #151515 1px);
+  background-image: linear-gradient(to right, #333333 1px, #000000 1px), linear-gradient(to bottom, #333333 1px, #000000 1px);
   background-size: 2px 2px;
   cursor: pointer;
   /* Space between lines */
@@ -1555,7 +1554,7 @@ button:active {
   background-color: #1ed760;
   height: 15px;
   border-radius: 5px 5px 5px 5px;
-  background-image: linear-gradient(to right, #1ed760 1px, #151515 1px), linear-gradient(to bottom, #1ed760 1px, #151515 1px);
+  background-image: linear-gradient(to right, #1ed760 1px, #000000 1px), linear-gradient(to bottom, #1ed760 1px, #000000 1px);
   background-size: 2px 2px;
   /* Space between lines */
 }
@@ -1586,7 +1585,7 @@ button:active {
   margin-top: -4px;
 }
 .top-bar-mobile {
-  background-color: #3a3a3a;
+  background-color: #070707;
   height: 20px;
   border-radius: 5px 5px 5px 5px;
   padding: 5px;
@@ -1658,23 +1657,23 @@ button:active {
 }
 .tab {
   color: #ffffff;
-  background-color: #3a3a3a;
+  background-color: #070707;
   text-align: center;
   height: 40px;
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #212121;
+  border: 1px solid #000000;
 }
 .tab-selected {
   color: #ffffff;
-  background-color: #3a3a3a;
+  background-color: #070707;
   text-align: center;
   height: 40px;
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #212121;
+  border: 1px solid #000000;
   color: #505050;
   background-color: #1ed760;
 }
@@ -1695,11 +1694,11 @@ button:active {
   outline: none;
   border: 1px solid #292929;
   color: #ffffff;
-  background-color: #3a3a3a;
+  background-color: #070707;
   height: 40px;
   font-size: 20px;
   border-radius: 10px;
-  border: 1px solid #212121;
+  border: 1px solid #000000;
 }
 .panel-input-search {
   width: 100%;
@@ -1712,9 +1711,9 @@ button:active {
   font-family: Doto;
   box-sizing: border-box;
   color: #ffffff;
-  background-color: #2f2f2f;
+  background-color: #0d0d0d;
   outline: none;
-  border: 1px solid #292929;
+  border: 1px solid #0e0e0e;
   border-radius: 10px 10px 0px 0px;
 }
 .input-search:focus::placeholder {
@@ -1744,7 +1743,7 @@ button:active {
   /* space between buttons */
 }
 .player {
-  background: radial-gradient(ellipse at bottom, #1e1e1e 0%, #515151 100%);
+  background: radial-gradient(ellipse at bottom, #000000 0%, #111111 100%);
   overflow: hidden;
 }
 #stars {
@@ -1878,16 +1877,16 @@ button:active {
 }
 .playlist-divider {
   color: #ffffff;
-  background-color: #3a3a3a;
+  background-color: #070707;
 }
 .playlist-divider-playlists {
   color: #ffffff;
-  background-color: #3a3a3a;
+  background-color: #070707;
   background-color: #893e22;
 }
 .playlist-divider-albums {
   color: #ffffff;
-  background-color: #3a3a3a;
+  background-color: #070707;
   background-color: #225589;
 }
 .hideScrollbar {

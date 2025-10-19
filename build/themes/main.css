@@ -1715,7 +1715,7 @@ button:active {
   color: #ffffff;
   background-color: #202020;
   outline: none;
-  border: 1px solid #292929;
+  border: 1px solid #0e0e0e;
   border-radius: 10px 10px 0px 0px;
 }
 .input-search:focus::placeholder {
