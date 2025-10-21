@@ -30,8 +30,26 @@ import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion
 import Moveable from "react-moveable";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
-// import { unstable_Activity, Activity as ActivityStable } from 'react';
+import { useLongPress } from 'use-long-press';
 
+// import { unstable_Activity, Activity as ActivityStable } from 'react';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  useSortable,
+  rectSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 function useConstructor(callback) {
   const hasRun = useRef(false);
@@ -93,20 +111,7 @@ const ReorderableTrack = ({ track, forInfo, onClick, onArtistClick, onDoubleClic
                 display: isMobile() ? "table-cell" : "none",
               }}
             >
-              <motion.div
-                onPointerDown={(e) => dragControls.start(e)}
-                className="cursor-grab active:cursor-grabbing select-none"
-                style={{
-                  touchAction: "none",
-                  zIndex: 10,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  height: "100%",
-                }}
-              >
-                <DragHandleIcon />
-              </motion.div>
+
             </td>
           </tr>
         </tbody>
@@ -191,6 +196,19 @@ function App() {
   let timer = null;
 
   const TIME_LIMIT = 5000; // 5 seconds
+
+  const longPressHandler = useLongPress(
+    (e) => {
+      e.preventDefault();      // 👈 blocks the synthetic click after touchend
+      e.stopPropagation();     // 👈 prevents bubbling
+      window.location.href = 'intent://#Intent;package=com.shazam.android;scheme=shazam;end';
+    },
+    {
+      // extra safety: cancel synthetic click entirely
+      captureEvent: true,       // ensures we get the raw event
+      cancelOnMovement: true,   // prevents misfires when finger moves
+    }
+  );
 
   function formatTime(ms) {
     if (ms <= 0) return "00:00";
@@ -1288,51 +1306,83 @@ function App() {
     setShowPlaylistPicker(true);
   }
 
+  const sensors = useSensors(
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 150,
+        tolerance: 5,
+      },
+    }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    })
+  );
+
+  function handleDragEnd(event) {
+    const { active, over } = event;
+    if (!over) return;
+    if (active.id !== over.id) {
+      const oldIndex = tracks.findIndex((i) => i.id === active.id);
+      const newIndex = tracks.findIndex((i) => i.id === over.id);
+      setTracks((prev) => arrayMove(prev, oldIndex, newIndex));
+    }
+  }
+
   const getTracksPanel = () => {
     return loadingTracks ? <div className='loader'></div> : <>
+      <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd} modifiers={[restrictToVerticalAxis]}>
+        <SortableContext items={(tracks || []).map((i) => i.id)} strategy={rectSortingStrategy}>
+          <Virtuoso
+            style={{ height: '100%' }}
+            totalCount={tracks.length}
+            itemContent={(index) => {
+              const tr = tracks[index];
+              if (!tr) return null;
 
-      {/* {!isMobile() ? <div className="input-search-wrapper">
+              return isMobile() ?
+                <SortableItem id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+                <SortableItem id={tr.id} key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
 
-        <input ref={inputRef} className="panel-input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
-      </div> : null} */}
-
-      <Virtuoso
-
-        style={{ height: '100%' }}
-        totalCount={tracks.length}
-        // initialTopMostItemIndex={isMobile() ? tracksScrollTop : 0}
-        // rangeChanged={(range) => {
-        //   setTracksScrollTop(range.startIndex);
-        // }}
-        itemContent={(index) => {
-          const tr = tracks[index];
-          if (!tr) return null;
-          return isMobile() ?
-            <TrackRow id={"tr" + tr.id} onLongPress={onTrackLongPress} onSwipedRight={() => { return; onTrackSwippedRight(tr) }} onPlClick={() => addToPlaylist(tr)} onContextMenu={handleContextMenu} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onClick={() => { setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-            :
-            <TrackRow id={"tr" + tr.id} onArtistClick={(tr) => { loadArtistInfo(tr); }} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedTrackIndex} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrackIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-        }}
-      />
+            }}
+          />
+        </SortableContext>
+      </DndContext>
     </>
+  }
+
+  function handleDragEnd2(event) {
+    const { active, over } = event;
+    if (!over) return;
+    if (active.id !== over.id) {
+      const oldIndex = playlistTracks.findIndex((i) => i.id === active.id);
+      const newIndex = playlistTracks.findIndex((i) => i.id === over.id);
+      setTracks((prev) => arrayMove(prev, oldIndex, newIndex));
+    }
   }
 
   const getPlaylistPanel = (pl, callback) => {
     return (
-      <div className="p-4">
-        <Reorder.Group
-          axis="y"
-          values={pl} // ✅ must be the same object references
-          onReorder={callback} // ✅ Framer Motion returns new order
-          className="reorder-group list-none p-0 m-0 space-y-2 max-h-[70vh] overflow-y-auto"
-          style={{ WebkitOverflowScrolling: "touch" }}
-        >
-          {pl.map((tr, index) => (
-            isMobile() ?
-              <ReorderableTrack onSwipedRight={() => { addToPlaylist(tr) }} key={tr.uid} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.uid} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-              <ReorderableTrack key={tr.uid} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} id={tr.uid} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
-          ))}
-        </Reorder.Group>
-      </div>
+      <>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd2} modifiers={[restrictToVerticalAxis]}>
+          <SortableContext items={(playlistTracks || []).map((i) => i.id)} strategy={rectSortingStrategy}>
+            <Virtuoso
+              style={{ height: '100%' }}
+              totalCount={playlistTracks.length}
+              itemContent={(index) => {
+                const tr = playlistTracks[index];
+                if (!tr) return null;
+
+                return isMobile() ?
+                  <SortableItem id={tr.id} value={tr.name} key={tr.id} onSwipedRight={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+                  <SortableItem id={tr.id} value={tr.name} key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+              }}
+            />
+          </SortableContext>
+        </DndContext>
+      </>
+
     );
   };
 
@@ -1572,7 +1622,7 @@ function App() {
                   <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
                     <HistoryIcon></HistoryIcon>
                   </td>
-                  <td className='tab' onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
+                  <td className='tab' {...longPressHandler()} onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     {myShazamTracksPlIconMobile}
                   </td>
                   <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
@@ -1835,6 +1885,90 @@ function App() {
       }
     </>
 
+  );
+}
+
+const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 999 : undefined,
+  };
+
+  return (
+    <li ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`}>
+      <table style={{ width: "100%" }} className={isMobile() ? "item-row-mobile" : "item-row"}>
+        <tbody>
+          <tr>
+            {/* Main content cell */}
+            <td style={{ width: "auto" }}>
+              <TrackRow
+                track={track}
+                forInfo={forInfo}
+                onClick={onClick}
+                onArtistClick={onArtistClick}
+                onDoubleClick={onDoubleClick}
+                onMouseDown={onMouseDown}
+                index={index}
+                onDrop={onDrop}
+                selected={selected}
+                onContextMenu={onContextMenu}
+                playlists={playlists}
+                forPlaylist
+                forPlayer={forPlayer}
+                hideImage={hideImage}
+                playing={playing}
+                onPlClick={onPlClick}
+                id={id}
+                onAddToPlaylistButton={onAddToPlaylistButton}
+                onLongPress={onLongPress}
+                onSwipedLeft={onSwipedLeft}
+                onSwipedRight={onSwipedRight}
+              />
+            </td>
+
+            {/* Drag handle cell */}
+            <td
+              style={{
+                touchAction: "none",
+                width: 40,
+                textAlign: "right",
+                verticalAlign: "middle",
+                display: isMobile() || true ? "table-cell" : "none",
+
+              }}
+              {...attributes}
+              {...listeners}
+            >
+              <GripIcon />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+    </li>
+  );
+}
+
+function GripIcon() {
+  return (
+    <svg
+      viewBox="0 0 20 20"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="grip-icon"
+      aria-hidden
+    >
+      <path
+        d="M7 6h.01M7 10h.01M7 14h.01M13 6h.01M13 10h.01M13 14h.01"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 

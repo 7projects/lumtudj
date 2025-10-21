@@ -15,7 +15,7 @@ const getToken = async () => {
 }
 
 function shouldRefreshToken() {
-  if (tokenExpirationTimeLeft() <= 900000) { // 15min prije isteka refreshaj token! 3540000 - 59min
+  if (tokenExpirationTimeLeft() <= 300000) { // 5min prije isteka refreshaj token! 
     return true;
   }
   return false;
