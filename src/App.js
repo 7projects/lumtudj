@@ -619,8 +619,6 @@ function App() {
 
   const handleKeyDown = async (e) => {
     if (e.key === 'Enter' && searchText.trim()) {
-
-
       search(searchText);
       e.preventDefault();
       if (inputRef && inputRef.current)
@@ -800,21 +798,21 @@ function App() {
 
   const allowDrop = (e) => e.preventDefault();
 
-  const addToPlaylist = (track, position) => {
+  const addToPlaylist = (track, position, id) => {
 
     let newTrack = { ...track };
 
     if (isMobile())
-      flyToPlaylist(newTrack);
+      flyToPlaylist(id);
 
     let pl = [...playlistTracks];
-    if (dragSource == "playlist") {
-      if (locked) {
-        return
-      } else {
-        pl.splice(dragTrackIndex, 1);
-      }
-    }
+    // if (dragSource == "playlist") {
+    //   if (locked) {
+    //     return
+    //   } else {
+    //     pl.splice(dragTrackIndex, 1);
+    //   }
+    // }
 
     newTrack.uid = newGuid();
 
@@ -836,9 +834,7 @@ function App() {
 
   const addPlaylistToToPlaylist = (pl) => {
     if (isMobile())
-      flyToPlaylist(pl);
-
-
+      flyToPlaylist("pl" + pl.id);
 
     pl.tracks.map(x => x.uid = newGuid());
 
@@ -1020,12 +1016,10 @@ function App() {
 
   }
 
-  function flyToPlaylist(track) {
+  function flyToPlaylist(id) {
     requestAnimationFrame(() => {
-      let element = document.getElementById("tr" + track.id);
+      let element = document.getElementById(id);
 
-
-      debugger;
       if (!element)
         element = document.getElementById("tr" + track.uid);
 
@@ -1248,9 +1242,9 @@ function App() {
         itemContent={(index) => {
           const p = filteredPlaylists[index];
           return isMobile() ?
-            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"tr" + p.id} onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { loadPlaylistPrev(p); setSelectedPlaylistIndex(index) }} />
+            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { loadPlaylistPrev(p); setSelectedPlaylistIndex(index) }} />
             :
-            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"tr" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
+            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
         }}
       />
 
@@ -1330,7 +1324,7 @@ function App() {
           if (!tr) return null;
 
           return isMobile() ?
-            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
             <TrackRow id={tr.id} key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
         }}
       />
@@ -1357,7 +1351,16 @@ function App() {
     }
   }
 
-  const getReordableTrackList = (trackList, dragEndHandler, key) => {
+
+  const onPlaylistSwipedRight = (tr, id, index) => {
+    removeTrackFromPlaylist(index);
+  }
+
+  const onTracksSwipedRight = (tr, id, index) => {
+      addToPlaylist(tr, null, id );  
+  }
+
+  const getReordableTrackList = (trackList, dragEndHandler, key, onSwipedRight) => {
     return (
       <>
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={dragEndHandler} modifiers={[restrictToVerticalAxis]}>
@@ -1370,7 +1373,7 @@ function App() {
                 if (!tr) return null;
 
                 return isMobile() ?
-                  <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+                  <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index ) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
                   <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
               }}
             />
@@ -1658,7 +1661,7 @@ function App() {
                           </>
                           :
                           <>
-                            {getReordableTrackList(selectedPlaylistTracks, handleSelectedPlaylistDragEnd, "spl")}
+                            {getReordableTrackList(selectedPlaylistTracks, handleSelectedPlaylistDragEnd, "spl", onTracksSwipedRight)}
                             {/* {getAlbumsPanel()} */}
                           </>}
                       </div>
@@ -1694,7 +1697,7 @@ function App() {
                       {
                         playlistTracks.length > 0 ?
                           <div className='panel-playlist-mobile'>
-                            {getReordableTrackList(playlistTracks, handlePlaylistDragEnd, "pl")}
+                            {getReordableTrackList(playlistTracks, handlePlaylistDragEnd, "pl", onPlaylistSwipedRight)}
                           </div>
                           :
                           <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
@@ -1852,7 +1855,7 @@ function App() {
               <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
                 {
                   playlistTracks.length > 0 ?
-                    getReordableTrackList(playlistTracks, handlePlaylistDragEnd, "pl")
+                    getReordableTrackList(playlistTracks, handlePlaylistDragEnd, "pl", onTracksSwipedRight)
                     :
                     <div className='QueueMusicIcon'>
                       <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
@@ -1932,7 +1935,7 @@ const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, o
               {...attributes}
               {...listeners}
             >
-              <GripIcon />
+              <DragHandleIcon />
             </td>
           </tr>
         </tbody>
