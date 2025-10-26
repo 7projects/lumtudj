@@ -49,7 +49,8 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
         // onSwipedUp: () => alert('Swiped up!'),
         // onSwipedDown: () => alert('Swiped down!'),
         preventDefaultTouchmoveEvent: true,
-        trackMouse: true
+        trackMouse: true,
+        delta: 50
     });
 
     return (

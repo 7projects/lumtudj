@@ -1217,12 +1217,13 @@ function App() {
     }
   }
 
+
   const getPlaylistsPanel = () => {
     return <>
-      {isMobile() && false ?
+      {isMobile() ?
         <>
-          <PlaylistRow icon={myShazamTracksPlIcon} playlist={myShazamTracksPl} onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }} />
-          <PlaylistRow icon={lastListenedPlIcon} playlist={lastListenedPl} onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }} />
+          <PlaylistRow icon={myShazamTracksPlIcon} playlist={myShazamTracksPl} onClick={() => { loadPlaylistPrev(myShazamTracksPl) }} />
+          <PlaylistRow icon={lastListenedPlIcon} playlist={lastListenedPl} onClick={() => { loadPlaylistPrev(lastListenedPl) }} />
           {/* <div className='playlist-divider-playlists'>PLAYLISTS</div> */}
         </> : null}
 
@@ -1357,7 +1358,7 @@ function App() {
   }
 
   const onTracksSwipedRight = (tr, id, index) => {
-      addToPlaylist(tr, null, id );  
+    addToPlaylist(tr, null, id);
   }
 
   const getReordableTrackList = (trackList, dragEndHandler, key, onSwipedRight) => {
@@ -1373,7 +1374,7 @@ function App() {
                 if (!tr) return null;
 
                 return isMobile() ?
-                  <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index ) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+                  <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
                   <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
               }}
             />
@@ -1392,7 +1393,9 @@ function App() {
     });
 
 
-    setTracks(lastTracks);
+    return lastTracks;
+
+    // setTracks(lastTracks);
 
 
     // let lastTracks = [];
@@ -1430,10 +1433,12 @@ function App() {
 
     const tracks = await api.getTracks(id, 50);
 
-    if (tracks)
-      setTracks(tracks);
-
     setLoadingTracks(false);
+    return tracks;
+    // if (tracks)
+    //   setTracks(tracks);
+
+    // setLoadingTracks(false);
   }
 
   const [selectedArtist, setSelectedArtist] = useState(null);
@@ -1481,6 +1486,16 @@ function App() {
   const loadPlaylistPrev = async (pl) => {
     setCurrentTab("plprev");
     pl.tracks.map((tr) => tr.uid = newGuid());
+
+
+    if (pl.id == "MyShazamedTracks") {
+      pl.tracks = await getMyShazamTracks();
+    }
+
+    if (pl.id == "LastListened") {
+      pl.tracks = await getLastListened();
+    } 
+
     setSelectedPlaylist(pl);
     setSelectedPlaylistTracks(pl.tracks);
   }
@@ -1616,12 +1631,12 @@ function App() {
                   <td className='tab' onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     SHZM
                   </td> */}
-                  <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
+                  {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
                     <HistoryIcon></HistoryIcon>
                   </td>
                   <td className='tab' {...longPressHandler()} onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     {myShazamTracksPlIconMobile}
-                  </td>
+                  </td> */}
                   <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
                     <PlaylistPlayIcon></PlaylistPlayIcon>
                   </td>
@@ -1630,7 +1645,7 @@ function App() {
                   </td>
                 </tr>
                 <tr>
-                  <td colSpan={6} className='tab-panel'>
+                  <td colSpan={4} className='tab-panel'>
                     <Activity mode={tab == "1" ? "visible" : "hidden"}>
                       <div className='panel-playlists-mobile'>
                         {loadingPlaylists ?
@@ -1709,7 +1724,7 @@ function App() {
 
                     </Activity>
                   </td>
-                  {tab == 4 ? <td colSpan={6} className='tab-panel'>
+                  {tab == 4 ? <td colSpan={4} className='tab-panel'>
                     <button style={{ float: "right" }}>{time}</button>
                     <button style={{ float: "right" }} onClick={logout}>Logout</button>
                     <button style={{ float: "right" }} onClick={changeTheme}>Change theme</button>
