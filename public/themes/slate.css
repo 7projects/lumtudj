@@ -1173,9 +1173,6 @@ input[type="range"]::-webkit-slider-runnable-track {
     display: none;
   }
 }
-.header-button-small {
-  height: 40px;
-}
 button {
   background-color: #37474F;
   border-radius: 5px;
@@ -1655,6 +1652,9 @@ button:active {
   align-items: center;
   justify-content: center;
 }
+.header-button-small:focus {
+  outline: none;
+}
 .tab {
   color: #b4b281;
   background-color: #37474F;
@@ -1714,7 +1714,7 @@ button:active {
   color: #ffffff;
   background-color: #41555e;
   outline: none;
-  border: 1px solid #292929;
+  border: 1px solid #0e0e0e;
   border-radius: 10px 10px 0px 0px;
 }
 .input-search:focus::placeholder {
@@ -2117,4 +2117,40 @@ button:active {
   list-style: none;
   padding: 0;
   margin: 0;
+}
+/* 🔴 Blinking animation */
+@keyframes blink {
+  0%,
+  100% {
+    background-color: black;
+    color: red;
+  }
+  25%,
+  75% {
+    background-color: red;
+    color: black;
+  }
+}
+/* 💫 Shake (vibration) animation */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-4px);
+  }
+  40% {
+    transform: translateX(4px);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+/* Combine both animations for 2s total */
+.blinking {
+  animation: blink 0.5s linear 0s 4, shake 0.1s linear 0s 20;
 }

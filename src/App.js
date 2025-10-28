@@ -177,7 +177,10 @@ function App() {
 
   const [locked, setLocked] = useState(false);
 
+  const handleLockKeyDownRef = useRef(null);
+
   const [showingPlaylistPicker, setShowingPlaylistPicker] = useState(false);
+
 
   // const [albumsScrollTop, setAlbumsScrollTop] = useState(0);
 
@@ -356,7 +359,7 @@ function App() {
 
   const handleLockKeyDown = (event) => {
 
-    if (!isLocked()) return; // ignore input if already unlocked
+    if (localStorage.getItem("locked") != "true") return; // ignore input if already unlocked
 
     // Start timer on first keypressdin
     if (!timer) {
@@ -514,13 +517,24 @@ function App() {
       //   setPlaybackSDKReady(true);
       // };
 
-      document.removeEventListener('keydown', handleLockKeyDown);
-      document.addEventListener('keydown', handleLockKeyDown);
 
       let lckd = localStorage.getItem("lockpass")
       if (lckd == null || lckd == undefined || lckd == "") {
         localStorage.setItem("lockpass", "dinamo");
       }
+
+      if (!handleLockKeyDownRef.current) {
+        handleLockKeyDownRef.current = handleLockKeyDown;
+      }
+
+      if (localStorage.getItem("locked") === "true") {
+        setLocked(true);
+        // Initialize the function once
+        document.removeEventListener('keydown', handleLockKeyDownRef.current);
+        document.addEventListener('keydown', handleLockKeyDownRef.current);
+      }
+
+
 
       const theme = localStorage.getItem("theme");
       if (theme) {
@@ -943,6 +957,20 @@ function App() {
 
   const isLocked = () => {
     let l = localStorage.getItem("locked") == "true";
+    const btn = document.getElementById("lockButton");
+
+    if (l) {
+      // Add class only if not already blinking
+      if (!btn.classList.contains("blinking")) {
+        btn.classList.add("blinking");
+        // Remove blinking class automatically when animation ends
+        btn.addEventListener("animationend", () => {
+          btn.classList.remove("blinking");
+        });
+      }
+    }
+
+
     setLocked(l);
     return l;
   }
@@ -1057,9 +1085,9 @@ function App() {
   }
 
 
-  function flyToPlayer(track) {
+  function flyToPlayer(id) {
 
-    let element = document.getElementById(track.id + "0");
+    let element = document.getElementById(id);
     if (!element)
       return;
 
@@ -1104,7 +1132,7 @@ function App() {
       let pl = [...playlistTracks];
 
 
-      flyToPlayer(pl[0]);
+      flyToPlayer("pl0-dinamo" + pl[0].id);
 
 
       play(pl[0]);
@@ -1245,7 +1273,7 @@ function App() {
           return isMobile() ?
             <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { loadPlaylistPrev(p); setSelectedPlaylistIndex(index) }} />
             :
-            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
+            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { loadPlaylistPrev(p); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
         }}
       />
 
@@ -1319,9 +1347,9 @@ function App() {
     return loadingTracks ? <div className='loader'></div> : <>
       <Virtuoso
         style={{ height: '100%' }}
-        totalCount={tracks.length}
+        totalCount={selectedPlaylistTracks.length}
         itemContent={(index) => {
-          const tr = tracks[index];
+          const tr = selectedPlaylistTracks[index];
           if (!tr) return null;
 
           return isMobile() ?
@@ -1494,7 +1522,7 @@ function App() {
 
     if (pl.id == "LastListened") {
       pl.tracks = await getLastListened();
-    } 
+    }
 
     setSelectedPlaylist(pl);
     setSelectedPlaylistTracks(pl.tracks);
@@ -1730,7 +1758,7 @@ function App() {
                     <button style={{ float: "right" }} onClick={changeTheme}>Change theme</button>
                     <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
                     <button onClick={checkForUpdates}>Check for updates</button>
-                    <button onClick={refreshAccessToken}>refresh at</button>
+                    {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                     <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
                     <button onClick={() => { setToken(crypto.randomUUID()) }}>change token</button>
                   </td> : null}
@@ -1783,16 +1811,16 @@ function App() {
                         {/* <button onClick={updatePlaylists}>Update playlists</button>*/}
                         {/* <button onClick={checkForUpdates}>Check for updates</button> */}
                         {/* <button onClick={checkForUpdates}>Check for updates</button> */}
-                        <button onClick={refreshAccessToken}>refresh at</button>
+                        {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                         {/* <button onClick={startUniverse}>start</button> */}
 
                         <button className='header-button-small' onClick={getLastListened}><HistoryIcon></HistoryIcon></button>
                         <button className='header-button-small' onClick={toggleMode}><PlaylistAddCheckIcon></PlaylistAddCheckIcon></button>
                         {locked ?
-                          <button className='header-button-small' ><LockOutlineIcon style={{ color: "red" }} /></button>
-                          : <button className='header-button-small' onClick={lock}><LockOpenIcon /></button>}
+                          <button id="lockButton" style={{color:"red"}} className='header-button-small' onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                          : <button id="lockButton" className='header-button-small' onClick={lock}><LockOpenIcon  id="lockIcon" /></button>}
 
-                        <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={getMyShazamTracks}>{myShazamTracksPlIcon}</button>
+                        <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button>
                         {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
                       </div>
                     </td>
