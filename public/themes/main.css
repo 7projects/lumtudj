@@ -1111,7 +1111,7 @@ code {
   overflow-x: hidden;
 }
 .panel-main {
-  overflow-y: auto;
+  overflow-y: hidden;
   overflow-x: hidden;
   padding: 1px;
   background-color: #202020;

@@ -1814,11 +1814,11 @@ function App() {
                         {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                         {/* <button onClick={startUniverse}>start</button> */}
 
-                        <button className='header-button-small' onClick={getLastListened}><HistoryIcon></HistoryIcon></button>
+                        <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button>
                         <button className='header-button-small' onClick={toggleMode}><PlaylistAddCheckIcon></PlaylistAddCheckIcon></button>
                         {locked ?
-                          <button id="lockButton" style={{color:"red"}} className='header-button-small' onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                          : <button id="lockButton" className='header-button-small' onClick={lock}><LockOpenIcon  id="lockIcon" /></button>}
+                          <button id="lockButton" style={{ color: "red" }} className='header-button-small' onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                          : <button id="lockButton" className='header-button-small' onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
                         <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button>
                         {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
@@ -1829,10 +1829,10 @@ function App() {
                         {/* <button onClick={getTopTracks}>Top tracks</button>*/}
                         {/* <button onClick={getRecommendations}>Recommendations</button> */}
 
-                        <div className="input-search-wrapper">
+                        {/* <div className="input-search-wrapper">
                           <SearchIcon className="search-icon" />
                           <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
-                        </div>
+                        </div> */}
                         {/* <button onClick={getRecentTracks}>Recently played</button> */}
                       </td> : null}
                     <td>
@@ -1890,7 +1890,10 @@ function App() {
                 {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
 
                 {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
+                {!isMobile() || true ? <div className="input-search-wrapper">
+                  <input ref={inputRef} className="panel-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
 
+                </div> : null}
                 {
                   getTracksPanel()
                 }
