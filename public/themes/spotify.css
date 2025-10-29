@@ -1004,7 +1004,7 @@
 }
 body {
   margin: 0;
-  font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Doto, Monospace, Sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1032,6 +1032,9 @@ body {
   background-position: center;
   z-index: -1;
   fill: #030303;
+}
+.icons-color {
+  fill: #f1f1f1;
 }
 table,
 th,
@@ -1393,7 +1396,7 @@ code {
   color: #f1f1f1;
   cursor: pointer;
   font-size: 18px;
-  background-color: #37373752;
+  background-color: #0000007a;
 }
 .track-row {
   align-items: center;
@@ -1855,7 +1858,7 @@ button:active {
   color: #e2e2e2;
   /* Background color */
   /* Space between lines */
-  font-family: Doto;
+  font-family: Doto, Monospace, Sans-serif;
   font-size: 20px;
 }
 .selected-track-label {
@@ -2091,7 +2094,6 @@ button:active {
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #000000;
 }
 .tab-selected {
   color: #ffffff;
@@ -2101,8 +2103,6 @@ button:active {
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #000000;
-  color: #505050;
   background-color: #1ed760;
 }
 .input-search {
@@ -2111,7 +2111,7 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: Doto;
+  font-family: Doto, Monospace, Sans-serif;
   box-sizing: border-box;
   background-color: #1e1e1e;
   outline: none;
@@ -2463,7 +2463,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Doto, Monospace, Sans-serif;
 }
 .reconnecting-dots span {
   display: inline-block;
@@ -2576,13 +2576,12 @@ button:active {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family: Doto;
+  font-family: Doto, Monospace, Sans-serif;
   box-sizing: border-box;
   color: #ffffff;
-  background-color: #0d0d0d;
+  background-color: transparent;
   outline: none;
-  border: 1px solid #0e0e0e;
-  border-radius: 10px 10px 0px 0px;
+  border: none;
 }
 .toolbar-button {
   width: 20px;

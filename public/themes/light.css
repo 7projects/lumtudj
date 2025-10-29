@@ -1004,7 +1004,7 @@
 }
 body {
   margin: 0;
-  font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Monospace, Sans-serif;
   font-size: 14px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1015,7 +1015,7 @@ body {
   -moz-user-select: none;
   /* Firefox */
   -ms-user-select: none;
-  background-color: #f0f0f0;
+  background-color: #ffffff;
 }
 ::-webkit-scrollbar-corner {
   background: #1e1e1e;
@@ -1031,7 +1031,10 @@ body {
   background-size: cover;
   background-position: center;
   z-index: -1;
-  fill: #f3f3f3;
+  fill: #ffffff;
+}
+.icons-color {
+  fill: #5e5e5e;
 }
 table,
 th,
@@ -1054,7 +1057,7 @@ td {
 .context-menu {
   position: absolute;
   background: #f0f0f0;
-  border: 1px solid #cfcfcf;
+  border: 1px solid #ececec;
   z-index: 1000;
   border-radius: 4px;
 }
@@ -1092,7 +1095,7 @@ code {
 }
 .footer {
   height: 100px;
-  background-color: #f0f0f0;
+  background-color: #ffffff;
   color: white;
   display: flex;
   align-items: center;
@@ -1102,7 +1105,7 @@ code {
 .panel {
   flex: 1 1 0;
   padding: 1px;
-  background-color: #fdfdfd;
+  background-color: #ffffff;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
@@ -1113,7 +1116,7 @@ code {
   overflow-y: hidden;
   overflow-x: hidden;
   padding: 1px;
-  background-color: #fdfdfd;
+  background-color: #ffffff;
   width: 50%;
   text-wrap: auto;
   border-radius: 10px;
@@ -1155,7 +1158,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1170,7 +1173,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1248,13 +1251,13 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  background-color: #75f9ff;
-  box-shadow: 0 0 5px 1px #a8fbff;
+  background-color: #7fe2ff;
+  box-shadow: 0 0 5px 1px #b2eeff;
   display: inline-block;
   margin: 1px;
 }
 .bulbOnColor {
-  fill: #75f9ff !important;
+  fill: #7fe2ff !important;
 }
 .bulbOffColor {
   fill: #a7a7a7;
@@ -1272,15 +1275,15 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  color: #75f9ff;
+  color: #7fe2ff;
   cursor: pointer;
 }
 .bulbOn::before {
   content: '';
   width: 10px;
   height: 10px;
-  background-color: #75f9ff;
-  box-shadow: 0 0 5px 1px #a8fbff;
+  background-color: #7fe2ff;
+  box-shadow: 0 0 5px 1px #b2eeff;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -1303,7 +1306,7 @@ code {
   cursor: pointer;
 }
 .bulbOff:hover {
-  color: #75f9ff;
+  color: #7fe2ff;
 }
 .bulbOff::before {
   content: '';
@@ -1327,7 +1330,7 @@ code {
   left: 50%;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  color: #75f9ff;
+  color: #7fe2ff;
 }
 .item-row {
   align-items: center;
@@ -1339,7 +1342,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1355,7 +1358,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1371,7 +1374,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1388,12 +1391,12 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
   font-size: 18px;
-  background-color: #37373752;
+  background-color: #0000007a;
 }
 .track-row {
   align-items: center;
@@ -1405,7 +1408,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1420,7 +1423,7 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
@@ -1436,13 +1439,13 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid #cfcfcf;
+  border-bottom: 1px solid #ececec;
   background-color: transparent;
   color: #5e5e5e;
   cursor: pointer;
-  background-color: #75f9ff;
-  border: 1px solid #42f7ff;
-  box-shadow: 0 0 5px 1px #a8fbff;
+  background-color: #7fe2ff;
+  border: 1px solid #4cd6ff;
+  box-shadow: 0 0 5px 1px #b2eeff;
   text-shadow: 2 2 #dadada;
   color: #a7a7a7;
 }
@@ -1602,12 +1605,12 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 button {
-  background-color: #ececec;
+  background-color: #494949;
   border-radius: 5px;
-  border: 1px solid #d3d3d3;
+  border: 1px solid #2f2f2f;
   display: inline-block;
   cursor: pointer;
-  color: #424242;
+  color: #ffffff;
   font-family: Arial;
   font-size: 11px;
   padding: 6px;
@@ -1615,14 +1618,14 @@ button {
   margin: 2px;
 }
 button:hover {
-  background-color: #ffffff;
+  background-color: #626262;
 }
 button:active {
   position: relative;
   top: 1px;
 }
 .input::placeholder {
-  color: #1c1c1c;
+  color: #d9d9d9;
   box-shadow: none;
 }
 .input:focus::placeholder {
@@ -1855,11 +1858,11 @@ button:active {
   color: #1f1f1f;
   /* Background color */
   /* Space between lines */
-  font-family: Doto;
+  font-family: Monospace, Sans-serif;
   font-size: 20px;
 }
 .selected-track-label {
-  color: #424242;
+  color: #ffffff;
 }
 .selected-track-container {
   height: 45px;
@@ -1867,22 +1870,22 @@ button:active {
 }
 .selected-track-bulb-on {
   display: inline-block;
-  background-color: #75f9ff;
-  border: 1px solid #42f7ff;
+  background-color: #7fe2ff;
+  border: 1px solid #4cd6ff;
   color: #a7a7a7;
   margin: 2px;
   border-radius: 5px;
   font-size: 10px;
   padding: 3px;
   cursor: pointer;
-  box-shadow: 0 0 5px 1px #a8fbff;
+  box-shadow: 0 0 5px 1px #b2eeff;
   text-shadow: 2 2 #dadada;
 }
 .selected-track-bulb-off {
   display: inline-block;
-  background-color: #ececec;
-  border: 1px solid #d3d3d3;
-  color: #424242;
+  background-color: #494949;
+  border: 1px solid #2f2f2f;
+  color: #ffffff;
   margin: 2px;
   border-radius: 5px;
   font-size: 10px;
@@ -1890,16 +1893,16 @@ button:active {
   cursor: pointer;
 }
 .selected-track-bulb-off:hover {
-  background-color: #ffffff;
+  background-color: #626262;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root {
-  color: #424242;
+  color: #ffffff;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root.Mui-selected {
   color: #5e5e5e;
 }
 .css-1qltlow-MuiTabs-indicator {
-  background-color: #75f9ff;
+  background-color: #7fe2ff;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root:hover {
   background-color: transparent;
@@ -1976,10 +1979,10 @@ button:active {
   /* Space between lines */
 }
 .player-progress-bar-fill {
-  background-color: #75f9ff;
+  background-color: #7fe2ff;
   height: 15px;
   border-radius: 5px 5px 5px 5px;
-  background-image: linear-gradient(to right, #75f9ff 1px, #a5a5a5 1px), linear-gradient(to bottom, #75f9ff 1px, #a5a5a5 1px);
+  background-image: linear-gradient(to right, #7fe2ff 1px, #a5a5a5 1px), linear-gradient(to bottom, #7fe2ff 1px, #a5a5a5 1px);
   background-size: 2px 2px;
   /* Space between lines */
 }
@@ -1990,7 +1993,7 @@ button:active {
   padding: 3px;
 }
 .player-progress-bar-fill-mobile {
-  background-color: #75f9ff;
+  background-color: #7fe2ff;
   height: 2px;
   border-radius: 5px 5px 5px 5px;
 }
@@ -2005,12 +2008,12 @@ button:active {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #75f9ff;
+  background-color: #7fe2ff;
   position: relative;
   margin-top: -4px;
 }
 .top-bar-mobile {
-  background-color: #ececec;
+  background-color: #494949;
   height: 20px;
   border-radius: 5px 5px 5px 5px;
   padding: 5px;
@@ -2028,7 +2031,7 @@ button:active {
 .snackbar {
   visibility: hidden;
   min-width: 250px;
-  background-color: #75f9ff;
+  background-color: #7fe2ff;
   color: #a7a7a7;
   text-align: center;
   border-radius: 8px;
@@ -2051,7 +2054,7 @@ button:active {
   --borderWidth: 7px;
   --height: 24px;
   --width: 12px;
-  --borderColor: #75f9ff;
+  --borderColor: #7fe2ff;
 }
 .check {
   display: inline-block;
@@ -2060,7 +2063,7 @@ button:active {
   width: var(--width);
   border-bottom: var(--borderWidth) solid var(--borderColor);
   border-right: var(--borderWidth) solid var(--borderColor);
-  color: #75f9ff;
+  color: #7fe2ff;
 }
 .QueueMusicIcon {
   color: #79797969;
@@ -2084,26 +2087,23 @@ button:active {
   outline: none;
 }
 .tab {
-  color: #424242;
-  background-color: #ececec;
+  color: #ffffff;
+  background-color: #494949;
   text-align: center;
   height: 40px;
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #d3d3d3;
 }
 .tab-selected {
-  color: #424242;
-  background-color: #ececec;
+  color: #ffffff;
+  background-color: #494949;
   text-align: center;
   height: 40px;
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #d3d3d3;
-  color: #a7a7a7;
-  background-color: #75f9ff;
+  background-color: #7fe2ff;
 }
 .input-search {
   width: 100%;
@@ -2111,18 +2111,17 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: Doto;
+  font-family: Monospace, Sans-serif;
   box-sizing: border-box;
-  color: #ffffff;
   background-color: #1e1e1e;
   outline: none;
   border: 1px solid #292929;
-  color: #424242;
-  background-color: #ececec;
+  color: #ffffff;
+  background-color: #494949;
   height: 40px;
   font-size: 20px;
   border-radius: 10px;
-  border: 1px solid #d3d3d3;
+  border: 1px solid #2f2f2f;
 }
 .input-search:focus::placeholder {
   color: transparent;
@@ -2151,7 +2150,7 @@ button:active {
   /* space between buttons */
 }
 .player {
-  background: radial-gradient(ellipse at bottom, #ffffff 0%, #c5c5c5 100%);
+  background: radial-gradient(ellipse at bottom, #ffffff 0%, #f1f1f1 100%);
   overflow: hidden;
 }
 #stars {
@@ -2278,23 +2277,23 @@ button:active {
   color: #ffffff;
   border-radius: 12px;
   border-radius: 1px;
-  background-color: #75f9ff;
-  box-shadow: 0 0 5px 1px #a8fbff;
+  background-color: #7fe2ff;
+  box-shadow: 0 0 5px 1px #b2eeff;
   font-weight: bold;
   color: black;
 }
 .playlist-divider {
-  color: #424242;
-  background-color: #ececec;
+  color: #ffffff;
+  background-color: #494949;
 }
 .playlist-divider-playlists {
-  color: #424242;
-  background-color: #ececec;
+  color: #ffffff;
+  background-color: #494949;
   background-color: #893e22;
 }
 .playlist-divider-albums {
-  color: #424242;
-  background-color: #ececec;
+  color: #ffffff;
+  background-color: #494949;
   background-color: #225589;
 }
 .hideScrollbar {
@@ -2464,7 +2463,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Monospace, Sans-serif;
 }
 .reconnecting-dots span {
   display: inline-block;
@@ -2577,13 +2576,12 @@ button:active {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family: Doto;
+  font-family: Monospace, Sans-serif;
   box-sizing: border-box;
-  color: #424242;
-  background-color: #fdfdfd;
+  color: #ffffff;
+  background-color: transparent;
   outline: none;
-  border: 1px solid #0e0e0e;
-  border-radius: 10px 10px 0px 0px;
+  border: none;
 }
 .toolbar-button {
   width: 20px;
