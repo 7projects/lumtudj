@@ -1287,6 +1287,7 @@ button:active {
     display: flex;
     align-items: center;
     justify-content: center;
+
     // Hide focus outline
     &:focus {
         outline: none;
@@ -1311,13 +1312,6 @@ button:active {
     background-color: @bulb-on-color;
 }
 
-.input-search-wrapper {
-    position: relative;
-    width: 100%;
-    height: 40px;
-    // margin: 2px;
-}
-
 .input-search {
     width: 100%;
     height: 100%;
@@ -1339,23 +1333,6 @@ button:active {
     font-size: 20px;
     border-radius: 10px;
     border: 1px solid darken(@button-background-color, 10%);
-}
-
-.panel-input-search {
-    width: 100%;
-    height: 100%;
-    padding-left: 32px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 16px;
-    font-weight: bold;
-    font-family: Doto;
-    box-sizing: border-box;
-    color: #ffffff;
-    background-color: lighten(@primary-color, 5%);
-    outline: none;
-    border: 1px solid #0e0e0e;
-    border-radius: 10px 10px 0px 0px;
 }
 
 .input-search:focus::placeholder {
@@ -1926,4 +1903,47 @@ button:active {
     animation:
         blink 0.5s linear 0s 4,
         shake 0.1s linear 0s 20;
+}
+
+
+.toolbar-wrapper {
+    position: relative;
+    width: 100%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    // margin: 2px;
+}
+
+.toolbar-input-search {
+    width: 100%;
+    height: 100%;
+    padding-left: 32px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    font-family: Doto;
+    box-sizing: border-box;
+    color: @button-color;
+    background-color: lighten(@primary-color, 5%);
+    outline: none;
+    border: 1px solid #0e0e0e;
+    border-radius: 10px 10px 0px 0px;
+}
+
+.toolbar-button {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: darken(@track-row-color, 30%);
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+
+.toolbar-button:hover {
+    color: @track-row-color;
 }

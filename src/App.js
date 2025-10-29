@@ -11,6 +11,10 @@ import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons
 import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
 import Settings from '@mui/icons-material/Settings';
+import SaveIcon from '@mui/icons-material/Save';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import SwapVertIcon from '@mui/icons-material/SwapVert';
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import SearchIcon from '@mui/icons-material/Search';
@@ -642,9 +646,11 @@ function App() {
 
   const search = async (query) => {
     setSelectedPlaylistIndex(null);
+    setSelectedPlaylist(null);
+    setPlaylistChanged(false);
     setLoadingTracks(true);
     const data = await api.search(query);
-    setTracks(data);
+    setSelectedPlaylistTracks(data);
     setLoadingTracks(false);
   };
 
@@ -1255,9 +1261,10 @@ function App() {
           {/* <div className='playlist-divider-playlists'>PLAYLISTS</div> */}
         </> : null}
 
-      {!isMobile() || true ? <div className="input-search-wrapper">
+      {!isMobile() || true ? <div className="toolbar-wrapper">
 
-        <input ref={inputRef} className="panel-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={playlistsFilterText} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+        <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={playlistsFilterText} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+        <MoreVertIcon className='toolbar-button'></MoreVertIcon>
       </div> : null}
 
       <Virtuoso
@@ -1367,6 +1374,7 @@ function App() {
       const oldIndex = selectedPlaylistTracks.findIndex((i, index) => "spl" + index + "-" + i.id === active.id);
       const newIndex = selectedPlaylistTracks.findIndex((i, index) => "spl" + index + "-" + i.id === over.id);
       setSelectedPlaylistTracks((prev) => arrayMove(prev, oldIndex, newIndex));
+      setPlaylistChanged(true);
     }
   }
 
@@ -1524,8 +1532,24 @@ function App() {
       pl.tracks = await getLastListened();
     }
 
+    setSearchText(pl.name);
     setSelectedPlaylist(pl);
+    setPlaylistChanged(false);
     setSelectedPlaylistTracks(pl.tracks);
+  }
+
+  const [playlistChanged, setPlaylistChanged] = useState();
+
+  const onSearchTextChanged = (e) => {
+    setSearchText(e.target.value);
+    if (selectedPlaylistIndex && selectedPlaylistIndex > -1) {
+      setPlaylistChanged(true);
+    }
+  }
+
+  const saveSelectedPlaylist = () => {
+
+    setPlaylistChanged(false);
   }
 
   return (
@@ -1691,8 +1715,8 @@ function App() {
                       </div>
                     </Activity>
                     <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
-                      <div className="input-search-wrapper">
-                        <input ref={inputRef} className="panel-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedPlaylist.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+                      <div className="toolbar-wrapper">
+                        <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedPlaylist.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
                       </div>
                       <div className='panel-playlist-mobile'>
                         {false ?
@@ -1726,9 +1750,9 @@ function App() {
                     </Activity>
 
                     <Activity mode={tab == "2" ? "visible" : "hidden"}>
-                      <div className="input-search-wrapper">
+                      <div className="toolbar-wrapper">
                         <SearchIcon className="search-icon" />
-                        <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
+                        <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                       </div>
                       <div className="panel-search-mobile">
                         {getTracksPanel()}
@@ -1804,9 +1828,9 @@ function App() {
                           {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                         </div>
                         {mode == "compact" ?
-                          <div className="input-search-wrapper">
+                          <div className="toolbar-wrapper">
                             <SearchIcon className="search-icon" />
-                            <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
+                            <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                           </div> : null}
                         {/* <button onClick={updatePlaylists}>Update playlists</button>*/}
                         {/* <button onClick={checkForUpdates}>Check for updates</button> */}
@@ -1829,7 +1853,7 @@ function App() {
                         {/* <button onClick={getTopTracks}>Top tracks</button>*/}
                         {/* <button onClick={getRecommendations}>Recommendations</button> */}
 
-                        {/* <div className="input-search-wrapper">
+                        {/* <div className="toolbar-wrapper">
                           <SearchIcon className="search-icon" />
                           <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
                         </div> */}
@@ -1890,12 +1914,19 @@ function App() {
                 {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
 
                 {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
-                {!isMobile() || true ? <div className="input-search-wrapper">
-                  <input ref={inputRef} className="panel-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
+                {!isMobile() || true ? <div className="toolbar-wrapper">
+                  <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+
+                  {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
+
+                  <SwapVertIcon className='toolbar-button'></SwapVertIcon>
+
+                  <MoreVertIcon className='toolbar-button'></MoreVertIcon>
 
                 </div> : null}
                 {
-                  getTracksPanel()
+                  getReordableTrackList(selectedPlaylistTracks, handleSelectedPlaylistDragEnd, "spl", onTracksSwipedRight)
+                  // getTracksPanel()
                 }
               </div>
               <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
@@ -1981,7 +2012,9 @@ const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, o
               {...attributes}
               {...listeners}
             >
-              <DragHandleIcon />
+
+              <DragIndicatorIcon className='toolbar-button'></DragIndicatorIcon>
+              {/* <DragHandleIcon /> */}
             </td>
           </tr>
         </tbody>
