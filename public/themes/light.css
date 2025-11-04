@@ -1605,12 +1605,12 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 button {
-  background-color: #494949;
+  background-color: rgba(0, 0, 0, 0.05);
   border-radius: 5px;
-  border: 1px solid #2f2f2f;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   display: inline-block;
   cursor: pointer;
-  color: #ffffff;
+  color: #3a3a3a;
   font-family: Arial;
   font-size: 11px;
   padding: 6px;
@@ -1618,14 +1618,14 @@ button {
   margin: 2px;
 }
 button:hover {
-  background-color: #626262;
+  background-color: rgba(26, 26, 26, 0.05);
 }
 button:active {
   position: relative;
   top: 1px;
 }
 .input::placeholder {
-  color: #d9d9d9;
+  color: #141414;
   box-shadow: none;
 }
 .input:focus::placeholder {
@@ -1862,7 +1862,7 @@ button:active {
   font-size: 20px;
 }
 .selected-track-label {
-  color: #ffffff;
+  color: #3a3a3a;
 }
 .selected-track-container {
   height: 45px;
@@ -1883,9 +1883,9 @@ button:active {
 }
 .selected-track-bulb-off {
   display: inline-block;
-  background-color: #494949;
-  border: 1px solid #2f2f2f;
-  color: #ffffff;
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  color: #3a3a3a;
   margin: 2px;
   border-radius: 5px;
   font-size: 10px;
@@ -1893,10 +1893,10 @@ button:active {
   cursor: pointer;
 }
 .selected-track-bulb-off:hover {
-  background-color: #626262;
+  background-color: rgba(26, 26, 26, 0.05);
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root {
-  color: #ffffff;
+  color: #3a3a3a;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root.Mui-selected {
   color: #5e5e5e;
@@ -2013,7 +2013,7 @@ button:active {
   margin-top: -4px;
 }
 .top-bar-mobile {
-  background-color: #494949;
+  background-color: rgba(0, 0, 0, 0.05);
   height: 20px;
   border-radius: 5px 5px 5px 5px;
   padding: 5px;
@@ -2087,8 +2087,8 @@ button:active {
   outline: none;
 }
 .tab {
-  color: #ffffff;
-  background-color: #494949;
+  color: #3a3a3a;
+  background-color: rgba(0, 0, 0, 0.05);
   text-align: center;
   height: 40px;
   vertical-align: middle;
@@ -2096,8 +2096,8 @@ button:active {
   border-radius: 10px;
 }
 .tab-selected {
-  color: #ffffff;
-  background-color: #494949;
+  color: #3a3a3a;
+  background-color: rgba(0, 0, 0, 0.05);
   text-align: center;
   height: 40px;
   vertical-align: middle;
@@ -2113,15 +2113,16 @@ button:active {
   font-weight: bold;
   font-family: Monospace, Sans-serif;
   box-sizing: border-box;
+  color: #ffffff;
   background-color: #1e1e1e;
   outline: none;
   border: 1px solid #292929;
-  color: #ffffff;
-  background-color: #494949;
+  color: #3a3a3a;
+  background-color: rgba(0, 0, 0, 0.05);
   height: 40px;
   font-size: 20px;
   border-radius: 10px;
-  border: 1px solid #2f2f2f;
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 .input-search:focus::placeholder {
   color: transparent;
@@ -2283,17 +2284,17 @@ button:active {
   color: black;
 }
 .playlist-divider {
-  color: #ffffff;
-  background-color: #494949;
+  color: #3a3a3a;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 .playlist-divider-playlists {
-  color: #ffffff;
-  background-color: #494949;
+  color: #3a3a3a;
+  background-color: rgba(0, 0, 0, 0.05);
   background-color: #893e22;
 }
 .playlist-divider-albums {
-  color: #ffffff;
-  background-color: #494949;
+  color: #3a3a3a;
+  background-color: rgba(0, 0, 0, 0.05);
   background-color: #225589;
 }
 .hideScrollbar {
@@ -2578,7 +2579,7 @@ button:active {
   font-weight: bold;
   font-family: Monospace, Sans-serif;
   box-sizing: border-box;
-  color: #ffffff;
+  color: #3a3a3a;
   background-color: transparent;
   outline: none;
   border: none;

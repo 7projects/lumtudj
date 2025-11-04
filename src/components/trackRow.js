@@ -6,12 +6,17 @@ import { useLongPress } from 'use-long-press';
 import { useSwipeable } from 'react-swipeable';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import Marquee from 'react-fast-marquee';
+import useAppStore from '../AppStore';
 
-const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+
+const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+
+    const { library } = useAppStore();
+
+    const playlists = library.filter(x => x.tracks.some(t => t.id == track.id));
 
     const getTrackRowClass = () => {
         let clss = isMobile() ? 'item-row-mobile' : 'item-row';
-
 
         // if (playing)
         //     clss = 'track-row-selected track-row-playing'
@@ -24,7 +29,7 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
 
         if (forPlaylist)
             clss = "";
-        
+
         return clss;
     }
 
@@ -112,12 +117,6 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
                                                                         </div>
                                                                     )
                                                                     }
-                                                                    {/* {playlists && playlists.map((p) =>
-                                                    <span key={"trackpname-" + p.id} style={{ fontSize: 10, marginLeft: 5, color: "gray" }} >
-                                                        {p.name.toUpperCase()},
-                                                    </span>
-                                                )
-                                                } */}
                                                                 </div>
 
                                                             </td>
@@ -189,14 +188,7 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
                                                         </div>
                                                     )
                                                     }
-                                                    {/* {playlists && playlists.map((p) =>
-                                                    <span key={"trackpname-" + p.id} style={{ fontSize: 10, marginLeft: 5, color: "gray" }} >
-                                                        {p.name.toUpperCase()},
-                                                    </span>
-                                                )
-                                                } */}
                                                 </div>
-
                                             </td>
                                         </tr>
                                     </tbody>
@@ -206,9 +198,6 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
                     </tr>
                 </tbody>
             </table>
-
-
-
         </div>
     )
 }

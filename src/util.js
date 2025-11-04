@@ -23,6 +23,41 @@ export const loadThemeCSS = (themeName) => {
   }
 }
 
+export const changeTheme = () => {
+  if (localStorage.getItem("theme") == "blue") {
+    localStorage.setItem("theme", "light");
+    loadThemeCSS("light");
+    return;
+  }
+
+  if (localStorage.getItem("theme") == "light") {
+    localStorage.setItem("theme", "spotify");
+    loadThemeCSS("spotify");
+    return;
+  }
+
+  if (localStorage.getItem("theme") == "spotify") {
+    localStorage.setItem("theme", "mono");
+    loadThemeCSS("mono");
+    return;
+  }
+
+  if (localStorage.getItem("theme") == "mono") {
+    localStorage.setItem("theme", "slate");
+    loadThemeCSS("slate");
+    return;
+  }
+
+  if (localStorage.getItem("theme") == "slate") {
+    localStorage.setItem("theme", "blue");
+    loadThemeCSS("blue");
+    return;
+  }
+
+  loadThemeCSS("spotify");
+  localStorage.setItem("theme", "spotify");
+}
+
 export const isMobile = () => {
   return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
     navigator.userAgent
@@ -262,9 +297,83 @@ export const isTokenExpired = (expiryTimestampMs) => {
 }
 
 export const newGuid = () => {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
     const r = Math.random() * 16 | 0;
     const v = c === 'x' ? r : (r & 0x3 | 0x8);
     return v.toString(16);
+  });
+}
+
+export const flyToPlaylist = (id) => {
+  requestAnimationFrame(() => {
+    let element = document.getElementById(id);
+
+    // if (!element)
+    //   element = document.getElementById("tr" + track.uid);
+
+    // if (!element)
+    //   element = document.getElementById(track.uid);
+
+    if (!element) return;
+
+    const clone = element.cloneNode(true);
+    const rectStart = element.getBoundingClientRect();
+    const player = document.getElementById('playlistButton');
+    const rectEnd = player.getBoundingClientRect();
+
+    clone.style.position = 'fixed';
+    clone.style.left = rectStart.left + 'px';
+    clone.style.top = rectStart.top + 'px';
+    clone.style.width = rectStart.width + 'px';
+    clone.style.height = rectStart.height + 'px';
+    clone.style.zIndex = 9000;
+    clone.style.transition = 'all 1s ease-out';
+
+    document.body.appendChild(clone);
+
+    requestAnimationFrame(() => {
+      clone.style.left = rectEnd.left + 'px';
+      clone.style.top = rectEnd.top + 'px';
+      clone.style.opacity = 0;
+      clone.style.transform = 'scale(0.5)';
+    });
+
+    clone.addEventListener('transitionend', () => {
+      clone.remove();
+    });
+  });
+}
+
+export const flyToPlayer = (id) => {
+
+  let element = document.getElementById(id);
+  if (!element)
+    return;
+
+  const clone = element.cloneNode(true);
+  const rectStart = element.getBoundingClientRect();
+  const player = document.querySelector('.player');
+  const rectEnd = player.getBoundingClientRect();
+
+  clone.style.position = 'fixed';
+  clone.style.left = rectStart.left + 'px';
+  clone.style.top = rectStart.top + 'px';
+  clone.style.width = rectStart.width + 'px';
+  clone.style.height = rectStart.height + 'px';
+
+  clone.style.zIndex = 1000;
+  clone.style.transition = 'all 1s ease-out';
+  document.body.appendChild(clone);
+
+  requestAnimationFrame(() => {
+    clone.style.left = rectEnd.left + 'px';
+    clone.style.top = rectEnd.top + 'px';
+    clone.style.opacity = 0;
+    clone.style.transform = 'scale(0.5)';
+  });
+
+  clone.addEventListener('transitionend', () => {
+    clone.remove();
+    // Optional: trigger player update here
   });
 }

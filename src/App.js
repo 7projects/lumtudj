@@ -6,7 +6,7 @@ import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
-import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid } from './util';
+import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme } from './util';
 import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
@@ -35,6 +35,14 @@ import Moveable from "react-moveable";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { useLongPress } from 'use-long-press';
+import SortableItem from './components/sortableItem';
+import ReordableTrackList from './components/reordableTrackList';
+
+
+import PanelLibrary from './components/panelLibrary';
+
+import useAppStore from './AppStore';
+
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -53,104 +61,34 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-
 function useConstructor(callback) {
   const hasRun = useRef(false);
   if (!hasRun.current) {
     callback();
     hasRun.current = true;
   }
-
 }
 
-const ReorderableTrack = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
-  const dragControls = useDragControls();
-
-  return (
-    <Reorder.Item
-      value={track}
-      dragListener={false}
-      dragControls={dragControls}
-      whileDrag={{ scale: 1.05 }}
-      layout="position"
-      className="p-3 bg-white rounded-lg shadow flex justify-between items-center"
-    >
-      <table style={{ width: "100%" }} className={isMobile() ? "item-row-mobile" : "item-row"}>
-        <tbody>
-          <tr>
-            {/* Main content cell */}
-            <td style={{ width: "auto" }}>
-              <TrackRow
-                track={track}
-                forInfo={forInfo}
-                onClick={onClick}
-                onArtistClick={onArtistClick}
-                onDoubleClick={onDoubleClick}
-                onMouseDown={onMouseDown}
-                index={index}
-                onDrop={onDrop}
-                selected={selected}
-                onContextMenu={onContextMenu}
-                playlists={playlists}
-                forPlaylist
-                forPlayer={forPlayer}
-                hideImage={hideImage}
-                playing={playing}
-                onPlClick={onPlClick}
-                id={id}
-                onAddToPlaylistButton={onAddToPlaylistButton}
-                onLongPress={onLongPress}
-                onSwipedLeft={onSwipedLeft}
-                onSwipedRight={onSwipedRight}
-              />
-            </td>
-
-            {/* Drag handle cell */}
-            <td
-              style={{
-                width: 40,
-                textAlign: "right",
-                verticalAlign: "middle",
-                display: isMobile() ? "table-cell" : "none",
-              }}
-            >
-
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-    </Reorder.Item>
-  );
-};
-
 function App() {
+  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
-  const urlParams = new URLSearchParams(window.location.search)
+  const urlParams = new URLSearchParams(window.location.search);
   const [token, setToken] = useState(localStorage.getItem("token"));
-  // const [token, setToken] = useState(false);
-  const [playlists, setPlaylists] = useState([]);
 
   const [albums, setAlbums] = useState([]);
   const [playlistTracks, setPlaylistTracks] = useState([]);
   const [filteredPlaylists, setFilteredPlaylists] = useState([]);
   const [tracks, setTracks] = useState([]);
 
-  const [selectedTrack, setSelectedTrack] = useState();
-  const [selectedTrackIndex, setSelectedTrackIndex] = useState(-1);
-
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
-  const [selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex] = useState(-1);
 
   const [selectedPlaylist, setSelectedPlaylist] = useState({ name: "pl", tracks: [] });
   const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
   const [selectedPlaylistIndex, setSelectedPlaylistIndex] = useState(-1);
 
-  const [dragTrack, setDragTrack] = useState([]);
   const [dragTrackIndex, setDragTrackIndex] = useState();
-  const [dragSource, setDragSource] = useState();
 
   const [trackCounts, setTrackCounts] = useState({});
   const [track, setTrack] = useState({});
@@ -158,18 +96,14 @@ function App() {
   const [playlistsFilterText, setPlaylistsFilterText] = useState();
 
   const [loadingTracks, setLoadingTracks] = useState(false);
-  const [loadingPlaylists, setLoadingPlaylists] = useState(false);
-  const [loadingPlaylistsText, setLoadingPlaylistsText] = useState(false);
+
   const [loadingToken, setLoadingToken] = useState(urlParams.get('code') ? true : false);
 
   const [showplaylistPicker, setShowPlaylistPicker] = useState(false);
-  const [menuPosition, setMenuPosition] = useState(null);
 
   const [playPosition, setPlayPosition] = useState(null);
   const [playIndex, setPlayIndex] = useState(null);
   const [playState, setPlayState] = useState(null);
-
-  const [backgroundPlaylists, setBackgroundPlaylists] = useState([]);
 
   const [mode, setMode] = useState(localStorage.getItem("mode") ? localStorage.getItem("mode") : "normal");
 
@@ -179,20 +113,9 @@ function App() {
 
   const [snackbarMessage, setSnackbarMessage] = useState("");
 
-  const [locked, setLocked] = useState(false);
-
   const handleLockKeyDownRef = useRef(null);
 
   const [showingPlaylistPicker, setShowingPlaylistPicker] = useState(false);
-
-
-  // const [albumsScrollTop, setAlbumsScrollTop] = useState(0);
-
-  // const [tracksScrollTop, setTracksScrollTop] = useState(0);
-
-  // const [playlistsScrollTop, setPlaylistsScrollTop] = useState(0);
-
-  // const [playlistScrollTop, setPlaylistscrollTop] = useState(0);
 
   const inputBuffer = useRef();
 
@@ -256,7 +179,6 @@ function App() {
 
   const getPlaylistsAndAlbums = async () => {
 
-
     const cachedPlaylists = await loadPlaylists(); // Load back
     const cachedAlbums = await loadAlbums(); // Load back
 
@@ -268,8 +190,9 @@ function App() {
     //   })
     // }
 
+
     if (cachedPlaylists && cachedPlaylists.length > 0) {
-      setPlaylists([...cachedPlaylists]);
+      setLibrary([...cachedPlaylists]);
       setFilteredPlaylists([...cachedPlaylists]);
     }
 
@@ -320,7 +243,7 @@ function App() {
       }
     });
 
-    if (playlists.length == 0) {
+    if (library.length == 0) {
       getPlaylistsAndAlbums();
     }
 
@@ -398,40 +321,8 @@ function App() {
     timer = null;
   }
 
-  const changeTheme = () => {
-    if (localStorage.getItem("theme") == "blue") {
-      localStorage.setItem("theme", "light");
-      loadThemeCSS("light");
-      return;
-    }
-
-    if (localStorage.getItem("theme") == "light") {
-      localStorage.setItem("theme", "spotify");
-      loadThemeCSS("spotify");
-      return;
-    }
-
-    if (localStorage.getItem("theme") == "spotify") {
-      localStorage.setItem("theme", "mono");
-      loadThemeCSS("mono");
-      return;
-    }
-
-    if (localStorage.getItem("theme") == "mono") {
-      localStorage.setItem("theme", "slate");
-      loadThemeCSS("slate");
-      return;
-    }
-
-    if (localStorage.getItem("theme") == "slate") {
-      localStorage.setItem("theme", "blue");
-      loadThemeCSS("blue");
-      return;
-    }
-
-    loadThemeCSS("spotify");
-    localStorage.setItem("theme", "spotify");
-
+  const nextTheme = () => {
+    changeTheme();
   };
 
   const handleContextMenu = (e) => {
@@ -442,44 +333,6 @@ function App() {
   const closeMenu = () => {
     setMenuPosition(null);
   };
-
-  // const fetchTokens = async (code) => {
-
-  //   const verifier = localStorage.getItem('code_verifier');
-
-  //   const redirectUri = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://lumtudj.net';
-
-  //   const body = new URLSearchParams({
-  //     grant_type: 'authorization_code',
-  //     code,
-  //     redirect_uri: redirectUri,
-  //     client_id: clientId,
-  //     code_verifier: verifier
-  //   });
-
-  //   const response = await fetch('https://accounts.spotify.com/api/token', {
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/x-www-form-urlencoded'
-  //     },
-  //     body
-  //   });
-
-  //   const data = await api.getAccessTokenByAuthorizationCode
-
-  //   if (data.access_token) {
-  //     console.log('New ccess token:', data.access_token);
-  //     setToken(data.access_token);
-  //     localStorage.setItem('token', data.access_token);
-  //     localStorage.setItem('refresh_token', data.refresh_token);
-  //     localStorage.setItem('token_expiry', Date.now() + data.expires_in * 1000);
-  //     window.history.replaceState({}, document.title, '/');
-
-  //     return data;
-  //   }
-
-  //   return null
-  // };
 
   const toggleMode = () => {
     let m = mode === "normal" ? "compact" : "normal";
@@ -613,7 +466,7 @@ function App() {
           setToken(accessToken);
           window.localStorage.setItem("token", accessToken);
           window.history.replaceState({}, document.title, '/'); // Clean URL
-          if (playlists.length == 0) {
+          if (library.length == 0) {
 
             getPlaylistsAndAlbums();
             getBackgroundPlaylists();
@@ -622,7 +475,7 @@ function App() {
       }
       else {
         if (access_token) {
-          if (playlists.length == 0) {
+          if (library.length == 0) {
 
             getPlaylistsAndAlbums();
             getBackgroundPlaylists();
@@ -666,20 +519,20 @@ function App() {
 
   const updatePlaylists = async () => {
 
-    setLoadingPlaylists(true);
+    setLoadingLibrary("LOADING PLAYLISTS...")
 
     try {
-      const plsts = await api.getFullPlaylists((i, l) => setLoadingPlaylistsText("LOADING PLAYLISTS " + i + "/" + l));
+      const plsts = await api.getFullPlaylists((i, l) => setLoadingLibrary("LOADING PLAYLISTS " + i + "/" + l));
       savePlaylists(plsts);
-      setPlaylists(plsts);
+      setLibrary(plsts);
       setFilteredPlaylists(plsts);
 
-      const albms = await api.getFullAlbums((i, l) => setLoadingPlaylistsText("LOADING ALBUMS " + i + "/" + l));
+      const albms = await api.getFullAlbums((i, l) => setLoadingLibrary("LOADING ALBUMS " + i + "/" + l));
       saveAlbums(albms);
       setAlbums(albms);
 
-      setLoadingPlaylistsText("LOADING PLAYLISTS...")
-      setLoadingPlaylists(false);
+      setLoadingLibrary(null);
+
     }
     catch {
       //go to login page
@@ -700,12 +553,11 @@ function App() {
       //ipnut box to confirm update
       const confirmUpdate = window.confirm("Playlists to update: " + toUpdate.map(p => p.name).join(", ") + ". Do you want to update the playlists?");
       if (confirmUpdate) {
-        setLoadingPlaylists(true);
-        setLoadingPlaylistsText("UPDATING PLAYLISTS...");
-        const updatedPlaylists = await api.updatePlaylists(toUpdate, (i, l) => setLoadingPlaylistsText("UPDATING PLAYLISTS " + i + "/" + l));
+        setLoadingLibrary("UPDATING PLAYLISTS...");
+        const updatedPlaylists = await api.updatePlaylists(toUpdate, (i, l) => setLoadingLibrary("UPDATING PLAYLISTS " + i + "/" + l));
 
         // Update the cached playlists with the new data from browser
-        for (const pl of playlists) {
+        for (const pl of library) {
           const updatedPl = updatedPlaylists.find(p => p.id === pl.id);
           if (updatedPl) {
             pl.images = updatedPl.images;
@@ -723,8 +575,7 @@ function App() {
         savePlaylists(updatedPlaylists);
 
         await getPlaylistsAndAlbums(); // Reload playlists from IndexedDB
-
-        setLoadingPlaylists(false);
+        setLoadingLibrary(null);
       }
 
     } else {
@@ -782,7 +633,7 @@ function App() {
   }
 
   const loadTracksFromState = async (playlistID) => {
-    const pl = playlists.find(p => p.id === playlistID);
+    const pl = library.find(p => p.id === playlistID);
     if (pl && pl.tracks.length) {
       setTracks(pl.tracks);
       setLoadingTracks(false);
@@ -833,7 +684,7 @@ function App() {
     //   }
     // }
 
-    newTrack.uid = newGuid();
+    // newTrack.uid = newGuid();
 
     if (position || position == 0) {
       pl.splice(position, 0, newTrack);
@@ -855,7 +706,7 @@ function App() {
     if (isMobile())
       flyToPlaylist("pl" + pl.id);
 
-    pl.tracks.map(x => x.uid = newGuid());
+    // pl.tracks.map(x => x.uid = newGuid());
 
     let pls = [...playlistTracks, ...pl.tracks];
     setPlaylistTracks(pls);
@@ -879,41 +730,27 @@ function App() {
         pl.tracks.push(selectedTrack);
       }
 
-      let pls = [...playlists];
+      let pls = [...library];
       let p = pls.find(x => x.id == pl.id);
       pl.count = pl.tracks.length;
       p = pl;
-      setPlaylists(pls);
+      setLibrary(pls);
       savePlaylists(pls);
     }
-  }
-
-  const addToBackgroundPlaylists = async (pl, bulbOn) => {
-    let pls = [...backgroundPlaylists];
-    if (bulbOn) {
-      pls = pls.filter(x => x.id != pl.id);
-    } else {
-      if (pls.find(x => x.id == pl.id)) {
-        return;
-      }
-      pls.push(pl);
-    }
-    setBackgroundPlaylists(pls);
-    saveBackgroundPlaylists(pls);
   }
 
   const removeTrackFromSpotifyPlaylist = async () => {
     if (dragSource == "tracks") {
       if (selectedPlaylistIndex) {
-        let pl = playlists[selectedPlaylistIndex];
-        const tr = pl.tracks[selectedTrackIndex]
+        let pl = library[selectedPlaylistIndex];
+        const tr = pl.tracks[selectedTrackIndex];
         pl.tracks.splice(selectedTrackIndex, 1);
         setSelectedTrackIndex(-1);
         await api.removeTrackFromPlaylist(pl, tr);
-        let pls = [...playlists];
+        let pls = [...library];
         pls[selectedPlaylistIndex] = pl;
         pl.count = pl.tracks.length;
-        setPlaylists(pls);
+        setLibrary(pls);
         savePlaylists([pl]);
         closeMenu();
       }
@@ -992,9 +829,7 @@ function App() {
   }
 
   const onPlaylistTrackDoubleClick = (tr, index) => {
-
     if (isLocked()) { return; }
-
     play(tr);
     setPlayPosition("playlist");
     setPlayIndex(index);
@@ -1025,7 +860,7 @@ function App() {
     addToHistory(track);
     setTrack(track);
     setSelectedTrack(track);
-    let pls = playlists.filter(x => x.tracks.some(x => x.id == track.id));
+    let pls = library.filter(x => x.tracks.some(x => x.id == track.id));
     for (const pl of pls) {
       const trs = pl.tracks.filter(x => x.id == track.id);
       for (const tr of trs) {
@@ -1047,81 +882,6 @@ function App() {
     await savePlaylists(pls);
     getPlaylistsAndAlbums();
 
-  }
-
-  function flyToPlaylist(id) {
-    requestAnimationFrame(() => {
-      let element = document.getElementById(id);
-
-      if (!element)
-        element = document.getElementById("tr" + track.uid);
-
-      if (!element)
-        element = document.getElementById(track.uid);
-
-      if (!element) return;
-
-      const clone = element.cloneNode(true);
-      const rectStart = element.getBoundingClientRect();
-      const player = document.getElementById('playlistButton');
-      const rectEnd = player.getBoundingClientRect();
-
-      clone.style.position = 'fixed';
-      clone.style.left = rectStart.left + 'px';
-      clone.style.top = rectStart.top + 'px';
-      clone.style.width = rectStart.width + 'px';
-      clone.style.height = rectStart.height + 'px';
-      clone.style.zIndex = 9000;
-      clone.style.transition = 'all 1s ease-out';
-
-      document.body.appendChild(clone);
-
-      requestAnimationFrame(() => {
-        clone.style.left = rectEnd.left + 'px';
-        clone.style.top = rectEnd.top + 'px';
-        clone.style.opacity = 0;
-        clone.style.transform = 'scale(0.5)';
-      });
-
-      clone.addEventListener('transitionend', () => {
-        clone.remove();
-      });
-    });
-  }
-
-
-  function flyToPlayer(id) {
-
-    let element = document.getElementById(id);
-    if (!element)
-      return;
-
-    const clone = element.cloneNode(true);
-    const rectStart = element.getBoundingClientRect();
-    const player = document.querySelector('.player');
-    const rectEnd = player.getBoundingClientRect();
-
-    clone.style.position = 'fixed';
-    clone.style.left = rectStart.left + 'px';
-    clone.style.top = rectStart.top + 'px';
-    clone.style.width = rectStart.width + 'px';
-    clone.style.height = rectStart.height + 'px';
-
-    clone.style.zIndex = 1000;
-    clone.style.transition = 'all 1s ease-out';
-    document.body.appendChild(clone);
-
-    requestAnimationFrame(() => {
-      clone.style.left = rectEnd.left + 'px';
-      clone.style.top = rectEnd.top + 'px';
-      clone.style.opacity = 0;
-      clone.style.transform = 'scale(0.5)';
-    });
-
-    clone.addEventListener('transitionend', () => {
-      clone.remove();
-      // Optional: trigger player update here
-    });
   }
 
   const nextTrack = async (cached) => {
@@ -1241,82 +1001,13 @@ function App() {
   const onPlaylistFilterChange = async (text) => {
     setPlaylistsFilterText(text);
     //filter playlists by text
-    let allPlaylists = [...playlists];
+    let allPlaylists = [...library];
     if (text.trim() == "") {
       setFilteredPlaylists(allPlaylists);
     } else {
       const filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(text.toLowerCase()));
       setFilteredPlaylists(filtered);
     }
-  }
-
-
-  const getPlaylistsPanel = () => {
-    return <>
-      {isMobile() ?
-        <>
-          <PlaylistRow icon={myShazamTracksPlIcon} playlist={myShazamTracksPl} onClick={() => { loadPlaylistPrev(myShazamTracksPl) }} />
-          <PlaylistRow icon={lastListenedPlIcon} playlist={lastListenedPl} onClick={() => { loadPlaylistPrev(lastListenedPl) }} />
-          {/* <div className='playlist-divider-playlists'>PLAYLISTS</div> */}
-        </> : null}
-
-      {!isMobile() || true ? <div className="toolbar-wrapper">
-
-        <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={playlistsFilterText} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
-        <MoreVertIcon className='toolbar-button'></MoreVertIcon>
-      </div> : null}
-
-      <Virtuoso
-        className={isMobile() ? 'panel-playlists-mobile' : "panel-playlists"}
-        style={{ marginTop: 5 }}
-        totalCount={filteredPlaylists.length}
-        // initialTopMostItemIndex={playlistsScrollTop}
-        // rangeChanged={(range) => {
-        //   setPlaylistsScrollTop(range.startIndex);
-        // }}
-        itemContent={(index) => {
-          const p = filteredPlaylists[index];
-          return isMobile() ?
-            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { loadPlaylistPrev(p); setSelectedPlaylistIndex(index) }} />
-            :
-            <PlaylistRow onSwipedRight={() => { addPlaylistToToPlaylist(p) }} id={"pl" + p.id} onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { loadPlaylistPrev(p); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
-        }}
-      />
-
-
-      {/* {playlists.map((p, index) => (
-        <div key={"pl" + index}>
-          {
-            isMobile() ?
-              <PlaylistRow onBulbCheckClick={addToSpotifyPlaylist} onLongPressShuffle={(pl, onof) => { onLongPressShuffle(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { setCurrentTab("2"); getTracks(p.id); setSearchText(p.name); setSelectedPlaylistIndex(index) }} />
-              :
-              <PlaylistRow onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
-          }
-
-        </div>
-      ))}
-      <div className='playlist-divider-albums'>ALBUMS</div> */}
-    </>
-  }
-
-  const getAlbumsPanel = () => {
-    return <Virtuoso
-      className={isMobile() ? 'hideScrollbar' : ""}
-      style={{ height: '100%' }}
-      totalCount={albums.length}
-      // initialTopMostItemIndex={albumsScrollTop}
-      // rangeChanged={(range) => {
-      //   setAlbumsScrollTop(range.startIndex);
-      // }}
-      itemContent={(index) => {
-        const p = albums[index];
-        return isMobile() ?
-          <PlaylistRow id={"tr" + p.id} onSwipedRight={() => addPlaylistToToPlaylist(p)} album onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { setCurrentTab("2"); getTracks(p.id); setSearchText(p.name); setSelectedPlaylistIndex(index) }} />
-          :
-          <PlaylistRow id={"tr" + p.id} onSwipedRight={() => addPlaylistToToPlaylist(p)} album onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
-
-      }}
-    />
   }
 
   const onTrackLongPress = (track, e) => {
@@ -1335,20 +1026,6 @@ function App() {
     setShowPlaylistPicker(true);
   }
 
-  const sensors = useSensors(
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 150,
-        tolerance: 5,
-      },
-    }),
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    })
-  );
-
   const getTracksPanel = () => {
     return loadingTracks ? <div className='loader'></div> : <>
       <Virtuoso
@@ -1359,8 +1036,8 @@ function App() {
           if (!tr) return null;
 
           return isMobile() ?
-            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-            <TrackRow id={tr.id} key={tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+            <TrackRow id={tr.id} key={tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
         }}
       />
     </>
@@ -1396,28 +1073,28 @@ function App() {
     addToPlaylist(tr, null, id);
   }
 
-  const getReordableTrackList = (trackList, dragEndHandler, key, onSwipedRight) => {
-    return (
-      <>
-        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={dragEndHandler} modifiers={[restrictToVerticalAxis]}>
-          <SortableContext items={(trackList || []).map((i, index) => key + index + "-" + i.id)} strategy={rectSortingStrategy}>
-            <Virtuoso
-              style={{ height: '100%' }}
-              totalCount={trackList.length}
-              itemContent={(index) => {
-                const tr = trackList[index];
-                if (!tr) return null;
+  // const getReordableTrackList = (trackList, dragEndHandler, key, onSwipedRight) => {
+  //   return (
+  //     <>
+  //       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={dragEndHandler} modifiers={[restrictToVerticalAxis]}>
+  //         <SortableContext items={(trackList || []).map((i, index) => key + index + "-" + i.id)} strategy={rectSortingStrategy}>
+  //           <Virtuoso
+  //             style={{ height: '100%' }}
+  //             totalCount={trackList.length}
+  //             itemContent={(index) => {
+  //               const tr = trackList[index];
+  //               if (!tr) return null;
 
-                return isMobile() ?
-                  <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-                  <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
-              }}
-            />
-          </SortableContext>
-        </DndContext>
-      </>
-    );
-  };
+  //               return isMobile() ?
+  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+  //             }}
+  //           />
+  //         </SortableContext>
+  //       </DndContext>
+  //     </>
+  //   );
+  // };
 
   const getLastListened = async () => {
 
@@ -1434,7 +1111,7 @@ function App() {
 
 
     // let lastTracks = [];
-    // for (const pl of playlists) {
+    // for (const pl of library) {
     //   for (const tr of pl.tracks) {
     //     if (tr.datePlayed) {
     //       lastTracks.push(tr);
@@ -1510,7 +1187,6 @@ function App() {
 
   const inputRef = useRef(null);
 
-
   const onAlbumClick = async (album) => {
     setLoadingTracks(true);
     let tracks = await api.getAlbumTracks(album.id);
@@ -1520,7 +1196,7 @@ function App() {
 
   const loadPlaylistPrev = async (pl) => {
     setCurrentTab("plprev");
-    pl.tracks.map((tr) => tr.uid = newGuid());
+    // pl.tracks.map((tr) => tr.uid = newGuid());
 
 
     if (pl.id == "MyShazamedTracks") {
@@ -1588,7 +1264,7 @@ function App() {
 
                 <TabPanel>
                   {selectedArtist && selectedArtist.tracks.map((tr, index) => {
-                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} playlists={playlists.filter(x => x.tracks.some(t => t.id == tr.id))} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
                   })}
                 </TabPanel>
                 <TabPanel>
@@ -1657,7 +1333,7 @@ function App() {
                   transition={{ duration: 0.2, ease: "easeInOut" }}
                   className="fixed top-0 left-0 w-72 h-full bg-gray-900 text-white shadow-lg"
                 >
-                  <PlaylistPicker onClick={addToSpotifyPlaylist} track={selectedTrack} onSwipedLeft={() => setShowPlaylistPicker(false)} onClose={() => setShowPlaylistPicker(false)} playlists={playlists} />
+                  <PlaylistPicker onClick={addToSpotifyPlaylist} track={selectedTrack} onSwipedLeft={() => setShowPlaylistPicker(false)} onClose={() => setShowPlaylistPicker(false)} playlists={library} />
 
 
                 </motion.div>
@@ -1698,20 +1374,7 @@ function App() {
                 <tr>
                   {tab != 4 ? <td colSpan={4} className='tab-panel'>
                     <Activity mode={tab == "1" ? "visible" : "hidden"}>
-                      <div className='panel-playlists-mobile'>
-                        {loadingPlaylists ?
-                          <>
-                            <div className="loader-text">{loadingPlaylistsText}</div>
-                            <div className='loader'>
-
-                            </div>
-                          </>
-                          :
-                          <>
-                            {getPlaylistsPanel()}
-                            {/* {getAlbumsPanel()} */}
-                          </>}
-                      </div>
+                      <PanelLibrary onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                     </Activity>
                     <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
                       <div className="toolbar-wrapper">
@@ -1720,23 +1383,22 @@ function App() {
                       <div className='panel-playlist-mobile'>
                         {false ?
                           <>
-                            <div className="loader-text">{loadingPlaylistsText}</div>
+                            <div className="loader-text">{loadingLibrary}</div>
                             <div className='loader'>
 
                             </div>
                           </>
                           :
                           <>
-                            {getReordableTrackList(selectedPlaylistTracks, handleSelectedPlaylistDragEnd, "spl", onTracksSwipedRight)}
-                            {/* {getAlbumsPanel()} */}
+                            <ReordableTrackList onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
                           </>}
                       </div>
                     </Activity>
-                    <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
+                    {/* <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
                       <div className='panel-playlists-mobile'>
-                        {loadingPlaylists ?
+                        {loadingLibrary ?
                           <>
-                            <div className="loader-text">{loadingPlaylistsText}</div>
+                            <div className="loader-text">{loadingLibrary}</div>
                             <div className='loader'>
 
                             </div>
@@ -1746,7 +1408,7 @@ function App() {
                             {getAlbumsPanel()}
                           </>}
                       </div>
-                    </Activity>
+                    </Activity> */}
 
                     <Activity mode={tab == "2" ? "visible" : "hidden"}>
                       <div className="toolbar-wrapper">
@@ -1763,7 +1425,7 @@ function App() {
                       {
                         playlistTracks.length > 0 ?
                           <div className='panel-playlist-mobile'>
-                            {getReordableTrackList(playlistTracks, handlePlaylistDragEnd, "pl", onPlaylistSwipedRight)}
+                            <ReordableTrackList onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
                           </div>
                           :
                           <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
@@ -1778,7 +1440,7 @@ function App() {
                   {tab == 4 ? <td colSpan={4} className='tab-panel'>
                     <button style={{ float: "right" }}>{time}</button>
                     <button style={{ float: "right" }} onClick={logout}>Logout</button>
-                    <button style={{ float: "right" }} onClick={changeTheme}>Change theme</button>
+                    <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
                     <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
                     <button onClick={checkForUpdates}>Check for updates</button>
                     {/* <button onClick={refreshAccessToken}>refresh at</button> */}
@@ -1793,8 +1455,8 @@ function App() {
             <div className='footer-mobile player'>
 
               {token ?
-                // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
-                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
+                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
 
                 : null}
             </div>
@@ -1865,7 +1527,7 @@ function App() {
                         {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                       </div>
                       <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
-                      <button style={{ float: "right" }} onClick={changeTheme}>Change theme</button>
+                      <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
                       <button style={{ float: "right" }} onClick={logout}>Logout</button>
                       <button style={{ float: "right" }}>{time}</button>
                     </td>
@@ -1883,7 +1545,7 @@ function App() {
                         />
                       </td>
                       <td className='selected-track-container'>
-                        {playlists.map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        {library.map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                       </td>
                     </tr>
                   </tbody>
@@ -1891,24 +1553,10 @@ function App() {
             </div>
             <div className="main">
               {mode == "normal" ?
-                <div className="panel">
-
-
-                  {loadingPlaylists ?
-                    <>
-                      <div className="loader-text">{loadingPlaylistsText}</div>
-                      <div className='loader'>
-
-                      </div>
-                    </>
-                    :
-                    <>
-                      {getPlaylistsPanel()}
-
-                      {/* {getAlbumsPanel()} */}
-                    </>}
-
-                </div> : null}
+                <div className={'panel'}>
+                  <PanelLibrary onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                </div>
+                : null}
               <div id="panel-main" className="panel-main">
                 {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
 
@@ -1924,14 +1572,15 @@ function App() {
 
                 </div> : null}
                 {
-                  getReordableTrackList(selectedPlaylistTracks, handleSelectedPlaylistDragEnd, "spl", onTracksSwipedRight)
+                  <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
                   // getTracksPanel()
                 }
               </div>
               <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
                 {
                   playlistTracks.length > 0 ?
-                    getReordableTrackList(playlistTracks, handlePlaylistDragEnd, "pl", onTracksSwipedRight)
+                    <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
                     :
                     <div className='QueueMusicIcon'>
                       <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
@@ -1942,84 +1591,17 @@ function App() {
             </div>
             <div className="footer player">
               {/* {playbackSDKReady && token ?
-                <Player locked={locked} onNext={() => { if (isLocked()) { return; } nextTrack() }} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={() => setSelectedTrack(track)} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
+                <Player locked={locked} onNext={() => { if (isLocked()) { return; } nextTrack() }} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={() => setSelectedTrack(track)} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
 
 
                 : null} */}
-              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={playlists.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
             </div>
           </div>
       )
       }
     </>
 
-  );
-}
-
-const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, playlists, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
-
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    zIndex: isDragging ? 999 : undefined,
-  };
-
-  return (
-    <li ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`}>
-      <table style={{ width: "100%" }} className={isMobile() ? "item-row-mobile" : "item-row"}>
-        <tbody>
-          <tr>
-            {/* Main content cell */}
-            <td style={{ width: "auto" }}>
-              <TrackRow
-                track={track}
-                forInfo={forInfo}
-                onClick={onClick}
-                onArtistClick={onArtistClick}
-                onDoubleClick={onDoubleClick}
-                onMouseDown={onMouseDown}
-                index={index}
-                onDrop={onDrop}
-                selected={selected}
-                onContextMenu={onContextMenu}
-                playlists={playlists}
-                forPlaylist
-                forPlayer={forPlayer}
-                hideImage={hideImage}
-                playing={playing}
-                onPlClick={onPlClick}
-                id={id}
-                onAddToPlaylistButton={onAddToPlaylistButton}
-                onLongPress={onLongPress}
-                onSwipedLeft={onSwipedLeft}
-                onSwipedRight={onSwipedRight}
-              />
-            </td>
-
-            {/* Drag handle cell */}
-            <td
-              style={{
-                touchAction: "none",
-                width: 40,
-                textAlign: "right",
-                verticalAlign: "middle",
-                display: isMobile() || true ? "table-cell" : "none",
-
-              }}
-              {...attributes}
-              {...listeners}
-            >
-
-              <DragIndicatorIcon className='toolbar-button'></DragIndicatorIcon>
-              {/* <DragHandleIcon /> */}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-    </li>
   );
 }
 
