@@ -1,10 +1,12 @@
+import { library } from "@fortawesome/fontawesome-svg-core";
+
 // database.js
 const DB_NAME = 'SpotifyPlaylistsDB';
 const DB_VERSION = 4
-const PLAYLISTS_STORE_NAME = 'playlists';
-const ALBUMS_STORE_NAME = 'albums';
 const BACKGROUND_PLAYLISTS_STORE_NAME = 'backgroundPlaylists';
 const HISTORY_STORE_NAME = 'history';
+
+const LIBRARY_STORE_NAME = 'library';
 
 /**
  * Open or create the IndexedDB database.
@@ -15,14 +17,18 @@ function openDB() {
 
     request.onupgradeneeded = (event) => {
 
-       const db = event.target.result;
-      if (!db.objectStoreNames.contains(PLAYLISTS_STORE_NAME)) {
-        db.createObjectStore(PLAYLISTS_STORE_NAME, { keyPath: 'id' });
+      const db = event.target.result;
+      if (!db.objectStoreNames.contains(LIBRARY_STORE_NAME)) {
+        db.createObjectStore(LIBRARY_STORE_NAME , { keyPath: 'id' });
       }
 
-      if (!db.objectStoreNames.contains(ALBUMS_STORE_NAME)) {
-        db.createObjectStore(ALBUMS_STORE_NAME, { keyPath: 'id' });
-      }
+      // if (!db.objectStoreNames.contains(PLAYLISTS_STORE_NAME)) {
+      //   db.createObjectStore(PLAYLISTS_STORE_NAME, { keyPath: 'id' });
+      // }
+
+      // if (!db.objectStoreNames.contains(ALBUMS_STORE_NAME)) {
+      //   db.createObjectStore(ALBUMS_STORE_NAME, { keyPath: 'id' });
+      // }
 
       if (!db.objectStoreNames.contains(BACKGROUND_PLAYLISTS_STORE_NAME)) {
         db.createObjectStore(BACKGROUND_PLAYLISTS_STORE_NAME, { keyPath: 'id' });
@@ -46,14 +52,15 @@ function openDB() {
  * Each playlist must have a unique `id` property.
  * @param {Array<Object>} playlists
  */
-export async function savePlaylists(playlists) {
-  const db = await openDB();
-  const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readwrite');
-  const store = tx.objectStore(PLAYLISTS_STORE_NAME);
 
-  for (const playlist of playlists) {
+export async function saveLibrary(library) {
+  const db = await openDB();
+  const tx = db.transaction(LIBRARY_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(LIBRARY_STORE_NAME);
+
+  for (const item of library) {
     await new Promise((resolve, reject) => {
-      const request = store.put(playlist);
+      const request = store.put(item);
       request.onsuccess = resolve;
       request.onerror = reject;
     });
@@ -62,41 +69,60 @@ export async function savePlaylists(playlists) {
   db.close();
 }
 
-export async function saveAlbums(albums) {
-  const db = await openDB();
-  const tx = db.transaction(ALBUMS_STORE_NAME, 'readwrite');
-  const store = tx.objectStore(ALBUMS_STORE_NAME);
+// export async function savePlaylists(playlists) {
+//   const db = await openDB();
+//   const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readwrite');
+//   const store = tx.objectStore(PLAYLISTS_STORE_NAME);
 
-  for (const album of albums) {
-    await new Promise((resolve, reject) => {
-      const request = store.put(album);
-      request.onsuccess = resolve;
-      request.onerror = reject;
-    });
-  }
+//   for (const playlist of playlists) {
+//     await new Promise((resolve, reject) => {
+//       const request = store.put(playlist);
+//       request.onsuccess = resolve;
+//       request.onerror = reject;
+//     });
+//   }
 
-  db.close();
-}
+//   db.close();
+// }
+
+// export async function saveAlbums(albums) {
+//   const db = await openDB();
+//   const tx = db.transaction(ALBUMS_STORE_NAME, 'readwrite');
+//   const store = tx.objectStore(ALBUMS_STORE_NAME);
+
+//   for (const album of albums) {
+//     await new Promise((resolve, reject) => {
+//       const request = store.put(album);
+//       request.onsuccess = resolve;
+//       request.onerror = reject;
+//     });
+//   }
+
+//   db.close();
+// }
 
 export async function loadBackgroundPlaylists() {
   const db = await openDB();
-  const tx = db.transaction(BACKGROUND_PLAYLISTS_STORE_NAME, 'readonly');
-  const store = tx.objectStore(BACKGROUND_PLAYLISTS_STORE_NAME);
+  const tx = db.transaction(LIBRARY_STORE_NAME, 'readonly');
+  const store = tx.objectStore(LIBRARY_STORE_NAME);
 
-  const playlists = await new Promise((resolve, reject) => {
+  const playlist = await new Promise((resolve, reject) => {
     const request = store.getAll();
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      const result = request.result.find(p => p.shuffle); // match by field
+      resolve(result);
+    };
     request.onerror = () => reject(request.error);
   });
 
   db.close();
-  return playlists;
+  return playlist;
 }
 
 export async function saveBackgroundPlaylists(playlists) {
   const db = await openDB();
-  const tx = db.transaction(BACKGROUND_PLAYLISTS_STORE_NAME, 'readwrite');
-  const store = tx.objectStore(BACKGROUND_PLAYLISTS_STORE_NAME);
+  const tx = db.transaction(LIBRARY_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(LIBRARY_STORE_NAME);
   // Clear all records in the store
   const clearRequest = store.clear();
 
@@ -127,71 +153,86 @@ export async function addToHistory(track) {
  * Load all playlists from IndexedDB.
  * @returns {Promise<Array<Object>>}
  */
-export async function loadPlaylists() {
+export async function loadLibray() {
   const db = await openDB();
-  const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readonly');
-  const store = tx.objectStore(PLAYLISTS_STORE_NAME);
+  const tx = db.transaction(LIBRARY_STORE_NAME, 'readonly');
+  const store = tx.objectStore(LIBRARY_STORE_NAME);
 
-  const playlists = await new Promise((resolve, reject) => {
+  const library = await new Promise((resolve, reject) => {
     const request = store.getAll();
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
 
   db.close();
-  return playlists;
+  return library;
 }
 
-export async function loadPlaylistById(id) {
-  const db = await openDB();
-  const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readonly');
-  const store = tx.objectStore(PLAYLISTS_STORE_NAME);
+// export async function loadPlaylists() {
+//   const db = await openDB();
+//   const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readonly');
+//   const store = tx.objectStore(PLAYLISTS_STORE_NAME);
 
-  const playlist = await new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => {
-      const result = request.result.find(p => p.id === id); // match by field
-      resolve(result);
-    };
-    request.onerror = () => reject(request.error);
-  });
+//   const playlists = await new Promise((resolve, reject) => {
+//     const request = store.getAll();
+//     request.onsuccess = () => resolve(request.result);
+//     request.onerror = () => reject(request.error);
+//   });
 
-  db.close();
-  return playlist;
-}
+//   db.close();
+//   return playlists;
+// }
 
-export async function loadAlbums() {
-  const db = await openDB();
-  const tx = db.transaction(ALBUMS_STORE_NAME, 'readonly');
-  const store = tx.objectStore(ALBUMS_STORE_NAME);
+// export async function loadPlaylistById(id) {
+//   const db = await openDB();
+//   const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readonly');
+//   const store = tx.objectStore(PLAYLISTS_STORE_NAME);
 
-  const albums = await new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => resolve(request.result);
-    request.onerror = () => reject(request.error);
-  });
+//   const playlist = await new Promise((resolve, reject) => {
+//     const request = store.getAll();
+//     request.onsuccess = () => {
+//       const result = request.result.find(p => p.id === id); // match by field
+//       resolve(result);
+//     };
+//     request.onerror = () => reject(request.error);
+//   });
 
-  db.close();
-  return albums;
-}
+//   db.close();
+//   return playlist;
+// }
 
-export async function loadAlbumById(id) {
-  const db = await openDB();
-  const tx = db.transaction(ALBUMS_STORE_NAME, 'readonly');
-  const store = tx.objectStore(ALBUMS_STORE_NAME);
+// export async function loadAlbums() {
+//   const db = await openDB();
+//   const tx = db.transaction(ALBUMS_STORE_NAME, 'readonly');
+//   const store = tx.objectStore(ALBUMS_STORE_NAME);
 
-  const album = await new Promise((resolve, reject) => {
-    const request = store.getAll();
-    request.onsuccess = () => {
-      const result = request.result.find(a => a.id === id); // match by field
-      resolve(result);
-    };
-    request.onerror = () => reject(request.error);
-  });
+//   const albums = await new Promise((resolve, reject) => {
+//     const request = store.getAll();
+//     request.onsuccess = () => resolve(request.result);
+//     request.onerror = () => reject(request.error);
+//   });
 
-  db.close();
-  return album;
-}
+//   db.close();
+//   return albums;
+// }
+
+// export async function loadAlbumById(id) {
+//   const db = await openDB();
+//   const tx = db.transaction(ALBUMS_STORE_NAME, 'readonly');
+//   const store = tx.objectStore(ALBUMS_STORE_NAME);
+
+//   const album = await new Promise((resolve, reject) => {
+//     const request = store.getAll();
+//     request.onsuccess = () => {
+//       const result = request.result.find(a => a.id === id); // match by field
+//       resolve(result);
+//     };
+//     request.onerror = () => reject(request.error);
+//   });
+
+//   db.close();
+//   return album;
+// }
 
 export async function getHistory() {
   const db = await openDB();
@@ -213,13 +254,17 @@ export async function getHistory() {
 export async function clearDatabase() {
   const db = await openDB();
 
-  const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readwrite');
-  const store = tx.objectStore(PLAYLISTS_STORE_NAME);
-  await store.clear();
+  const txl = db.transaction(LIBRARY_STORE_NAME, 'readwrite');
+  const storel = txl.objectStore(LIBRARY_STORE_NAME);
+  await storel.clear();
 
-  const tx2 = db.transaction(ALBUMS_STORE_NAME, 'readwrite');
-  const store2 = tx2.objectStore(ALBUMS_STORE_NAME);
-  await store2.clear();
+  // const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readwrite');
+  // const store = tx.objectStore(PLAYLISTS_STORE_NAME);
+  // await store.clear();
+
+  // const tx2 = db.transaction(ALBUMS_STORE_NAME, 'readwrite');
+  // const store2 = tx2.objectStore(ALBUMS_STORE_NAME);
+  // await store2.clear();
 
   const tx3 = db.transaction(BACKGROUND_PLAYLISTS_STORE_NAME, 'readwrite');
   const store3 = tx3.objectStore(BACKGROUND_PLAYLISTS_STORE_NAME);

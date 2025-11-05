@@ -316,10 +316,10 @@ const getAlbumTracks = async (albumId) => {
 
 const getFullPlaylists = async (callback) => {
   const playlists = await getPlaylists();
-  return await updatePlaylists(playlists, callback);
+  return await updateLibrary(playlists, callback);
 };
 
-const updatePlaylists = async (playlists, callback) => {
+const updateLibrary = async (playlists, callback) => {
   const fullPlaylists = [];
 
   let index = 0;
@@ -599,7 +599,7 @@ export default {
   getRecommendations,
   fetchPlaylistsAndTracks,
   getFullPlaylists,
-  updatePlaylists,
+  updateLibrary,
   addTrackToPlaylist,
   removeTrackFromPlaylist,
   refreshAccessToken,

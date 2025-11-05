@@ -8,7 +8,7 @@ import api from '../Api';
 import PlaylistRow from '../components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid } from '../util';
 import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
-import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from '../database';
+import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase, saveLibrary } from '../database';
 
 import Settings from '@mui/icons-material/Settings';
 import SaveIcon from '@mui/icons-material/Save';
@@ -87,12 +87,12 @@ const lastListenedPl = {
 }
 
 const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, onLongPress, onShuffleClick}) => {
-
-    const [filter, setFilter] = useState();
   
-    const {library, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex} = useAppStore();
+    const { library, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex} = useAppStore();
 
     const [filteredLibrary, setFilteredLibrary] = useState([...library]);
+
+    const [filter, setFilter] = useState("");
 
     useEffect(()=>{
         if(filteredLibrary.length == 0 ){
@@ -113,17 +113,25 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
     }
 
     const addToBackgroundPlaylists = async (pl, bulbOn) => {
-        let pls = [...backgroundPlaylists];
-        if (bulbOn) {
-            pls = pls.filter(x => x.id != pl.id);
-        } else {
-            if (pls.find(x => x.id == pl.id)) {
-                return;
-            }
-            pls.push(pl);
-        }
-        setBackgroundPlaylists(pls);
-        saveBackgroundPlaylists(pls);
+        let lib = [...library];
+        // if (bulbOn) {
+        let p = lib.filter(x => x.id != pl.id)[0];
+        p.shuffle = bulbOn || 1;
+
+        setLibrary(lib)
+        setFilteredLibrary(lib.filter(x=>x.name.toLowerCase().includes(filter)));
+
+        // } else {
+        //     if (pls.find(x => x.id == pl.id)) {
+        //         return;
+        //     }
+        //     pls.push(pl);
+        // }
+
+        debugger;
+        pl.shuffle = bulbOn || 1;
+         
+        saveLibrary([pl]);
     }
 
     const inputRef = useRef(null);
@@ -160,9 +168,9 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
                             itemContent={(index) => {
                                 const p = filteredLibrary[index];
                                 return isMobile() ?
-                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={onBulbClick} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
+                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={onBulbClick} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
                                     :
-                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { if (onClick) onClick(p); setSelectedLibraryIndex(index); }} />
+                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { if (onClick) onClick(p); setSelectedLibraryIndex(index); }} />
                             }}
                         />
                     </>

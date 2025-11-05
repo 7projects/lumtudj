@@ -28,10 +28,6 @@ const useAppStore = create((set) => ({
   selectedPlaylistTrackIndex: -1,
   setSelectedPlaylistTrackIndex: (index) => set({ selectedPlaylistTrackIndex: index }),
 
-  // --- Background playlists ---
-  backgroundPlaylists: [],
-  setBackgroundPlaylists: (plsts) => set({ backgroundPlaylists: plsts }),
-
   selectedPlaylistChanged: false,
   setSelectedPlaylistChanged: (value) => set({ selectedPlaylistChanged: value }),
 

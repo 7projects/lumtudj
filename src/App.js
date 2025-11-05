@@ -8,7 +8,7 @@ import api from './Api';
 import PlaylistRow from './components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme } from './util';
 import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
-import { savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
+import {loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
 import Settings from '@mui/icons-material/Settings';
 import SaveIcon from '@mui/icons-material/Save';
@@ -70,7 +70,7 @@ function useConstructor(callback) {
 }
 
 function App() {
-  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -79,7 +79,7 @@ function App() {
 
   const [albums, setAlbums] = useState([]);
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  const [filteredPlaylists, setFilteredPlaylists] = useState([]);
+  const [filteredLibrary, setFilteredLibrary] = useState([]);
   const [tracks, setTracks] = useState([]);
 
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
@@ -178,8 +178,19 @@ function App() {
 
   const getPlaylistsAndAlbums = async () => {
 
-    const cachedPlaylists = await loadPlaylists(); // Load back
-    const cachedAlbums = await loadAlbums(); // Load back
+
+    const cacheLibrary = await loadLibray();
+    if (cacheLibrary && cacheLibrary.length > 0) {
+      setLibrary(cacheLibrary);
+    }else{
+      updateLibrary();
+    }
+
+
+    return;
+
+    // const cachedPlaylists = await loadPlaylists(); // Load back
+    // const cachedAlbums = await loadAlbums(); // Load back
 
     // if (!cached.some(playlist => playlist.name == "lastlistened")) {
     //   cached.unshift({
@@ -190,24 +201,24 @@ function App() {
     // }
 
 
-    if (cachedPlaylists && cachedPlaylists.length > 0) {
-      setLibrary([...cachedPlaylists]);
-      setFilteredPlaylists([...cachedPlaylists]);
-    }
+    // if (cachedPlaylists && cachedPlaylists.length > 0) {
+    //   setLibrary([...cachedPlaylists]);
+    //   setFilteredLibrary([...cachedPlaylists]);
+    // }
 
-    if (cachedAlbums && cachedAlbums.length > 0) {
-      setAlbums(cachedAlbums);
-    }
+    // if (cachedAlbums && cachedAlbums.length > 0) {
+    //   setAlbums(cachedAlbums);
+    // }
 
-    if (cachedPlaylists == null || cachedPlaylists.length == 0) {
-      updatePlaylists();
-      return;
-    }
+    // if (cachedPlaylists == null || cachedPlaylists.length == 0) {
+    //   updateLibrary();
+    //   return;
+    // }
 
-    if (cachedAlbums == null || cachedAlbums.length == 0) {
-      updatePlaylists();
-      return;
-    }
+    // if (cachedAlbums == null || cachedAlbums.length == 0) {
+    //   updateLibrary();
+    //   return;
+    // }
 
   };
 
@@ -534,19 +545,25 @@ function App() {
     window.localStorage.clear();
   };
 
-  const updatePlaylists = async () => {
 
-    setLoadingLibrary("LOADING PLAYLISTS...")
+  const updateLibrary = async () => {
+
+    setLoadingLibrary("LOADING LIBRARY...")
 
     try {
-      const plsts = await api.getFullPlaylists((i, l) => setLoadingLibrary("LOADING PLAYLISTS " + i + "/" + l));
-      savePlaylists(plsts);
-      setLibrary(plsts);
-      setFilteredPlaylists(plsts);
 
       const albms = await api.getFullAlbums((i, l) => setLoadingLibrary("LOADING ALBUMS " + i + "/" + l));
-      saveAlbums(albms);
-      setAlbums(albms);
+
+      const plsts = await api.getFullPlaylists((i, l) => setLoadingLibrary("LOADING PLAYLISTS " + i + "/" + l));
+
+      albms.forEach(alb => {alb.type = "album";});
+      plsts.forEach(pl => {pl.type = "playlist";});
+
+      const lib = [...plsts, ...albms];
+
+      saveLibrary(lib);
+      setLibrary(lib);
+      setFilteredLibrary(plsts);
 
       setLoadingLibrary(null);
 
@@ -558,9 +575,33 @@ function App() {
 
   }
 
+  // const updateLibrary = async () => {
+
+  //   setLoadingLibrary("LOADING LIBRARY...")
+
+  //   try {
+  //     const plsts = await api.getFullPlaylists((i, l) => setLoadingLibrary("LOADING PLAYLISTS " + i + "/" + l));
+  //     savePlaylists(plsts);
+  //     setLibrary(plsts);
+  //     setFilteredLibrary(plsts);
+
+  //     const albms = await api.getFullAlbums((i, l) => setLoadingLibrary("LOADING ALBUMS " + i + "/" + l));
+  //     saveAlbums(albms);
+  //     setAlbums(albms);
+
+  //     setLoadingLibrary(null);
+
+  //   }
+  //   catch {
+  //     //go to login page
+  //     setToken("");
+  //   }
+
+  // }
+
   const checkForUpdates = async () => {
-    const cached = await loadPlaylists(); // Load back
-    const fresh = await api.getPlaylists();
+    const cached = await loadLibray(); // Load back
+    const fresh = await api.getFreshLibrary();
 
     let { toUpdate, deleted } = getPlaylistsToUpdate(cached, fresh);
 
@@ -571,7 +612,7 @@ function App() {
       const confirmUpdate = window.confirm("Playlists to update: " + toUpdate.map(p => p.name).join(", ") + ". Do you want to update the playlists?");
       if (confirmUpdate) {
         setLoadingLibrary("UPDATING PLAYLISTS...");
-        const updatedPlaylists = await api.updatePlaylists(toUpdate, (i, l) => setLoadingLibrary("UPDATING PLAYLISTS " + i + "/" + l));
+        const updatedPlaylists = await api.updateLibrary(toUpdate, (i, l) => setLoadingLibrary("UPDATING PLAYLISTS " + i + "/" + l));
 
         // Update the cached playlists with the new data from browser
         for (const pl of library) {
@@ -589,7 +630,7 @@ function App() {
           }
         }
 
-        savePlaylists(updatedPlaylists);
+        saveLibrary(updatedPlaylists);
 
         await getPlaylistsAndAlbums(); // Reload playlists from IndexedDB
         setLoadingLibrary(null);
@@ -752,7 +793,7 @@ function App() {
       pl.count = pl.tracks.length;
       p = pl;
       setLibrary(pls);
-      savePlaylists(pls);
+      saveLibrary(pls);
     }
   }
 
@@ -768,7 +809,7 @@ function App() {
         pls[selectedPlaylistIndex] = pl;
         pl.count = pl.tracks.length;
         setLibrary(pls);
-        savePlaylists([pl]);
+        saveLibrary([pl]);
         closeMenu();
       }
 
@@ -885,18 +926,7 @@ function App() {
       }
     }
 
-    if (backgroundPlaylists && backgroundPlaylists.length > 0) {
-      pls = backgroundPlaylists.filter(x => x.tracks.some(x => x.id == track.id));
-      for (const pl of pls) {
-        const trs = pl.tracks.filter(x => x.id == track.id);
-        for (const tr of trs) {
-          tr.datePlayed = new Date();
-        }
-      }
-    }
-
-
-    await savePlaylists(pls);
+    await saveLibrary(pls);
     getPlaylistsAndAlbums();
 
   }
@@ -1020,10 +1050,10 @@ function App() {
     //filter playlists by text
     let allPlaylists = [...library];
     if (text.trim() == "") {
-      setFilteredPlaylists(allPlaylists);
+      setFilteredLibrary(allPlaylists);
     } else {
       const filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(text.toLowerCase()));
-      setFilteredPlaylists(filtered);
+      setFilteredLibrary(filtered);
     }
   }
 
@@ -1509,7 +1539,7 @@ function App() {
                             <SearchIcon className="search-icon" />
                             <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                           </div> : null}
-                        {/* <button onClick={updatePlaylists}>Update playlists</button>*/}
+                        {/* <button onClick={updateLibrary}>Update playlists</button>*/}
                         {/* <button onClick={checkForUpdates}>Check for updates</button> */}
                         {/* <button onClick={checkForUpdates}>Check for updates</button> */}
                         {/* <button onClick={refreshAccessToken}>refresh at</button> */}
@@ -1561,7 +1591,7 @@ function App() {
                         />
                       </td>
                       <td className='selected-track-container'>
-                        {library.map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        {library.filter(l=>l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                       </td>
                     </tr>
                   </tbody>
