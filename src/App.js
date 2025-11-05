@@ -491,6 +491,9 @@ function App() {
 
 
   const handleKeyDown = async (e) => {
+
+    let st = searchText + e.key;
+
     setSelectedLibraryItem(null);
     setSelectedLibraryIndex(-1);
     if (e.key === 'Enter' && searchText.trim()) {
@@ -498,6 +501,16 @@ function App() {
       e.preventDefault();
       if (inputRef && inputRef.current)
         inputRef.current.blur();
+    } else {
+
+      //filter all tracks from library (each playlist in libray contains tracks) whose name contains st
+      let allTracks = [];
+      library.forEach(pl => {
+        allTracks = allTracks.concat(pl.tracks);
+      });
+      let filtered = allTracks.filter(tr => tr.name.toLowerCase().includes(st.toLowerCase()) || tr.artists[0].name.toLowerCase().includes(st.toLowerCase()));
+      setSelectedPlaylistTracks(filtered);
+
     }
   };
 
@@ -1572,7 +1585,7 @@ function App() {
                     <SearchIcon></SearchIcon>
                   } */}
 
-                  <SearchIcon style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
+                  <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
                   {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
 
                     : null}
