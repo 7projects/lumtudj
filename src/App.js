@@ -70,7 +70,7 @@ function useConstructor(callback) {
 }
 
 function App() {
-  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -84,7 +84,6 @@ function App() {
 
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
 
-  const [selectedPlaylist, setSelectedPlaylist] = useState({ name: "pl", tracks: [] });
   const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
   const [selectedPlaylistIndex, setSelectedPlaylistIndex] = useState(-1);
 
@@ -488,7 +487,12 @@ function App() {
 
   }, [code]);
 
+
+
+
   const handleKeyDown = async (e) => {
+    setSelectedLibraryItem(null);
+    setSelectedLibraryIndex(-1);
     if (e.key === 'Enter' && searchText.trim()) {
       search(searchText);
       e.preventDefault();
@@ -1064,7 +1068,6 @@ function App() {
     }
   }
 
-
   const onPlaylistSwipedRight = (tr, id, index) => {
     removeTrackFromPlaylist(index);
   }
@@ -1208,7 +1211,7 @@ function App() {
     }
 
     setSearchText(pl.name);
-    setSelectedPlaylist(pl);
+    setSelectedLibraryItem(pl);
     setPlaylistChanged(false);
     setSelectedPlaylistTracks(pl.tracks);
   }
@@ -1378,7 +1381,7 @@ function App() {
                     </Activity>
                     <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
                       <div className="toolbar-wrapper">
-                        <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedPlaylist.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+                        <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedLibraryItem && selectedLibraryItem.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
                       </div>
                       <div className='panel-playlist-mobile'>
                         {false ?
@@ -1562,6 +1565,21 @@ function App() {
 
                 {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
                 {!isMobile() || true ? <div className="toolbar-wrapper">
+
+                  {/* {selectedLibraryItem ?
+                    <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
+                    :
+                    <SearchIcon></SearchIcon>
+                  } */}
+
+                  <SearchIcon style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
+                  {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
+
+                    : null}
+
+
+
+
                   <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
 
                   {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
@@ -1572,14 +1590,14 @@ function App() {
 
                 </div> : null}
                 {
-                  <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                  <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
                   // getTracksPanel()
                 }
               </div>
               <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
                 {
                   playlistTracks.length > 0 ?
-                    <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                    <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                     :
                     <div className='QueueMusicIcon'>
