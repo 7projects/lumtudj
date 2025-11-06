@@ -109,7 +109,7 @@ export async function loadBackgroundPlaylists() {
   const playlist = await new Promise((resolve, reject) => {
     const request = store.getAll();
     request.onsuccess = () => {
-      const result = request.result.find(p => p.shuffle); // match by field
+      const result = request.result.filter(p => p.shuffle); // match by field
       resolve(result);
     };
     request.onerror = () => reject(request.error);

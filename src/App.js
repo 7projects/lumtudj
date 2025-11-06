@@ -8,7 +8,7 @@ import api from './Api';
 import PlaylistRow from './components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme } from './util';
 import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
-import {loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
+import { loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
 import Settings from '@mui/icons-material/Settings';
 import SaveIcon from '@mui/icons-material/Save';
@@ -70,7 +70,7 @@ function useConstructor(callback) {
 }
 
 function App() {
-  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -182,7 +182,7 @@ function App() {
     const cacheLibrary = await loadLibray();
     if (cacheLibrary && cacheLibrary.length > 0) {
       setLibrary(cacheLibrary);
-    }else{
+    } else {
       updateLibrary();
     }
 
@@ -227,8 +227,9 @@ function App() {
 
     const cached = await loadBackgroundPlaylists(); // Load back
 
+    debugger;
+
     if (cached && cached.length > 0) {
-      setBackgroundPlaylists(cached);
 
       return cached;
     }
@@ -296,7 +297,11 @@ function App() {
 
   const handleLockKeyDown = (event) => {
 
+
+    console.log("hlkd");
+
     if (localStorage.getItem("locked") != "true") return; // ignore input if already unlocked
+
 
     // Start timer on first keypressdin
     if (!timer) {
@@ -503,7 +508,22 @@ function App() {
 
   const handleKeyDown = async (e) => {
 
-    let st = searchText + e.key;
+    //check if e.key is alphanumeric or space
+    let st = searchText;
+
+    if (e.key === 'Backspace') {
+      st = st.slice(0, -1);
+    }
+
+    if (st.trim() == "") {
+      setSearchText("");
+      setSelectedPlaylistTracks([]);
+      return;
+    }
+
+    if (e.key.match(/^[a-zA-Z0-9 ]$/) && e.key !== 'Enter') {
+      st += e.key;
+    }
 
     setSelectedLibraryItem(null);
     setSelectedLibraryIndex(-1);
@@ -520,7 +540,10 @@ function App() {
         allTracks = allTracks.concat(pl.tracks);
       });
       let filtered = allTracks.filter(tr => tr.name.toLowerCase().includes(st.toLowerCase()) || tr.artists[0].name.toLowerCase().includes(st.toLowerCase()));
-      setSelectedPlaylistTracks(filtered);
+
+      const distinct = [...new Map(filtered.map(item => [item.id, item])).values()];
+
+      setSelectedPlaylistTracks(distinct);
 
     }
   };
@@ -556,8 +579,8 @@ function App() {
 
       const plsts = await api.getFullPlaylists((i, l) => setLoadingLibrary("LOADING PLAYLISTS " + i + "/" + l));
 
-      albms.forEach(alb => {alb.type = "album";});
-      plsts.forEach(pl => {pl.type = "playlist";});
+      albms.forEach(alb => { alb.type = "album"; });
+      plsts.forEach(pl => { pl.type = "playlist"; });
 
       const lib = [...plsts, ...albms];
 
@@ -876,6 +899,14 @@ function App() {
   }
 
   const lock = () => {
+
+    if (!handleLockKeyDownRef.current) {
+      handleLockKeyDownRef.current = handleLockKeyDown;
+    }
+
+    document.removeEventListener('keydown', handleLockKeyDownRef.current);
+    document.addEventListener('keydown', handleLockKeyDownRef.current);
+
     localStorage.setItem("locked", true);
     setLocked(true);
   }
@@ -937,6 +968,7 @@ function App() {
     //   play(playlist[playIndex + 1]);
     // }
 
+    debugger;
     const bpl = cached ? cached : await loadBackgroundPlaylists();
 
 
@@ -1033,7 +1065,7 @@ function App() {
   }
 
   const onLongPress = (pl, onof) => {
-    setBackgroundPlaylists([pl]);
+ 
     saveBackgroundPlaylists([pl]);
     setTimeout(() => {
       nextTrack([pl]);
@@ -1568,7 +1600,7 @@ function App() {
                       </td> : null}
                     <td>
                       <div onContextMenu={handleContextMenu} className='app-title'>
-                        {mode == "compact" ? <span>PLAYLIST</span> : null}
+                        {mode == "compact" ? <span>QUEUE</span> : null}
                         {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
                         {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                       </div>
@@ -1591,7 +1623,7 @@ function App() {
                         />
                       </td>
                       <td className='selected-track-container'>
-                        {library.filter(l=>l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                       </td>
                     </tr>
                   </tbody>

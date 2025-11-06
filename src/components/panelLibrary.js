@@ -113,23 +113,18 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
     }
 
     const addToBackgroundPlaylists = async (pl, bulbOn) => {
+
+        debugger;
         let lib = [...library];
         // if (bulbOn) {
-        let p = lib.filter(x => x.id != pl.id)[0];
-        p.shuffle = bulbOn || 1;
+        let p = lib.filter(x => x.id == pl.id)[0];
+        p.shuffle = bulbOn ? 0 : 1;
 
+        debugger;
         setLibrary(lib)
         setFilteredLibrary(lib.filter(x=>x.name.toLowerCase().includes(filter)));
 
-        // } else {
-        //     if (pls.find(x => x.id == pl.id)) {
-        //         return;
-        //     }
-        //     pls.push(pl);
-        // }
-
-        debugger;
-        pl.shuffle = bulbOn || 1;
+        pl.shuffle = bulbOn ? 0 : 1;
          
         saveLibrary([pl]);
     }
@@ -168,7 +163,7 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
                             itemContent={(index) => {
                                 const p = filteredLibrary[index];
                                 return isMobile() ?
-                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={onBulbClick} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
+                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
                                     :
                                     <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { if (onClick) onClick(p); setSelectedLibraryIndex(index); }} />
                             }}

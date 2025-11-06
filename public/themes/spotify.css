@@ -1262,6 +1262,9 @@ code {
 .bulbOffColor {
   fill: #505050;
 }
+.bulbOffColor:hover {
+  fill: #b6b6b6;
+}
 .bulbOn {
   width: 20px;
   height: 20px;
