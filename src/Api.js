@@ -148,7 +148,8 @@ const getPlaylists = async () => {
       count: item.tracks.total,     // total number of tracks
       images: item.images,          // array of image objects
       tracks: [],                   // you can fill this later with actual track data
-      uri: item.uri
+      uri: item.uri,
+      snapshot_id: item.snapshot_id
     }));
 
     playlists.push(...simplified);
@@ -188,8 +189,6 @@ const getAlbums = async () => {
 
     const data = await response.json();
 
-    console.log(data);
-
     const simplified = data.items.map(item => ({
       id: item.album.id,
       addedAt: item.added_at,
@@ -200,18 +199,15 @@ const getAlbums = async () => {
       albumUrl: item.album.external_urls.spotify,
       images: item.album.images,
       tracks: [],
-      uri: item.album.uri
+      uri: item.album.uri,
+      snapshot_id: item.snapshot_id
     }));
 
     albums.push(...simplified);
 
-    ;
-    let tracks = await getAlbumTracks(albums[0].id);
-
     url = data.next; // Spotify gives the next page URL, or null
   }
 
-  console.log(albums);
   return albums;
 };
 

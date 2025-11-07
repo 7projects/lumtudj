@@ -239,6 +239,9 @@ function App() {
 
   useConstructor(async () => {
 
+
+    alert("constructor");
+
     // Handle back/forward navigation
     window.addEventListener('hashchange', () => {
       const hash = window.location.hash.replace('#', '');
@@ -624,22 +627,36 @@ function App() {
 
   const checkForUpdates = async () => {
     const cached = await loadLibray(); // Load back
-    const fresh = await api.getFreshLibrary();
 
-    let { toUpdate, deleted } = getPlaylistsToUpdate(cached, fresh);
+    let fresh = [];
+    const playlists = await api.getPlaylists();
+    const albums = await api.getAlbums();
 
-    if (toUpdate.length > 0) {
-      // alert("Playlists to update: " + toUpdate.map(p => p.name).join(", "));
+    fresh = [...playlists, ...albums];
+
+    let { updated, deleted, metaChanged } = getPlaylistsToUpdate(cached, fresh);
+
+    if (updated.length > 0) {
+      // alert("Playlists to update: " + updated.map(p => p.name).join(", "));
 
       //ipnut box to confirm update
-      const confirmUpdate = window.confirm("Playlists to update: " + toUpdate.map(p => p.name).join(", ") + ". Do you want to update the playlists?");
+      const confirmUpdate = window.confirm("Playlists to update: " + updated.map(p => p.name).join(", ") + ". Do you want to update the playlists?");
+      const confirmDelete = window.confirm("Playlists to delete: " + deleted.map(p => p.name).join(", ") + ". Do you want to delete the playlists?");
+
       if (confirmUpdate) {
         setLoadingLibrary("UPDATING PLAYLISTS...");
-        const updatedPlaylists = await api.updateLibrary(toUpdate, (i, l) => setLoadingLibrary("UPDATING PLAYLISTS " + i + "/" + l));
+        const updatedPlaylists = await api.updateLibrary(updated, (i, l) => setLoadingLibrary("UPDATING PLAYLISTS " + i + "/" + l));
 
         // Update the cached playlists with the new data from browser
         for (const pl of library) {
+          const renamed = metaChanged.find(p => p.id === pl.id);
+          if (renamed) {
+            pl.name = renamed.name;
+            pl.description = renamed.description;
+          };
+
           const updatedPl = updatedPlaylists.find(p => p.id === pl.id);
+
           if (updatedPl) {
             pl.images = updatedPl.images;
             pl.count = updatedPl.tracks.length;
@@ -664,10 +681,15 @@ function App() {
     }
 
     if (deleted.length > 0) {
+
       alert("Playlists deleted: " + deleted.map(p => p.name).join(", "));
+
+      let newLibrary = [...library];
+      newLibrary = newLibrary.filter(pl => !deleted.some(d => d.id === pl.id));
+      setLibrary(newLibrary);
+      saveLibrary(newLibrary);
+
     }
-
-
   }
 
   function getPlaylistsToUpdate(cached, fresh) {
@@ -677,8 +699,9 @@ function App() {
     const freshMap = new Map();
     fresh.forEach(p => freshMap.set(p.id, p));
 
-    const toUpdate = [];
+    const updated = [];
     const deleted = [];
+    const metaChanged = [];
 
     // Detect new or changed playlists
     for (const p of fresh) {
@@ -686,21 +709,25 @@ function App() {
 
       const isNew = !cachedPlaylist;
       const nameChanged = cachedPlaylist?.name !== p.name;
-      const countChanged = cachedPlaylist?.count !== p.count;
+      const descriptionChanged = cachedPlaylist?.description !== p.description;
 
-      if (isNew || nameChanged || countChanged) {
-        toUpdate.push(p);
+      if (descriptionChanged || nameChanged) {
+        metaChanged.push(p);
+      }
+
+      if (cachedPlaylist?.snapshot_id != p.snapshot_id || isNew) {
+        updated.push(p);
       }
     }
 
     // Detect deleted playlists
     for (const cachedItem of cached) {
       if (!freshMap.has(cachedItem.id)) {
-        toUpdate.push(cachedItem);
+        deleted.push(cachedItem);
       }
     }
 
-    return { toUpdate, deleted };
+    return { updated, deleted, metaChanged };
   }
 
   const getTracks = async (playlistID) => {
@@ -1065,7 +1092,7 @@ function App() {
   }
 
   const onLongPress = (pl, onof) => {
- 
+
     saveBackgroundPlaylists([pl]);
     setTimeout(() => {
       nextTrack([pl]);
@@ -1606,6 +1633,7 @@ function App() {
                       </div>
                       <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
                       <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
+                      <button style={{ float: "right" }} onClick={checkForUpdates}>update</button>
                       <button style={{ float: "right" }} onClick={logout}>Logout</button>
                       <button style={{ float: "right" }}>{time}</button>
                     </td>
