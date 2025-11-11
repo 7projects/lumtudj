@@ -13,6 +13,7 @@ import RepeatIcon from '@mui/icons-material/Repeat';
 import RepeatOneIcon from '@mui/icons-material/RepeatOne';
 import AutoFixHighIcon from '@mui/icons-material/AutoFixHigh';
 import ShuffleIcon from '@mui/icons-material/Shuffle';
+import useAppStore from '../AppStore';
 
 import { isMobile } from '../util';
 
@@ -26,6 +27,7 @@ function useConstructor(callback) {
 
 const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onError, onNext }) => {
 
+    const { dragTrack, setDragTrack } = useAppStore();
     const [track, setTrack] = useState(null);
     const [position, setPosition] = useState(0);
     const [duration, setDuration] = useState(100);
@@ -109,7 +111,7 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
             //dobili smo novi refresh token 
             alert("update token");
             playerRef.current._options.getOAuthToken = cb => cb(token);
-            
+
         }
         else {
             initializePlayer();
@@ -602,17 +604,21 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                         </table>
                                     </td>
                                     <td style={{ width: "30%", textAlign: "right", paddingRight: 20 }}>
-                                        <input
-                                            type="range"
-                                            min={0}
-                                            max={100}
-                                            onClick={(e) => e.stopPropagation()}
-                                            onChange={(e) => {
-                                                setVolume(e.target.value * 0.01);
-                                                e.stopPropagation();
-                                            }}
-                                            style={{ width: '100%', maxWidth: '120px' }}
-                                        />
+
+                                        {dragTrack ? <div></div> :
+
+                                            <input
+                                                type="range"
+                                                min={0}
+                                                max={100}
+                                                onClick={(e) => e.stopPropagation()}
+                                                onChange={(e) => {
+                                                    setVolume(e.target.value * 0.01);
+                                                    e.stopPropagation();
+                                                }}
+                                                style={{ width: '100%', maxWidth: '120px' }}
+                                            />
+                                        }
                                     </td>
                                 </tr>
                             </tbody>

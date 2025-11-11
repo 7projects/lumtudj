@@ -7,6 +7,8 @@ import SkipNextIcon from "@mui/icons-material/SkipNext";
 import SkipPreviousIcon from "@mui/icons-material/SkipPrevious";
 import Marquee from "react-fast-marquee";
 import { useLongPress } from 'use-long-press';
+import useAppStore from '../AppStore';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export default function SpotifyPlayer({
   locked,
@@ -19,10 +21,13 @@ export default function SpotifyPlayer({
   stateChanged,
   onLongPress
 }) {
+
   const playerRef = useRef(null);
   const intervalRef = useRef(null);
   const tokenRef = useRef(token);
   const onNextRef = useRef(null);
+
+  const { dragTrack, setDragTrack } = useAppStore();
 
   const [deviceId, setDeviceId] = useState(null);
   const [position, setPosition] = useState(0);
@@ -362,7 +367,13 @@ export default function SpotifyPlayer({
           </div>
           <div className="div5"> </div>
           <div className="div6" style={{ paddingRight: 20 }}>
-            <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
+
+            {dragTrack ?
+              <div onDragOver={(e) => e.stopPropagation()}>
+                <DeleteIcon onDragOver={(e) => e.stopPropagation()} className="player-trash" style={{ fontSize: 60 }} />
+              </div> :
+              <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
+            }
           </div>
 
           {/* <Marquee style={{ fontSize: 73, position: "absolute", fontWeight: "bold", color: "#4545451c", zIndex: 1 }}>

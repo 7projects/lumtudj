@@ -28,7 +28,7 @@ import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import PlaylistPicker from '../components/playlistPicker';
 import AlbumIcon from '@mui/icons-material/Album';
 import SwipeRightIcon from '@mui/icons-material/SwipeRight';
- 
+
 import { motion, AnimatePresence, Reorder, useDragControls } from "framer-motion";
 import Moveable from "react-moveable";
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
@@ -86,16 +86,14 @@ const lastListenedPl = {
     tracks: []
 }
 
-const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, onLongPress, onShuffleClick}) => {
-  
-    const { library, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex} = useAppStore();
+const PanelLibrary = ({ onClick, onSwipedRight, onBulbClick, onBulbCheckClick, onLongPress, onShuffleClick, onDrop }) => {
 
-    const [filteredLibrary, setFilteredLibrary] = useState([...library]);
+    const { library, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
     const [filter, setFilter] = useState("");
 
-    useEffect(()=>{
-        if(filteredLibrary.length == 0 ){
+    useEffect(() => {
+        if (filteredLibrary.length == 0) {
             setFilteredLibrary([...library]);
         }
     }, [library])
@@ -122,10 +120,10 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
 
         debugger;
         setLibrary(lib)
-        setFilteredLibrary(lib.filter(x=>x.name.toLowerCase().includes(filter)));
+        setFilteredLibrary(lib.filter(x => x.name.toLowerCase().includes(filter)));
 
         pl.shuffle = bulbOn ? 0 : 1;
-         
+
         saveLibrary([pl]);
     }
 
@@ -157,6 +155,7 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
                         </div> : null}
 
                         <Virtuoso
+
                             className={isMobile() ? 'panel-playlists-mobile' : "panel-playlists"}
                             style={{ marginTop: 5 }}
                             totalCount={filteredLibrary.length}
@@ -165,7 +164,7 @@ const PanelLibrary = ({onClick, onSwipedRight, onBulbClick, onBulbCheckClick, on
                                 return isMobile() ?
                                     <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
                                     :
-                                    <PlaylistRow onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { if (onClick) onClick(p); setSelectedLibraryIndex(index); }} />
+                                    <PlaylistRow onDrop={onDrop} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { if (onClick) onClick(p); setSelectedLibraryIndex(index); }} />
                             }}
                         />
                     </>
@@ -189,22 +188,22 @@ itemContent={(index) => {
 }} */}
 
 
-  // const getAlbumsPanel = () => {
-  //   return <Virtuoso
-  //     className={isMobile() ? 'hideScrollbar' : ""}
-  //     style={{ height: '100%' }}
-  //     totalCount={albums.length}
-  //     // initialTopMostItemIndex={albumsScrollTop}
-  //     // rangeChanged={(range) => {
-  //     //   setAlbumsScrollTop(range.startIndex);
-  //     // }}
-  //     itemContent={(index) => {
-  //       const p = albums[index];
-  //       return isMobile() ?
-  //         <PlaylistRow id={"tr" + p.id} onSwipedRight={() => addPlaylistToToPlaylist(p)} album onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { setCurrentTab("2"); getTracks(p.id); setSearchText(p.name); setSelectedPlaylistIndex(index) }} />
-  //         :
-  //         <PlaylistRow id={"tr" + p.id} onSwipedRight={() => addPlaylistToToPlaylist(p)} album onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
+// const getAlbumsPanel = () => {
+//   return <Virtuoso
+//     className={isMobile() ? 'hideScrollbar' : ""}
+//     style={{ height: '100%' }}
+//     totalCount={albums.length}
+//     // initialTopMostItemIndex={albumsScrollTop}
+//     // rangeChanged={(range) => {
+//     //   setAlbumsScrollTop(range.startIndex);
+//     // }}
+//     itemContent={(index) => {
+//       const p = albums[index];
+//       return isMobile() ?
+//         <PlaylistRow id={"tr" + p.id} onSwipedRight={() => addPlaylistToToPlaylist(p)} album onBulbCheckClick={addToSpotifyPlaylist} onLongPress={(pl, onof) => { onLongPress(pl, onof) }} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { setCurrentTab("2"); getTracks(p.id); setSearchText(p.name); setSelectedPlaylistIndex(index) }} />
+//         :
+//         <PlaylistRow id={"tr" + p.id} onSwipedRight={() => addPlaylistToToPlaylist(p)} album onBulbCheckClick={addToSpotifyPlaylist} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedPlaylistIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={backgroundPlaylists && backgroundPlaylists.some(x => x.id == p.id)} playlist={p} onClick={() => { getTracks(p.id); setSelectedPlaylistIndex(index); setSelectedTrack(null); }} />
 
-  //     }}
-  //   />
-  // }
+//     }}
+//   />
+// }

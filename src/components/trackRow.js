@@ -11,9 +11,9 @@ import useAppStore from '../AppStore';
 
 const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
-    const { library } = useAppStore();
+    const { library, dragTrack, setDragTrack } = useAppStore();
 
-    const playlists = library.filter(x => x.tracks.some(t => t.id == track.id));
+    const playlists = library.filter(x => x.tracks.some(t => t.id == track.id) && x.type == "playlist");
 
     const getTrackRowClass = () => {
         let clss = isMobile() ? 'item-row-mobile' : 'item-row';
@@ -60,7 +60,7 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
 
     return (
         track &&
-        <div id={id} {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={onContextMenu} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
+        <div id={id} onDragEnd={() => setDragTrack(null)}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={onContextMenu} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
 
             <table style={{ width: "100%" }}>
                 <tbody>

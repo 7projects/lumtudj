@@ -9,13 +9,16 @@ const useAppStore = create((set) => ({
   library: [],
   setLibrary: (lib) => set({ library: lib }),
 
+  filteredLibrary: [],
+  setFilteredLibrary: (lib) => set({ filteredLibrary: lib }),
+
   loadingLibrary: null,
   setLoadingLibrary: (loading) => set({ loadingLibrary: loading }),
 
   selectedLibraryIndex: null,
   setSelectedLibraryIndex: (index) => set({ selectedLibraryIndex: index }),
 
-  selectedLibraryItem: { name: "pl", tracks: [] },
+  selectedLibraryItem: null,
   setSelectedLibraryItem: (plst) => set({ selectedLibraryItem: plst }),
 
   // --- Track selection ---

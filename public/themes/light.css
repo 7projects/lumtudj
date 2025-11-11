@@ -1033,9 +1033,6 @@ body {
   z-index: -1;
   fill: #ffffff;
 }
-.icons-color {
-  fill: #5e5e5e;
-}
 table,
 th,
 td {
@@ -1454,7 +1451,7 @@ code {
 }
 .song-name {
   word-wrap: normal;
-  font-size: 12px;
+  font-size: 15px;
 }
 .song-release-date {
   display: inline-block;
@@ -2089,6 +2086,14 @@ button:active {
 .header-button-small:focus {
   outline: none;
 }
+.icon-color {
+  color: #3a3a3a;
+  fill: #3a3a3a;
+}
+.player-trash {
+  color: #a3a3a3;
+  fill: #a3a3a3;
+}
 .tab {
   color: #3a3a3a;
   background-color: rgba(0, 0, 0, 0.05);
@@ -2565,17 +2570,24 @@ button:active {
   animation: blink 0.5s linear 0s 4, shake 0.1s linear 0s 20;
 }
 .toolbar-wrapper {
-  position: relative;
-  width: 100%;
-  height: 40px;
   display: flex;
   align-items: center;
+  width: 100%;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  gap: 10px;
   gap: 0.5rem;
   padding-left: 32px;
 }
+.toolbar-search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  /* takes remaining space */
+  gap: 8px;
+}
 .toolbar-input-search {
-  width: 100%;
-  height: 100%;
+  flex: 1;
   border: 1px solid #ccc;
   border-radius: 10px;
   font-size: 16px;
@@ -2586,6 +2598,14 @@ button:active {
   background-color: transparent;
   outline: none;
   border: none;
+}
+.toolbar-input-search::placeholder {
+  color: rgba(58, 58, 58, 0.4) !important;
+}
+.toolbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 .toolbar-button {
   width: 20px;

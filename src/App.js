@@ -70,7 +70,7 @@ function useConstructor(callback) {
 }
 
 function App() {
-  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -79,7 +79,7 @@ function App() {
 
   const [albums, setAlbums] = useState([]);
   const [playlistTracks, setPlaylistTracks] = useState([]);
-  const [filteredLibrary, setFilteredLibrary] = useState([]);
+
   const [tracks, setTracks] = useState([]);
 
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
@@ -182,6 +182,7 @@ function App() {
     const cacheLibrary = await loadLibray();
     if (cacheLibrary && cacheLibrary.length > 0) {
       setLibrary(cacheLibrary);
+      setFilteredLibrary(cacheLibrary);
     } else {
       updateLibrary();
     }
@@ -226,8 +227,6 @@ function App() {
   const getBackgroundPlaylists = async () => {
 
     const cached = await loadBackgroundPlaylists(); // Load back
-
-    debugger;
 
     if (cached && cached.length > 0) {
 
@@ -511,6 +510,7 @@ function App() {
 
   const handleKeyDown = async (e) => {
 
+
     //check if e.key is alphanumeric or space
     let st = searchText;
 
@@ -518,7 +518,7 @@ function App() {
       st = st.slice(0, -1);
     }
 
-    if (st.trim() == "") {
+    if (st != undefined && st.trim() == "") {
       setSearchText("");
       setSelectedPlaylistTracks([]);
       return;
@@ -589,7 +589,7 @@ function App() {
 
       saveLibrary(lib);
       setLibrary(lib);
-      setFilteredLibrary(plsts);
+      setFilteredLibrary(lib);
 
       setLoadingLibrary(null);
 
@@ -632,6 +632,7 @@ function App() {
     const playlists = await api.getPlaylists();
     const albums = await api.getAlbums();
 
+    debugger;
     fresh = [...playlists, ...albums];
 
     let { updated, deleted, metaChanged } = getPlaylistsToUpdate(cached, fresh);
@@ -640,20 +641,20 @@ function App() {
       // alert("Playlists to update: " + updated.map(p => p.name).join(", "));
 
       //ipnut box to confirm update
-      const confirmUpdate = window.confirm("Playlists to update: " + updated.map(p => p.name).join(", ") + ". Do you want to update the playlists?");
-      const confirmDelete = window.confirm("Playlists to delete: " + deleted.map(p => p.name).join(", ") + ". Do you want to delete the playlists?");
+      // const confirmUpdate = window.confirm("Playlists to update: " + updated.map(p => p.name).join(", ") + ". Do you want to update the playlists?");
+      // const confirmDelete = window.confirm("Playlists to delete: " + deleted.map(p => p.name).join(", ") + ". Do you want to delete the playlists?");
 
-      if (confirmUpdate) {
+      if (true) {
         setLoadingLibrary("UPDATING PLAYLISTS...");
         const updatedPlaylists = await api.updateLibrary(updated, (i, l) => setLoadingLibrary("UPDATING PLAYLISTS " + i + "/" + l));
 
         // Update the cached playlists with the new data from browser
         for (const pl of library) {
-          const renamed = metaChanged.find(p => p.id === pl.id);
-          if (renamed) {
-            pl.name = renamed.name;
-            pl.description = renamed.description;
-          };
+          // const renamed = metaChanged.find(p => p.id === pl.id);
+          // if (renamed) {
+          //   pl.name = renamed.name;
+          //   pl.description = renamed.description;
+          // };
 
           const updatedPl = updatedPlaylists.find(p => p.id === pl.id);
 
@@ -661,6 +662,11 @@ function App() {
             pl.images = updatedPl.images;
             pl.count = updatedPl.tracks.length;
             pl.name = updatedPl.name;
+            pl.description = updatedPl.description;
+            pl.type = "playlist";
+            updatedPl.type = "playlist";
+
+            debugger;
             for (const tr of updatedPl.tracks) {
               const oldtr = pl.tracks.find(t => t.id === tr.id);
               if (oldtr) {
@@ -687,6 +693,7 @@ function App() {
       let newLibrary = [...library];
       newLibrary = newLibrary.filter(pl => !deleted.some(d => d.id === pl.id));
       setLibrary(newLibrary);
+      setFilteredLibrary(newLibrary);
       saveLibrary(newLibrary);
 
     }
@@ -829,13 +836,16 @@ function App() {
     // console.log(pl);
     // console.log(selectedTrack);
     // console.log(bulbOn);
-    if (pl.id && selectedTrack) {
+
+    let tr = dragTrack || selectedTrack;
+
+    if (pl.id && tr) {
       if (bulbOn) {
-        await api.removeTrackFromPlaylist(pl, selectedTrack);
-        pl.tracks = pl.tracks.filter(x => x.id != selectedTrack.id);
+        await api.removeTrackFromPlaylist(pl, tr);
+        pl.tracks = pl.tracks.filter(x => x.id != tr.id);
       } else {
-        await api.addTrackToPlaylist(pl, selectedTrack);
-        pl.tracks.push(selectedTrack);
+        await api.addTrackToPlaylist(pl, tr);
+        pl.tracks.push(tr);
       }
 
       let pls = [...library];
@@ -843,6 +853,7 @@ function App() {
       pl.count = pl.tracks.length;
       p = pl;
       setLibrary(pls);
+      setFilteredLibrary(pls);
       saveLibrary(pls);
     }
   }
@@ -859,6 +870,7 @@ function App() {
         pls[selectedPlaylistIndex] = pl;
         pl.count = pl.tracks.length;
         setLibrary(pls);
+        setFilteredLibrary(pls);
         saveLibrary([pl]);
         closeMenu();
       }
@@ -1332,6 +1344,12 @@ function App() {
     setPlaylistChanged(false);
   }
 
+  const onLibrayRowDrop = (playlist) => {
+    if (playlist.type == "playlist") {
+      addToSpotifyPlaylist(playlist);
+    }
+  }
+
   return (
     <>
       <Moveable
@@ -1651,7 +1669,7 @@ function App() {
                         />
                       </td>
                       <td className='selected-track-container'>
-                        {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        {filteredLibrary.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                       </td>
                     </tr>
                   </tbody>
@@ -1660,7 +1678,7 @@ function App() {
             <div className="main">
               {mode == "normal" ?
                 <div className={'panel'}>
-                  <PanelLibrary onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                  <PanelLibrary onDrop={onLibrayRowDrop} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                 </div>
                 : null}
               <div id="panel-main" className="panel-main">
@@ -1675,21 +1693,21 @@ function App() {
                     <SearchIcon></SearchIcon>
                   } */}
 
-                  <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
-                  {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
+                  <div className='toolbar-search'>
+                    <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
+                    {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
 
-                    : null}
-
-
-
-
-                  <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                      : null}
+                    <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                  </div>
 
                   {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
 
-                  <SwapVertIcon className='toolbar-button'></SwapVertIcon>
+                  <div className='toolbar-icons'>
+                    <SwapVertIcon className='toolbar-button'></SwapVertIcon>
+                    <MoreVertIcon className='toolbar-button'></MoreVertIcon>
+                  </div>
 
-                  <MoreVertIcon className='toolbar-button'></MoreVertIcon>
 
                 </div> : null}
                 {
