@@ -37,7 +37,7 @@ import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { useLongPress } from 'use-long-press';
 import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
-
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import PanelLibrary from './components/panelLibrary';
 
@@ -70,7 +70,7 @@ function useConstructor(callback) {
 }
 
 function App() {
-  const { locked, setLocked, dragTrack, setDragTrack, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryIndex, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -85,9 +85,6 @@ function App() {
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
 
   const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
-  const [selectedPlaylistIndex, setSelectedPlaylistIndex] = useState(-1);
-
-  const [dragTrackIndex, setDragTrackIndex] = useState();
 
   const [trackCounts, setTrackCounts] = useState({});
   const [track, setTrack] = useState({});
@@ -239,7 +236,7 @@ function App() {
   useConstructor(async () => {
 
 
-    alert("constructor");
+    // alert("constructor");
 
     // Handle back/forward navigation
     window.addEventListener('hashchange', () => {
@@ -795,7 +792,7 @@ function App() {
     //   if (locked) {
     //     return
     //   } else {
-    //     pl.splice(dragTrackIndex, 1);
+    //     pl.splice(dragSourceIndex, 1);
     //   }
     // }
 
@@ -839,42 +836,49 @@ function App() {
 
     let tr = dragTrack || selectedTrack;
 
+    let res = null;
+
     if (pl.id && tr) {
       if (bulbOn) {
         await api.removeTrackFromPlaylist(pl, tr);
         pl.tracks = pl.tracks.filter(x => x.id != tr.id);
       } else {
-        await api.addTrackToPlaylist(pl, tr);
+        res = await api.addTrackToPlaylist(pl, tr);
         pl.tracks.push(tr);
       }
 
       let pls = [...library];
       let p = pls.find(x => x.id == pl.id);
       pl.count = pl.tracks.length;
+      pl.snapshot_id = res.snapshot_id;
       p = pl;
       setLibrary(pls);
-      setFilteredLibrary(pls);
+      // setFilteredLibrary(pls);
       saveLibrary(pls);
     }
   }
 
   const removeTrackFromSpotifyPlaylist = async () => {
-    if (dragSource == "tracks") {
-      if (selectedPlaylistIndex) {
-        let pl = library[selectedPlaylistIndex];
-        const tr = pl.tracks[selectedTrackIndex];
-        pl.tracks.splice(selectedTrackIndex, 1);
+
+    if (dragSource == "plprev") {
+      if (selectedLibraryIndex) {
+
+        let pl = library[selectedLibraryIndex];
+        const tr = pl.tracks[dragSourceIndex];
+        pl.tracks.splice(dragSourceIndex, 1);
         setSelectedTrackIndex(-1);
-        await api.removeTrackFromPlaylist(pl, tr);
+        const res = await api.removeTrackFromPlaylist(pl, tr);
+
         let pls = [...library];
-        pls[selectedPlaylistIndex] = pl;
+        pls[selectedLibraryIndex] = pl;
         pl.count = pl.tracks.length;
+        pl.snapshot_id = res.snapshot_id;
+        setSelectedPlaylistTracks(pl.tracks);
         setLibrary(pls);
         setFilteredLibrary(pls);
         saveLibrary([pl]);
         closeMenu();
       }
-
     }
   }
 
@@ -902,7 +906,7 @@ function App() {
         return;
       }
 
-      if (dragSource == "tracks" && selectedPlaylistIndex >= 0) {
+      if (dragSource == "tracks" && selectedLibraryIndex >= 0) {
         removeTrackFromSpotifyPlaylist();
       }
 
@@ -1154,8 +1158,8 @@ function App() {
           if (!tr) return null;
 
           return isMobile() ?
-            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-            <TrackRow id={tr.id} key={tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+            <TrackRow id={tr.id} key={tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
         }}
       />
     </>
@@ -1203,8 +1207,8 @@ function App() {
   //               if (!tr) return null;
 
   //               return isMobile() ?
-  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragTrackIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
   //             }}
   //           />
   //         </SortableContext>
@@ -1334,7 +1338,7 @@ function App() {
 
   const onSearchTextChanged = (e) => {
     setSearchText(e.target.value);
-    if (selectedPlaylistIndex && selectedPlaylistIndex > -1) {
+    if (selectedLibraryIndex && selectedLibraryIndex > -1) {
       setPlaylistChanged(true);
     }
   }
@@ -1348,6 +1352,19 @@ function App() {
     if (playlist.type == "playlist") {
       addToSpotifyPlaylist(playlist);
     }
+  }
+
+  const onTrash = () => {
+    if (dragSource == "playlist") {
+      removeTrackFromPlaylist();
+    }
+
+    if (dragSource == "plprev") {
+      removeTrackFromSpotifyPlaylist();
+    }
+
+    setDragTrack(null);
+    setDragSourceIndex(-1);
   }
 
   return (
@@ -1366,6 +1383,12 @@ function App() {
           e.target.style.transform = e.transform;
         }}
       />
+
+      {dragTrack ?
+
+        <div className='trash-container' onDragOver={(e) => e.preventDefault()} onDrop={onTrash}>
+          <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
+        </div> : null}
 
       {selectedArtist || loadingArtistInfo ?
         <div className='panel-dialog target' id="artist-info">
@@ -1387,7 +1410,7 @@ function App() {
 
                 <TabPanel>
                   {selectedArtist && selectedArtist.tracks.map((tr, index) => {
-                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
                   })}
                 </TabPanel>
                 <TabPanel>
@@ -1513,7 +1536,7 @@ function App() {
                           </>
                           :
                           <>
-                            <ReordableTrackList onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                            <ReordableTrackList source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
                           </>}
                       </div>
                     </Activity>
@@ -1613,7 +1636,7 @@ function App() {
                         </div>
                         {mode == "compact" ?
                           <div className="toolbar-wrapper">
-                            <SearchIcon className="search-icon" />
+                            {/* <SearchIcon className="search-icon" /> */}
                             <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                           </div> : null}
                         {/* <button onClick={updateLibrary}>Update playlists</button>*/}
@@ -1669,7 +1692,7 @@ function App() {
                         />
                       </td>
                       <td className='selected-track-container'>
-                        {filteredLibrary.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                       </td>
                     </tr>
                   </tbody>
@@ -1693,32 +1716,38 @@ function App() {
                     <SearchIcon></SearchIcon>
                   } */}
 
-                  <div className='toolbar-search'>
-                    <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
-                    {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
 
-                      : null}
-                    <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                  </div>
 
-                  {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
+                  {mode == "normal" ?
+                    <>
+                      <div className='toolbar-search'>
+                        <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
+                        {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
 
-                  <div className='toolbar-icons'>
-                    <SwapVertIcon className='toolbar-button'></SwapVertIcon>
-                    <MoreVertIcon className='toolbar-button'></MoreVertIcon>
-                  </div>
+                          : null}
+                        <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                      </div>
+
+                      {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
+
+                      <div className='toolbar-icons'>
+                        <SwapVertIcon className='toolbar-button'></SwapVertIcon>
+                        <MoreVertIcon className='toolbar-button'></MoreVertIcon>
+                      </div>
+                    </> : null}
+
 
 
                 </div> : null}
                 {
-                  <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                  <ReordableTrackList source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
                   // getTracksPanel()
                 }
               </div>
               <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
                 {
                   playlistTracks.length > 0 ?
-                    <ReordableTrackList onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                    <ReordableTrackList source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                     :
                     <div className='QueueMusicIcon'>

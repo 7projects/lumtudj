@@ -44,8 +44,8 @@ const useAppStore = create((set) => ({
   dragSource: null,
   setDragSource: (source) => set({ dragSource: source }),
 
-  dragTrackIndex: null,
-  setDragTrackIndex: (index) => set({ dragTrackIndex: index }),
+  dragSourceIndex: null,
+  setDragSourceIndex: (index) => set({ dragSourceIndex: index }),
 
   // --- UI lock state ---
   locked: false,

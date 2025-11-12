@@ -9,9 +9,9 @@ import Marquee from 'react-fast-marquee';
 import useAppStore from '../AppStore';
 
 
-const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
-    const { library, dragTrack, setDragTrack } = useAppStore();
+    const { library, dragTrack, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
     const playlists = library.filter(x => x.tracks.some(t => t.id == track.id) && x.type == "playlist");
 
@@ -60,11 +60,12 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
 
     return (
         track &&
-        <div id={id} onDragEnd={() => setDragTrack(null)}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={onContextMenu} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
+        <div id={id} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); }}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={onContextMenu} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
 
             <table style={{ width: "100%" }}>
                 <tbody>
                     <tr>
+
                         {!hideImage && forPlayer && <td style={{ width: 60, padding: 5 }}>
                             <img
                                 src={track && track.album && track.album.images[2].url}
@@ -141,6 +142,8 @@ const TrackRow = ({ track, forPlaylist, forInfo, onClick, onArtistClick, onDoubl
                                             <td>
 
                                                 <span className="song-artist" onClick={(e) => { onArtistClick && onArtistClick(track); e.stopPropagation(); e.preventDefault(); }}>
+
+
                                                     {forInfo ? track && track.name :
                                                         track && track.artists && track.artists.map(a => a.name).join(", ")
                                                     }

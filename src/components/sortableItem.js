@@ -30,7 +30,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
-const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const SortableItem = ({source, track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -48,6 +48,7 @@ const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, o
                         {/* Main content cell */}
                         <td style={{ width: "auto" }}>
                             <TrackRow
+                                source={source}
                                 track={track}
                                 forInfo={forInfo}
                                 onClick={onClick}
@@ -84,7 +85,6 @@ const SortableItem = ({ track, forInfo, onClick, onArtistClick, onDoubleClick, o
                             {...attributes}
                             {...listeners}
                         >
-
                             <DragIndicatorIcon className='toolbar-button'></DragIndicatorIcon>
                             {/* <DragHandleIcon /> */}
                         </td>

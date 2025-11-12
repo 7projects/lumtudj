@@ -2090,10 +2090,6 @@ button:active {
   color: #b4b281;
   fill: #b4b281;
 }
-.player-trash {
-  color: #617d8b;
-  fill: #617d8b;
-}
 .tab {
   color: #b4b281;
   background-color: #37474F;
@@ -2619,5 +2615,25 @@ button:active {
 }
 .toolbar-button:hover {
   color: #eeeaa3;
+}
+.trash-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.3s ease;
+}
+.trash-icon {
+  color: #617d8b;
+  fill: #617d8b;
 }
 /*# sourceMappingURL=./slate.css.map */

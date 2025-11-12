@@ -2090,10 +2090,6 @@ button:active {
   color: #ffffff;
   fill: #ffffff;
 }
-.player-trash {
-  color: #353535;
-  fill: #353535;
-}
 .tab {
   color: #ffffff;
   background-color: #070707;
@@ -2618,5 +2614,25 @@ button:active {
 }
 .toolbar-button:hover {
   color: #f1f1f1;
+}
+.trash-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.3s ease;
+}
+.trash-icon {
+  color: #353535;
+  fill: #353535;
 }
 /*# sourceMappingURL=./spotify.css.map */

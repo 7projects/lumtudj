@@ -476,6 +476,7 @@ const addTrackToPlaylist = async (playlist, track) => {
     const error = await response.json();
     console.error('Failed to add track:', error);
   } else {
+    return await response.json();
     console.log('Track added successfully!');
   }
 };
@@ -500,9 +501,8 @@ const removeTrackFromPlaylist = async (playlist, track) => {
   if (!response.ok) {
     errorHandler();
     const error = await response.json();
-    console.error('Failed to add track:', error);
   } else {
-    console.log('Track removed successfully!');
+    return await response.json();
   }
 };
 

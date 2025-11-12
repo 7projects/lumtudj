@@ -1004,7 +1004,7 @@
 }
 body {
   margin: 0;
-  font-family: Doto, Monospace, Sans-serif;
+  font-family: monospace, Sans-serif;
   font-size: 10px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1859,7 +1859,7 @@ button:active {
   color: #e2e2e2;
   /* Background color */
   /* Space between lines */
-  font-family: Doto, Monospace, Sans-serif;
+  font-family: monospace, Sans-serif;
   font-size: 20px;
 }
 .selected-track-label {
@@ -2091,10 +2091,6 @@ button:active {
   color: #ffffff;
   fill: #ffffff;
 }
-.player-trash {
-  color: #a8a8a8;
-  fill: #a8a8a8;
-}
 .tab {
   color: #ffffff;
   background-color: #1f1f1f;
@@ -2120,7 +2116,7 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: Doto, Monospace, Sans-serif;
+  font-family: monospace, Sans-serif;
   box-sizing: border-box;
   background-color: #1e1e1e;
   outline: none;
@@ -2472,7 +2468,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: Doto, Monospace, Sans-serif;
+  font-family: monospace, Sans-serif;
 }
 .reconnecting-dots span {
   display: inline-block;
@@ -2592,7 +2588,7 @@ button:active {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family: Doto, Monospace, Sans-serif;
+  font-family: monospace, Sans-serif;
   box-sizing: border-box;
   color: #ffffff;
   background-color: transparent;
@@ -2619,5 +2615,25 @@ button:active {
 }
 .toolbar-button:hover {
   color: #f1f1f1;
+}
+.trash-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 140px;
+  height: 140px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.3s ease;
+}
+.trash-icon {
+  color: #a8a8a8;
+  fill: #a8a8a8;
 }
 /*# sourceMappingURL=./mono.css.map */

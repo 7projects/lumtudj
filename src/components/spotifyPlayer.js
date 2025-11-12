@@ -368,12 +368,14 @@ export default function SpotifyPlayer({
           <div className="div5"> </div>
           <div className="div6" style={{ paddingRight: 20 }}>
 
-            {dragTrack ?
+            {/* {dragTrack ?
               <div onDragOver={(e) => e.stopPropagation()}>
                 <DeleteIcon onDragOver={(e) => e.stopPropagation()} className="player-trash" style={{ fontSize: 60 }} />
               </div> :
               <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
-            }
+            } */}
+
+            <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
           </div>
 
           {/* <Marquee style={{ fontSize: 73, position: "absolute", fontWeight: "bold", color: "#4545451c", zIndex: 1 }}>

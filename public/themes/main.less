@@ -1305,11 +1305,6 @@ button:active {
     fill: @button-color;
 }
 
-.player-trash {
-    color: @player-slider-background-color;
-    fill: @player-slider-background-color;
-}
-
 .tab {
     color: @button-color;
     background-color: @button-background-color;
@@ -1978,3 +1973,26 @@ button:active {
 .toolbar-button:hover {
     color: @track-row-color;
 }
+
+
+.trash-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 140px;
+    height: 140px;
+    border-radius: 10px;
+    background-color: rgb(0 0 0 / 85%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    z-index: 10000;
+    transition: background-color 0.3s ease;
+}
+
+.trash-icon {
+    color: @player-slider-background-color;
+    fill: @player-slider-background-color;
+}   
