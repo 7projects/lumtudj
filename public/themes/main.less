@@ -38,6 +38,8 @@
 
 @font-family: Doto, Monospace, Sans-serif;
 
+@selection-color:@bulb-off-color;
+@selection-background-color:@bulb-on-color;
 
 :root {
     color-scheme: dark;
@@ -297,8 +299,8 @@ code {
 
 
 .littleBulbOn {
-    width: 7px;
-    height: 7px;
+    width: 4px;
+    height: 4px;
     background-color: transparent;
     position: relative;
     border-radius: 1px;
@@ -473,6 +475,14 @@ code {
     display: inline-block;
     font-weight: normal;
     font-size: 10px;
+    opacity: 0.7;
+}
+
+.song-duration {
+    display: inline-block;
+    font-weight: normal;
+    font-size: 10px;
+    padding-top: 5px;
 }
 
 .song-artist {
@@ -1002,7 +1012,7 @@ button:active {
     //     linear-gradient(to bottom, lighten(@player-background-color, 10%) 1px, @player-background-color 1px);
     // background-size: 2px 2px;
     /* Space between lines */
-    font-family:  @font-family;
+    font-family: @font-family;
     font-size: 20px;
 }
 
@@ -1331,7 +1341,7 @@ button:active {
     border-radius: 10px;
     font-size: 20px;
     font-weight: bold;
-    font-family:  @font-family;
+    font-family: @font-family;
     box-sizing: border-box;
     color: #ffffff;
     background-color: #1e1e1e;
@@ -1774,7 +1784,7 @@ button:active {
     border-radius: 20px;
     color: white;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-    font-family:  @font-family;
+    font-family: @font-family;
 }
 
 .reconnecting-dots span {
@@ -1930,9 +1940,10 @@ button:active {
 .toolbar-search {
     display: flex;
     align-items: center;
-    flex: 1; /* takes remaining space */
+    flex: 1;
+    /* takes remaining space */
     gap: 8px;
-  }
+}
 
 .toolbar-input-search {
     flex: 1;
@@ -1940,7 +1951,7 @@ button:active {
     border-radius: 10px;
     font-size: 16px;
     font-weight: bold;
-    font-family:  @font-family;
+    font-family: @font-family;
     box-sizing: border-box;
     color: @button-color;
     background-color: transparent;
@@ -1950,15 +1961,16 @@ button:active {
     // border-radius: 10px 10px 0px 0px;
 }
 
-.toolbar-input-search::placeholder{
-    color: fade(@button-color, 40%)!important;
+.toolbar-input-search::placeholder {
+    color: fade(@button-color, 40%) !important;
 }
 
 .toolbar-icons {
     display: flex;
     align-items: center;
     gap: 8px;
-  }
+}
+
 .toolbar-button {
     width: 20px;
     height: 20px;
@@ -1992,7 +2004,18 @@ button:active {
     transition: background-color 0.3s ease;
 }
 
+.trash-container:hover {
+    background-color: red;
+}
+
 .trash-icon {
     color: @player-slider-background-color;
     fill: @player-slider-background-color;
-}   
+}
+
+::selection {
+    background: @selection-background-color;
+    /* yellow highlight */
+    color: @selection-color;
+    /* black text */
+}

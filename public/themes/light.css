@@ -1236,8 +1236,8 @@ code {
   object-fit: cover;
 }
 .littleBulbOn {
-  width: 7px;
-  height: 7px;
+  width: 4px;
+  height: 4px;
   background-color: transparent;
   position: relative;
   border-radius: 1px;
@@ -1457,6 +1457,13 @@ code {
   display: inline-block;
   font-weight: normal;
   font-size: 10px;
+  opacity: 0.7;
+}
+.song-duration {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 10px;
+  padding-top: 5px;
 }
 .song-artist:hover {
   font-weight: bold;
@@ -2632,8 +2639,17 @@ button:active {
   z-index: 10000;
   transition: background-color 0.3s ease;
 }
+.trash-container:hover {
+  background-color: red;
+}
 .trash-icon {
   color: #a3a3a3;
   fill: #a3a3a3;
+}
+::selection {
+  background: #7fe2ff;
+  /* yellow highlight */
+  color: #a7a7a7;
+  /* black text */
 }
 /*# sourceMappingURL=./light.css.map */

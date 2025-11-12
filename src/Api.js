@@ -120,6 +120,7 @@ const playTrack = async (id) => {
 
 const search = async (query) => {
   let data = await request(`/search?q=${query}&type=track`);
+  
   return data.tracks.items;
 };
 

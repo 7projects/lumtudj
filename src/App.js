@@ -38,7 +38,6 @@ import { useLongPress } from 'use-long-press';
 import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
 import DeleteIcon from '@mui/icons-material/Delete';
-
 import PanelLibrary from './components/panelLibrary';
 
 import useAppStore from './AppStore';
@@ -81,6 +80,8 @@ function App() {
   const [playlistTracks, setPlaylistTracks] = useState([]);
 
   const [tracks, setTracks] = useState([]);
+
+  const [showPickerButtons, setShowPickerButtons] = useState(true);
 
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
 
@@ -788,6 +789,7 @@ function App() {
       flyToPlaylist(id);
 
     let pl = [...playlistTracks];
+
     // if (dragSource == "playlist") {
     //   if (locked) {
     //     return
@@ -795,6 +797,13 @@ function App() {
     //     pl.splice(dragSourceIndex, 1);
     //   }
     // }
+
+    if (dragSource == "library" && !locked) {
+      const selPl = filteredLibrary[dragSourceIndex];
+      pl = [...playlistTracks, ...selPl.tracks];
+      setPlaylistTracks(pl);
+      return;
+    }
 
     // newTrack.uid = newGuid();
 
@@ -1672,16 +1681,18 @@ function App() {
                         {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
                         {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                       </div>
+
                       <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
                       <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
                       <button style={{ float: "right" }} onClick={checkForUpdates}>update</button>
                       <button style={{ float: "right" }} onClick={logout}>Logout</button>
                       <button style={{ float: "right" }}>{time}</button>
+
                     </td>
                   </tr>
                 </tbody>
               </table>
-              {mode == "normal" ?
+              {mode == "normal" && showPickerButtons ?
                 <table style={{ width: "100%", display: "inline-block" }}>
                   <tbody>
                     <tr>

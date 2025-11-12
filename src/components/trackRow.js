@@ -165,11 +165,19 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
                                                             <Marquee>{track.name}</Marquee>
                                                             :
                                                             track.name} */}
-                                                        {track.name}
+                                                        {track.name}&nbsp;
+                                                        {!forInfo ?
+                                                        <div className="song-release-date">
+                                                            (
+                                                            {track.album && track.album.release_date ? track.album.name : "Unknown album"}&nbsp;
+                                                            {track.album && track.album.release_date ? new Date(track.album.release_date).getFullYear() : "Unknown Release Date"}
+                                                            )
+                                                        </div> : null}
                                                     </span>
                                                 </td>
                                             </tr> : null}
-                                        {!forInfo ?
+
+                                        {/* {!forInfo ?
                                             <tr>
                                                 <td colSpan={2}>
                                                     <div className="song-release-date">
@@ -177,11 +185,11 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
                                                         ({track.album && track.album.release_date ? new Date(track.album.release_date).getFullYear() : "Unknown Release Date"})
                                                     </div>
                                                 </td>
-                                            </tr> : null}
+                                            </tr> : null} */}
 
                                         <tr>
-                                            <td colSpan={2}  >
-                                                <div className="song-release-date">
+                                            <td colSpan={2} style={{float:"left"}} >
+                                                <div className="song-duration">
                                                     {!forPlayer && formatTime(track.duration_ms)}
 
                                                     {!forPlayer && <>&nbsp;</>}
