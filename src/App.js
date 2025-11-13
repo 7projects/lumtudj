@@ -1,13 +1,13 @@
 import logo from './logo.svg';
 
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, cache } from "react";
 import axios from "axios";
 import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme } from './util';
-import { faL, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
+import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
 import Settings from '@mui/icons-material/Settings';
@@ -176,8 +176,11 @@ function App() {
 
   const getPlaylistsAndAlbums = async () => {
 
-
     const cacheLibrary = await loadLibray();
+
+    cacheLibrary.shift(myShazamTracksPl);
+    cacheLibrary.shift(lastListenedPl);
+
     if (cacheLibrary && cacheLibrary.length > 0) {
       setLibrary(cacheLibrary);
       setFilteredLibrary(cacheLibrary);
@@ -583,7 +586,7 @@ function App() {
       albms.forEach(alb => { alb.type = "album"; });
       plsts.forEach(pl => { pl.type = "playlist"; });
 
-      const lib = [...plsts, ...albms];
+      const lib = [myShazamTracksPl, lastListenedPl, ...plsts, ...albms];
 
       saveLibrary(lib);
       setLibrary(lib);
@@ -997,7 +1000,7 @@ function App() {
       await refreshAccessToken();
     }
 
-    // startUniverse();
+    startUniverse();
     addToHistory(track);
     setTrack(track);
     setSelectedTrack(track);
@@ -1132,7 +1135,7 @@ function App() {
   const onPlaylistFilterChange = async (text) => {
     setPlaylistsFilterText(text);
     //filter playlists by text
-    let allPlaylists = [...library];
+    let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
     if (text.trim() == "") {
       setFilteredLibrary(allPlaylists);
     } else {
@@ -1328,6 +1331,7 @@ function App() {
     setCurrentTab("plprev");
     // pl.tracks.map((tr) => tr.uid = newGuid());
 
+    setLoadingTracks(true);
 
     if (pl.id == "MyShazamedTracks") {
       pl.tracks = await getMyShazamTracks();
@@ -1341,6 +1345,8 @@ function App() {
     setSelectedLibraryItem(pl);
     setPlaylistChanged(false);
     setSelectedPlaylistTracks(pl.tracks);
+
+    setLoadingTracks(false);
   }
 
   const [playlistChanged, setPlaylistChanged] = useState();
@@ -1629,6 +1635,7 @@ function App() {
                 {/* <div>Copy</div>
                 <div>Paste</div> */}
                 <div onMouseDown={(e) => { removeTrackFromPlaylist(); e.stopPropagation() }} >Remove from playlist</div>
+                <div onMouseDown={(e) => { removeTrackFromPlaylist(); e.stopPropagation() }} >Remove from playlist2</div>
               </div>
             )}
 
@@ -1727,8 +1734,6 @@ function App() {
                     <SearchIcon></SearchIcon>
                   } */}
 
-
-
                   {mode == "normal" ?
                     <>
                       <div className='toolbar-search'>
@@ -1751,7 +1756,9 @@ function App() {
 
                 </div> : null}
                 {
-                  <ReordableTrackList source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                  loadingTracks ? <div className='loader'></div> :
+                    <ReordableTrackList source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
                   // getTracksPanel()
                 }
               </div>

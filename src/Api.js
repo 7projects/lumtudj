@@ -154,7 +154,6 @@ const getPlaylists = async () => {
     }));
 
     playlists.push(...simplified);
-
     url = data.next; // Spotify gives the next page URL, or null
   }
 

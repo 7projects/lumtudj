@@ -94,14 +94,14 @@ const PanelLibrary = ({ onClick, onSwipedRight, onBulbClick, onBulbCheckClick, o
 
     useEffect(() => {
         if (filteredLibrary.length == 0) {
-            setFilteredLibrary([...library]);
+            setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...library]);
         }
     }, [library])
 
     const onFilterChange = async (text) => {
         setFilter(text);
         //filter playlists by text
-        let allPlaylists = [...library];
+        let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
         if (text.trim() == "") {
             setFilteredLibrary(allPlaylists);
         } else {
@@ -146,7 +146,9 @@ const PanelLibrary = ({ onClick, onSwipedRight, onBulbClick, onBulbCheckClick, o
                                 <PlaylistRow index={-1} icon={myShazamTracksPlIcon} playlist={myShazamTracksPl} onClick={() => { onClick(myShazamTracksPl) }} />
                                 <PlaylistRow index={-2} icon={lastListenedPlIcon} playlist={lastListenedPl} onClick={() => { onClick(lastListenedPl) }} />
                                 {/* <div className='playlist-divider-playlists'>PLAYLISTS</div> */}
-                            </> : null}
+                            </> 
+                            
+                        : null}
 
                         {!isMobile() || true ? <div className="toolbar-wrapper">
 
@@ -164,7 +166,7 @@ const PanelLibrary = ({ onClick, onSwipedRight, onBulbClick, onBulbCheckClick, o
                                 return isMobile() ?
                                     <PlaylistRow index={index} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
                                     :
-                                    <PlaylistRow index={index} onDrop={onDrop} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { if (onClick) onClick(p); setSelectedLibraryIndex(index); }} />
+                                    <PlaylistRow index={index} onDrop={onDrop} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { setSelectedLibraryIndex(index); if (onClick) onClick(p); }} />
                             }}
                         />
                     </>
