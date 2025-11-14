@@ -2656,4 +2656,8 @@ button:active {
   color: #232d31;
   /* black text */
 }
+.MuiPaper-root {
+  background-color: #ffff66 !important;
+  color: #232d31 !important;
+}
 /*# sourceMappingURL=./slate.css.map */

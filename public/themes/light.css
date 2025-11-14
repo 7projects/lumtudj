@@ -2656,4 +2656,8 @@ button:active {
   color: #a7a7a7;
   /* black text */
 }
+.MuiPaper-root {
+  background-color: #7fe2ff !important;
+  color: #a7a7a7 !important;
+}
 /*# sourceMappingURL=./light.css.map */

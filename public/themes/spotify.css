@@ -2655,4 +2655,8 @@ button:active {
   color: #505050;
   /* black text */
 }
+.MuiPaper-root {
+  background-color: #1ed760 !important;
+  color: #505050 !important;
+}
 /*# sourceMappingURL=./spotify.css.map */

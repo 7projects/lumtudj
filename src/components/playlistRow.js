@@ -72,7 +72,7 @@ const PlaylistRow = ({ id, index, playlist, onClick, onDoubleClick, bulbOn, onBu
                             {playlist.artists[0].name}
                           </div> :
                           <div className="playlists-count">
-                            {(playlist.count ? playlist.count : playlist.tracks.total) + " songs (" + playlist.tracks.filter(x => x.datePlayed).length + " played)"}
+                            {(playlist.count ? playlist.count : playlist.tracks.total) + " songs (" + playlist.tracks && playlist.tracks.filter(x => x.datePlayed).length + " played)"}
                           </div>}
                       </td> : null}
                   </tr>

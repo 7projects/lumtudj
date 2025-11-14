@@ -5,6 +5,9 @@ const useAppStore = create((set) => ({
   menuPosition: null,
   setMenuPosition: (position) => set({ menuPosition: position ? { x: position.x, y: position.y } : null }),
 
+  menuAnchor: null,
+  setMenuAnchor: (anchor) => set({ menuAnchor: anchor }),
+
   // --- Library state ---
   library: [],
   setLibrary: (lib) => set({ library: lib }),

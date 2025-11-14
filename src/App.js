@@ -9,6 +9,8 @@ import PlaylistRow from './components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
 import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 
 import Settings from '@mui/icons-material/Settings';
 import SaveIcon from '@mui/icons-material/Save';
@@ -70,7 +72,7 @@ function useConstructor(callback) {
 }
 
 function App() {
-  const { locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { menuAnchor, setMenuAnchor, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -122,6 +124,15 @@ function App() {
   const intervalRef = useRef();
 
   let timer = null;
+
+
+  const open = Boolean(menuAnchor);
+  const handleClick = (event) => {
+    setMenuAnchor(event.currentTarget);
+  };
+  const handleClose = () => {
+    setMenuAnchor(null);
+  };
 
   const TIME_LIMIT = 5000; // 5 seconds
 
@@ -179,9 +190,9 @@ function App() {
 
     let cacheLibrary = await loadLibray();
 
-    cacheLibrary = [myShazamTracksPl, lastListenedPl, ...cacheLibrary];
 
     if (cacheLibrary && cacheLibrary.length > 0) {
+      cacheLibrary = [myShazamTracksPl, lastListenedPl, ...cacheLibrary];
       setLibrary(cacheLibrary);
       setFilteredLibrary(cacheLibrary);
     } else {
@@ -343,10 +354,10 @@ function App() {
     changeTheme();
   };
 
-  const handleContextMenu = (e, source) => {
-    debugger;
+  const handleContextMenu = (e) => {
+    //get htlm attribute data-source from e.currentTarget
+    setMenuAnchor(e.currentTarget);
     e.preventDefault();
-    setMenuPosition({ x: e.pageX, y: e.pageY });
   };
 
   const closeMenu = () => {
@@ -629,13 +640,12 @@ function App() {
   // }
 
   const checkForUpdates = async () => {
-    const cached = await loadLibray(); // Load back
+    const cached = (await loadLibray()).filter(x => x.type != "featured"); // Load back
 
     let fresh = [];
     const playlists = await api.getPlaylists();
     const albums = await api.getAlbums();
 
-    debugger;
     fresh = [...playlists, ...albums];
 
     let { updated, deleted, metaChanged } = getPlaylistsToUpdate(cached, fresh);
@@ -730,6 +740,8 @@ function App() {
       }
     }
 
+
+    debugger;
     // Detect deleted playlists
     for (const cachedItem of cached) {
       if (!freshMap.has(cachedItem.id)) {
@@ -1370,6 +1382,33 @@ function App() {
 
   return (
     <>
+      {menuAnchor &&
+        <Menu
+          anchorEl={menuAnchor}
+          id="account-menu"
+          open={open}
+          onClose={handleClose}
+          onClick={handleClose}
+          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        >
+
+          {menuAnchor.getAttribute("menu-target") == "library" ?
+            <MenuItem onClick={logout}>
+              New playlist
+            </MenuItem> : null}
+
+          {menuAnchor.getAttribute("menu-target") == "library" ?
+            <MenuItem onClick={checkForUpdates}>
+              Update library
+            </MenuItem> : null}
+
+          {menuAnchor.getAttribute("menu-target") == "settings" ?
+            <MenuItem onClick={logout}>
+              Log out
+            </MenuItem> : null}
+        </Menu>
+      }
       <Moveable
         target={document.querySelector("#artist-info")}
         draggable={true}
@@ -1521,7 +1560,7 @@ function App() {
                 <tr>
                   {tab != 4 ? <td colSpan={4} className='tab-panel'>
                     <Activity mode={tab == "1" ? "visible" : "hidden"}>
-                      <PanelLibrary onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                      <PanelLibrary onMenuClick={handleContextMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                     </Activity>
                     <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
                       <div className="toolbar-wrapper">
@@ -1603,13 +1642,13 @@ function App() {
 
               {token ?
                 // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
-                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
 
                 : null}
             </div>
           </div >
           :
-          <div className='layout' onMouseDown={closeMenu}>
+          <div className='layout' >
 
             {menuPosition && (
               <div className="context-menu"
@@ -1673,7 +1712,7 @@ function App() {
                         {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                       </div>
 
-                      <button style={{ float: "right" }} onMouseDown={handleContextMenu}><MoreVertIcon></MoreVertIcon></button>
+                      <button style={{ float: "right" }} menu-target="settings" onMouseDown={handleContextMenu}><MoreVertIcon></MoreVertIcon></button>
 
                       <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon></button>
                       {locked ?
@@ -1681,8 +1720,8 @@ function App() {
                         : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
                       <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
-                      <button style={{ float: "right" }} onClick={checkForUpdates}>update</button>
-                      <button style={{ float: "right" }} onClick={logout}>Logout</button>
+                      {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
+                      {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
                       {/* <button style={{ float: "right" }}>{time}</button> */}
 
                     </td>
@@ -1709,7 +1748,7 @@ function App() {
             <div className="main">
               {mode == "normal" ?
                 <div className={'panel'}>
-                  <PanelLibrary onDrop={onLibrayRowDrop} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                  <PanelLibrary onDrop={onLibrayRowDrop} onMenuClick={handleContextMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                 </div>
                 : null}
               <div id="panel-main" className="panel-main">
@@ -1771,7 +1810,7 @@ function App() {
 
 
                 : null} */}
-              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
             </div>
           </div>
       )
