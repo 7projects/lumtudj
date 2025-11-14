@@ -1699,10 +1699,10 @@ function App() {
                         {/* <button onClick={getTopTracks}>Top tracks</button>*/}
                         {/* <button onClick={getRecommendations}>Recommendations</button> */}
 
-                        <div className="toolbar-wrapper">
+                        {/* <div className="toolbar-wrapper">
                           <SearchIcon className="search-icon" />
                           <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
-                        </div>
+                        </div> */}
                         {/* <button onClick={getRecentTracks}>Recently played</button> */}
                       </td> : null}
                     <td>
@@ -1715,11 +1715,18 @@ function App() {
                       <button style={{ float: "right" }} menu-target="settings" onMouseDown={handleContextMenu}><MoreVertIcon></MoreVertIcon></button>
 
                       <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon></button>
+
                       {locked ?
                         <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
                         : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
                       <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+
+                      <button
+                        onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
+                        🍺 Buy me a beer
+                      </button>
+
                       {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
                       {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
                       {/* <button style={{ float: "right" }}>{time}</button> */}
@@ -1770,6 +1777,7 @@ function App() {
                         {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
 
                           : null}
+
                         <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                       </div>
 
