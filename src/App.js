@@ -1426,7 +1426,7 @@ function App() {
 
       {dragTrack ?
 
-        <div className='trash-container' onDragOver={(e) => e.preventDefault()} onDrop={onTrash}>
+        <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
           <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
         </div> : null}
 
@@ -1699,10 +1699,10 @@ function App() {
                         {/* <button onClick={getTopTracks}>Top tracks</button>*/}
                         {/* <button onClick={getRecommendations}>Recommendations</button> */}
 
-                        {/* <div className="toolbar-wrapper">
+                        <div className="toolbar-wrapper">
                           <SearchIcon className="search-icon" />
                           <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
-                        </div> */}
+                        </div>
                         {/* <button onClick={getRecentTracks}>Recently played</button> */}
                       </td> : null}
                     <td>
