@@ -1723,6 +1723,7 @@ function App() {
                       <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
 
                       <button
+                        style={{ height: 40, float: "right" }}
                         onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
                         🍺 Buy me a beer
                       </button>
