@@ -6,7 +6,7 @@ import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
-import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme } from './util';
+import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
 import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 
@@ -39,9 +39,10 @@ import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PanelLibrary from './components/panelLibrary';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import ColorLensIcon from '@mui/icons-material/ColorLens';
 
 import useAppStore from './AppStore';
-
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -176,10 +177,9 @@ function App() {
 
   const getPlaylistsAndAlbums = async () => {
 
-    const cacheLibrary = await loadLibray();
+    let cacheLibrary = await loadLibray();
 
-    cacheLibrary.shift(myShazamTracksPl);
-    cacheLibrary.shift(lastListenedPl);
+    cacheLibrary = [myShazamTracksPl, lastListenedPl, ...cacheLibrary];
 
     if (cacheLibrary && cacheLibrary.length > 0) {
       setLibrary(cacheLibrary);
@@ -343,7 +343,8 @@ function App() {
     changeTheme();
   };
 
-  const handleContextMenu = (e) => {
+  const handleContextMenu = (e, source) => {
+    debugger;
     e.preventDefault();
     setMenuPosition({ x: e.pageX, y: e.pageY });
   };
@@ -543,7 +544,8 @@ function App() {
       library.forEach(pl => {
         allTracks = allTracks.concat(pl.tracks);
       });
-      let filtered = allTracks.filter(tr => tr.name.toLowerCase().includes(st.toLowerCase()) || tr.artists[0].name.toLowerCase().includes(st.toLowerCase()));
+
+      let filtered = allTracks.filter(tr => tr.name.toLowerCase().includes(st.toLowerCase()) || tr.artists && tr.artists.length > 1 && tr.artists[0].name.toLowerCase().includes(st.toLowerCase()));
 
       const distinct = [...new Map(filtered.map(item => [item.id, item])).values()];
 
@@ -691,7 +693,7 @@ function App() {
 
       alert("Playlists deleted: " + deleted.map(p => p.name).join(", "));
 
-      let newLibrary = [...library];
+      let newLibrary = [myShazamTracksPl, lastListenedPl, ...library];
       newLibrary = newLibrary.filter(pl => !deleted.some(d => d.id === pl.id));
       setLibrary(newLibrary);
       setFilteredLibrary(newLibrary);
@@ -881,7 +883,7 @@ function App() {
         setSelectedTrackIndex(-1);
         const res = await api.removeTrackFromPlaylist(pl, tr);
 
-        let pls = [...library];
+        let pls = [myShazamTracksPl, lastListenedPl, ...library];
         pls[selectedLibraryIndex] = pl;
         pl.count = pl.tracks.length;
         pl.snapshot_id = res.snapshot_id;
@@ -1102,22 +1104,6 @@ function App() {
     <path d="M12,24C5.4,24,0,18.6,0,12h2c0,5.5,4.5,10,10,10s10-4.5,10-10S17.5,2,12,2C8.4,2,5.1,3.9,3.3,7H8v2H0V1h2v4.4
      C4.2,2.1,8,0,12,0c6.6,0,12,5.4,12,12S18.6,24,12,24z M15.3,17.8L11,13.4V6h2v6.6l3.7,3.8L15.3,17.8z"/>
   </svg>;
-
-  const myShazamTracksPl = {
-    id: "MyShazamedTracks",
-    count: 0,
-    name: "My shazamed tracks",
-    total: 0,
-    tracks: []
-  }
-
-  const lastListenedPl = {
-    id: "LastListened",
-    count: 0,
-    name: "Last listened",
-    total: 0,
-    tracks: []
-  }
 
   const onLongPress = (pl, onof) => {
 
@@ -1602,7 +1588,7 @@ function App() {
                     <button style={{ float: "right" }}>{time}</button>
                     <button style={{ float: "right" }} onClick={logout}>Logout</button>
                     <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
-                    <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
+                    <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon> </button>
                     <button onClick={checkForUpdates}>Check for updates</button>
                     {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                     <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
@@ -1661,13 +1647,11 @@ function App() {
                         {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                         {/* <button onClick={startUniverse}>start</button> */}
 
-                        <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button>
+                        {/* <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button> */}
                         <button className='header-button-small' onClick={toggleMode}><PlaylistAddCheckIcon></PlaylistAddCheckIcon></button>
-                        {locked ?
-                          <button id="lockButton" style={{ color: "red" }} className='header-button-small' onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                          : <button id="lockButton" className='header-button-small' onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
-                        <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button>
+
+                        {/* <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button> */}
                         {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
                       </div>
                     </td>
@@ -1689,11 +1673,17 @@ function App() {
                         {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                       </div>
 
-                      <button style={{ float: "right" }} onClick={fullscreen}>Fullscreen</button>
-                      <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
+                      <button style={{ float: "right" }} onMouseDown={handleContextMenu}><MoreVertIcon></MoreVertIcon></button>
+
+                      <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon></button>
+                      {locked ?
+                        <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                        : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+
+                      <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
                       <button style={{ float: "right" }} onClick={checkForUpdates}>update</button>
                       <button style={{ float: "right" }} onClick={logout}>Logout</button>
-                      <button style={{ float: "right" }}>{time}</button>
+                      {/* <button style={{ float: "right" }}>{time}</button> */}
 
                     </td>
                   </tr>

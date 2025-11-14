@@ -1,5 +1,25 @@
 import React from "react";
 
+
+export const myShazamTracksPl = {
+  id: "MyShazamedTracks",
+  count: 0,
+  name: "My shazamed tracks",
+  total: 0,
+  type: "featured",
+  tracks: []
+}
+
+export const lastListenedPl = {
+  id: "LastListened",
+  count: 0,
+  name: "Last listened",
+  total: 0,
+  type: "featured",
+  tracks: []
+}
+
+
 export const formatTime = (ms) => {
   if (ms === null) return '0:00';
   const minutes = Math.floor(ms / 60000);
@@ -94,6 +114,8 @@ export function fullscreen() {
 }
 
 export const startUniverse = () => {
+
+  return; // disabling for now
   const field = document.getElementById("field");
   const f = field.getContext("2d");
 

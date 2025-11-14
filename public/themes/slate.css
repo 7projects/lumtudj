@@ -2627,8 +2627,8 @@ button:active {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 140px;
-  height: 140px;
+  width: 100px;
+  height: 100px;
   border-radius: 10px;
   background-color: rgba(0, 0, 0, 0.85);
   display: flex;
@@ -2641,6 +2641,10 @@ button:active {
 }
 .trash-container:hover {
   background-color: red;
+}
+/* Highlight when item is dragged over */
+.trash-container.drag-over {
+  background-color: red !important;
 }
 .trash-icon {
   color: #617d8b;
