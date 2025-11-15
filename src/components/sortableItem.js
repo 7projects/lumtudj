@@ -8,8 +8,7 @@ import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 
 
-
-
+import useAppStore from '../AppStore';
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -30,7 +29,9 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
-const SortableItem = ({source, track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const SortableItem = ({ enableDrag, source, track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+
+    const { selectedLibraryItem } = useAppStore();
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -73,21 +74,22 @@ const SortableItem = ({source, track, forInfo, onClick, onArtistClick, onDoubleC
                         </td>
 
                         {/* Drag handle cell */}
-                        <td
-                            style={{
-                                touchAction: "none",
-                                width: 40,
-                                textAlign: "right",
-                                verticalAlign: "middle",
-                                display: isMobile() || true ? "table-cell" : "none",
+                        {enableDrag ?
+                            <td
+                                style={{
+                                    touchAction: "none",
+                                    width: 40,
+                                    textAlign: "right",
+                                    verticalAlign: "middle",
+                                    display: isMobile() || true ? "table-cell" : "none",
 
-                            }}
-                            {...attributes}
-                            {...listeners}
-                        >
-                            <DragIndicatorIcon className='toolbar-button'></DragIndicatorIcon>
-                            {/* <DragHandleIcon /> */}
-                        </td>
+                                }}
+                                {...attributes}
+                                {...listeners}
+                            >
+                                <DragIndicatorIcon className='toolbar-button'></DragIndicatorIcon>
+                                {/* <DragHandleIcon /> */}
+                            </td> : null}
                     </tr>
                 </tbody>
             </table>

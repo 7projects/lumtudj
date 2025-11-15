@@ -738,10 +738,15 @@ function App() {
       if (cachedPlaylist?.snapshot_id != p.snapshot_id || isNew) {
         updated.push(p);
       }
+
+      if (cachedPlaylist.name == "Klinci") {
+        debugger;
+      }
     }
 
 
-    debugger;
+
+
     // Detect deleted playlists
     for (const cachedItem of cached) {
       if (!freshMap.has(cachedItem.id)) {
@@ -895,7 +900,7 @@ function App() {
         setSelectedTrackIndex(-1);
         const res = await api.removeTrackFromPlaylist(pl, tr);
 
-        let pls = [myShazamTracksPl, lastListenedPl, ...library];
+        let pls = [...library];
         pls[selectedLibraryIndex] = pl;
         pl.count = pl.tracks.length;
         pl.snapshot_id = res.snapshot_id;
@@ -1037,7 +1042,6 @@ function App() {
     //   play(playlist[playIndex + 1]);
     // }
 
-    debugger;
     const bpl = cached ? cached : await loadBackgroundPlaylists();
 
 
@@ -1045,7 +1049,7 @@ function App() {
       let pl = [...playlistTracks];
 
 
-      flyToPlayer("pl0-dinamo" + pl[0].id);
+      flyToPlayer("pl0-" + pl[0].id);
 
 
       play(pl[0]);
@@ -1181,6 +1185,11 @@ function App() {
     if (active.id !== over.id) {
       const oldIndex = selectedPlaylistTracks.findIndex((i, index) => "spl" + index + "-" + i.id === active.id);
       const newIndex = selectedPlaylistTracks.findIndex((i, index) => "spl" + index + "-" + i.id === over.id);
+
+      if (selectedLibraryItem && selectedLibraryItem.type == "playlist") {
+        api.changeTrackPosition(selectedLibraryItem.id, oldIndex, newIndex);
+      }
+
       setSelectedPlaylistTracks((prev) => arrayMove(prev, oldIndex, newIndex));
       setPlaylistChanged(true);
     }
@@ -1576,7 +1585,7 @@ function App() {
                           </>
                           :
                           <>
-                            <ReordableTrackList source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                            <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
                           </>}
                       </div>
                     </Activity>
@@ -1611,7 +1620,7 @@ function App() {
                       {
                         playlistTracks.length > 0 ?
                           <div className='panel-playlist-mobile'>
-                            <ReordableTrackList onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
+                            <ReordableTrackList enableDrag={true} onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
                           </div>
                           :
                           <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
@@ -1795,7 +1804,7 @@ function App() {
                 </div> : null}
                 {
                   loadingTracks ? <div className='loader'></div> :
-                    <ReordableTrackList source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                    <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                   // getTracksPanel()
                 }
@@ -1803,7 +1812,7 @@ function App() {
               <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
                 {
                   playlistTracks.length > 0 ?
-                    <ReordableTrackList source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                    <ReordableTrackList enableDrag source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                     :
                     <div className='QueueMusicIcon'>

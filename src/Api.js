@@ -481,6 +481,31 @@ const addTrackToPlaylist = async (playlist, track) => {
   }
 };
 
+const changeTrackPosition = async (playlistId, oldIndex, newIndex) => {
+  const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
+
+  const body = {
+    range_start: oldIndex,
+    insert_before: newIndex
+  };
+
+  const res = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Authorization": `Bearer ${await getToken()}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const error = await res.text();
+    throw new Error(`Failed to reorder track: ${error}`);
+  }
+
+  return await res.json(); // will include snapshot_id
+};
+
 const removeTrackFromPlaylist = async (playlist, track) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`;
   const response = await fetch(url, {
@@ -605,7 +630,8 @@ export default {
   getArtistTopTracks,
   getArtistAlbums,
   getAlbumTracks,
-  getArtistInfo
+  getArtistInfo,
+  changeTrackPosition
 };
 
 
