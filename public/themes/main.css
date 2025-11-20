@@ -1004,8 +1004,8 @@
 }
 body {
   margin: 0;
-  font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-  font-size: 14px;
+  font-family: Doto, Monospace, Sans-serif;
+  font-size: 10px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-color: #131313;
@@ -1237,8 +1237,8 @@ code {
   object-fit: cover;
 }
 .littleBulbOn {
-  width: 7px;
-  height: 7px;
+  width: 4px;
+  height: 4px;
   background-color: transparent;
   position: relative;
   border-radius: 1px;
@@ -1259,6 +1259,9 @@ code {
 }
 .bulbOffColor {
   fill: #078ec2;
+}
+.bulbOffColor:hover {
+  fill: #9ae0fb;
 }
 .bulbOn {
   width: 20px;
@@ -1394,7 +1397,7 @@ code {
   color: #f1f1f1;
   cursor: pointer;
   font-size: 18px;
-  background-color: #37373752;
+  background-color: #0000007a;
 }
 .track-row {
   align-items: center;
@@ -1449,12 +1452,19 @@ code {
 }
 .song-name {
   word-wrap: normal;
-  font-size: 12px;
+  font-size: 15px;
 }
 .song-release-date {
   display: inline-block;
   font-weight: normal;
   font-size: 10px;
+  opacity: 0.7;
+}
+.song-duration {
+  display: inline-block;
+  font-weight: normal;
+  font-size: 10px;
+  padding-top: 5px;
 }
 .song-artist:hover {
   font-weight: bold;
@@ -1735,7 +1745,7 @@ button:active {
   /* directly below the loader */
   left: 50%;
   font-size: 12px;
-  color: #4d4d4d;
+  color: #1ff076;
   width: 200px;
   font-size: 10px;
   text-align: center;
@@ -1856,7 +1866,7 @@ button:active {
   color: #e2e2e2;
   /* Background color */
   /* Space between lines */
-  font-family: Doto;
+  font-family: Doto, Monospace, Sans-serif;
   font-size: 20px;
 }
 .selected-track-label {
@@ -2084,6 +2094,10 @@ button:active {
 .header-button-small:focus {
   outline: none;
 }
+.icon-color {
+  color: #e2e2e2;
+  fill: #e2e2e2;
+}
 .tab {
   color: #e2e2e2;
   background-color: #1d1d1d;
@@ -2092,7 +2106,6 @@ button:active {
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #030303;
 }
 .tab-selected {
   color: #e2e2e2;
@@ -2102,14 +2115,7 @@ button:active {
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  border: 1px solid #030303;
-  color: #078ec2;
   background-color: #1efa9e;
-}
-.input-search-wrapper {
-  position: relative;
-  width: 100%;
-  height: 40px;
 }
 .input-search {
   width: 100%;
@@ -2117,7 +2123,7 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: Doto;
+  font-family: Doto, Monospace, Sans-serif;
   box-sizing: border-box;
   color: #ffffff;
   background-color: #1e1e1e;
@@ -2129,22 +2135,6 @@ button:active {
   font-size: 20px;
   border-radius: 10px;
   border: 1px solid #030303;
-}
-.panel-input-search {
-  width: 100%;
-  height: 100%;
-  padding-left: 32px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: bold;
-  font-family: Doto;
-  box-sizing: border-box;
-  color: #ffffff;
-  background-color: #202020;
-  outline: none;
-  border: 1px solid #0e0e0e;
-  border-radius: 10px 10px 0px 0px;
 }
 .input-search:focus::placeholder {
   color: transparent;
@@ -2486,7 +2476,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: Doto, Handjet, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-family: Doto, Monospace, Sans-serif;
 }
 .reconnecting-dots span {
   display: inline-block;
@@ -2582,4 +2572,176 @@ button:active {
 /* Combine both animations for 2s total */
 .blinking {
   animation: blink 0.5s linear 0s 4, shake 0.1s linear 0s 20;
+}
+.toolbar-wrapper {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 6px 10px;
+  box-sizing: border-box;
+  gap: 10px;
+  gap: 0.5rem;
+  padding-left: 32px;
+}
+.toolbar-search {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  /* takes remaining space */
+  gap: 8px;
+}
+.toolbar-input-search {
+  flex: 1;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  font-family: Doto, Monospace, Sans-serif;
+  box-sizing: border-box;
+  color: #e2e2e2;
+  background-color: transparent;
+  outline: none;
+  border: none;
+}
+.toolbar-input-search::placeholder {
+  color: rgba(226, 226, 226, 0.4) !important;
+}
+.toolbar-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.toolbar-button {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a4a4a4;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+.toolbar-button:hover {
+  color: #f1f1f1;
+}
+.trash-container {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 100px;
+  height: 100px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 10000;
+  transition: background-color 0.3s ease;
+}
+.trash-container:hover {
+  background-color: red;
+}
+/* Highlight when item is dragged over */
+.trash-container.drag-over {
+  background-color: red !important;
+}
+.trash-icon {
+  color: #1d1d1d;
+  fill: #1d1d1d;
+}
+::selection {
+  background: #1efa9e;
+  /* yellow highlight */
+  color: #078ec2;
+  /* black text */
+}
+.MuiPaper-root {
+  background-color: #1efa9e !important;
+  color: #078ec2 !important;
+}
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  transition: opacity 0.2s ease;
+}
+.dialog-backdrop.modal-backdrop {
+  background: rgba(0, 0, 0, 0.4);
+  pointer-events: auto;
+}
+.dialog-backdrop.no-block {
+  background: transparent;
+  pointer-events: none;
+}
+.dialog-window {
+  position: absolute;
+  width: 400px;
+  background: #353535;
+  border-radius: 10px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  pointer-events: auto;
+  user-select: none;
+}
+.dialog-header {
+  background: #353535;
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  cursor: move;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+}
+.dialog-header .dialog-close {
+  border: none;
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.dialog-header .dialog-close:hover {
+  color: #d00;
+}
+.dialog-title {
+  font-size: 16px;
+}
+.dialog-body {
+  padding: 16px;
+  font-size: 14px;
+  color: #e2e2e2;
+  background-color: #353535;
+}
+.dialog-footer {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.dialog-footer .dialog-btn {
+  padding: 6px 12px;
+  border: none;
+  background: #353535;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.dialog-footer .dialog-btn:hover {
+  background: #1d1d1d;
+}
+.dialog-footer .dialog-btn.primary {
+  border: none;
+  background: #1d1d1d;
+  color: #e2e2e2;
+}
+.dialog-footer .dialog-btn.primary:hover {
+  background: #1d1d1d;
 }

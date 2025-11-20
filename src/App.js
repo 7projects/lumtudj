@@ -43,8 +43,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PanelLibrary from './components/panelLibrary';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
-
+import Dialog from './components/dialog';
+import PlaylistInfo from './components/playlistInfo';
 import useAppStore from './AppStore';
+
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -116,6 +118,8 @@ function App() {
   const handleLockKeyDownRef = useRef(null);
 
   const [showingPlaylistPicker, setShowingPlaylistPicker] = useState(false);
+
+  const [showPlaylistInfo, setShowPlaylistInfo] = useState(false);
 
   const inputBuffer = useRef();
 
@@ -1391,6 +1395,8 @@ function App() {
 
   return (
     <>
+
+
       {menuAnchor &&
         <Menu
           anchorEl={menuAnchor}
@@ -1416,8 +1422,15 @@ function App() {
             <MenuItem onClick={logout}>
               Log out
             </MenuItem> : null}
+
+          {menuAnchor.getAttribute("menu-target") == "library-item" ?
+            <MenuItem onClick={() => setShowPlaylistInfo(true)}>
+              Edit playlist
+            </MenuItem> : null}
+
         </Menu>
       }
+
       <Moveable
         target={document.querySelector("#artist-info")}
         draggable={true}
@@ -1433,8 +1446,10 @@ function App() {
         }}
       />
 
-      {dragTrack ?
+      {showPlaylistInfo ?
+        <PlaylistInfo playlist={selectedLibraryItem}></PlaylistInfo> : null}
 
+      {dragTrack ?
         <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
           <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
         </div> : null}
