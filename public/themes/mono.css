@@ -2681,7 +2681,7 @@ button:active {
 .dialog-window {
   position: absolute;
   width: 400px;
-  background: #fff;
+  background: #242424;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   overflow: hidden;
@@ -2689,7 +2689,7 @@ button:active {
   user-select: none;
 }
 .dialog-header {
-  background: #f0f0f0;
+  background: #242424;
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;
@@ -2716,7 +2716,8 @@ button:active {
 .dialog-body {
   padding: 16px;
   font-size: 14px;
-  color: #333;
+  color: #ffffff;
+  background-color: #242424;
 }
 .dialog-footer {
   padding: 12px 16px;
@@ -2726,20 +2727,21 @@ button:active {
 }
 .dialog-footer .dialog-btn {
   padding: 6px 12px;
-  border: 1px solid #bbb;
-  background: #fff;
+  border: none;
+  background: #242424;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
 }
 .dialog-footer .dialog-btn:hover {
-  background: #f5f5f5;
+  background: #1f1f1f;
 }
 .dialog-footer .dialog-btn.primary {
   border: none;
-  background: #4a67ff;
-  color: white;
+  background: #1f1f1f;
+  color: #ffffff;
 }
 .dialog-footer .dialog-btn.primary:hover {
-  background: #3a54d6;
+  background: #1f1f1f;
 }
+/*# sourceMappingURL=./mono.css.map */

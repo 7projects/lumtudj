@@ -120,7 +120,7 @@ const playTrack = async (id) => {
 
 const search = async (query) => {
   let data = await request(`/search?q=${query}&type=track`);
-  
+
   return data.tracks.items;
 };
 
@@ -606,6 +606,39 @@ const getAccessTokenByAuthorizationCode = async (code) => {
   return data;
 }
 
+const savePlaylistInfo = async (playlist, name, description) => {
+  const url = `https://api.spotify.com/v1/playlists/${playlist.id}`;
+  return fetch(url, {
+    method: 'PUT',
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      name: name,
+      description: description,
+    }),
+  });
+};
+
+const createPlaylist = async (name, description) => {
+  const userId = localStorage.getItem('userId');
+  const url = `https://api.spotify.com/v1/users/${userId}/playlists`;
+  return fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: name,
+      description: description,
+      public: false,
+    }),
+  });
+};
+
+
 export default {
   getToken,
   shouldRefreshToken,
@@ -631,7 +664,9 @@ export default {
   getArtistAlbums,
   getAlbumTracks,
   getArtistInfo,
-  changeTrackPosition
+  changeTrackPosition,
+  savePlaylistInfo,
+  createPlaylist
 };
 
 

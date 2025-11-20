@@ -194,6 +194,7 @@ function App() {
 
     let cacheLibrary = await loadLibray();
 
+    debugger;
 
     if (cacheLibrary && cacheLibrary.length > 0) {
       cacheLibrary = [myShazamTracksPl, lastListenedPl, ...cacheLibrary];
@@ -273,6 +274,7 @@ function App() {
     });
 
     if (library.length == 0) {
+      debugger;
       getPlaylistsAndAlbums();
     }
 
@@ -502,6 +504,7 @@ function App() {
           window.history.replaceState({}, document.title, '/'); // Clean URL
           if (library.length == 0) {
 
+            debugger;
             getPlaylistsAndAlbums();
             getBackgroundPlaylists();
           }
@@ -510,9 +513,9 @@ function App() {
       else {
         if (access_token) {
           if (library.length == 0) {
-
-            getPlaylistsAndAlbums();
-            getBackgroundPlaylists();
+            // debugger;
+            // getPlaylistsAndAlbums();
+            // getBackgroundPlaylists();
           }
         }
       }
@@ -694,7 +697,7 @@ function App() {
         }
 
         saveLibrary(updatedPlaylists);
-
+        debugger;
         await getPlaylistsAndAlbums(); // Reload playlists from IndexedDB
         setLoadingLibrary(null);
       }
@@ -1036,6 +1039,7 @@ function App() {
     }
 
     await saveLibrary(pls);
+    debugger;
     getPlaylistsAndAlbums();
 
   }
@@ -1393,6 +1397,22 @@ function App() {
     setDragSourceIndex(-1);
   }
 
+  const onPlaylistInfoSave = async (playlist, name, description) => {
+      const result = await api.savePlaylistInfo(playlist, name, description);
+      if (result) {
+        let pls = [...library];
+        let pl = pls.find(x => x.id == playlist.id);
+        pl.name = name;
+        pl.description = description;
+        setLibrary(pls);
+        setFilteredLibrary(pls);
+        saveLibrary(pls);
+        setSelectedLibraryItem(playlist);
+      }
+
+
+  }
+
   return (
     <>
 
@@ -1409,7 +1429,7 @@ function App() {
         >
 
           {menuAnchor.getAttribute("menu-target") == "library" ?
-            <MenuItem onClick={logout}>
+            <MenuItem onClick={() => setShowPlaylistInfo(true)}>
               New playlist
             </MenuItem> : null}
 
@@ -1447,7 +1467,7 @@ function App() {
       />
 
       {showPlaylistInfo ?
-        <PlaylistInfo playlist={selectedLibraryItem}></PlaylistInfo> : null}
+        <PlaylistInfo onSave={onPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))} playlist={selectedLibraryItem}></PlaylistInfo> : null}
 
       {dragTrack ?
         <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
