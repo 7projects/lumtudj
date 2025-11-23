@@ -16,7 +16,11 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
     const playlists = library.filter(x => x.tracks.some(t => t.id == track.id) && x.type == "playlist");
 
     const getTrackRowClass = () => {
-        let clss = isMobile() ? 'item-row-mobile' : 'item-row';
+
+        if(!forInfo) return "";
+        
+        let clss = isMobile()  ? 'item-row-mobile' : 'item-row';
+
 
         // if (playing)
         //     clss = 'track-row-selected track-row-playing'
@@ -141,7 +145,7 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
                                         <tr>
                                             <td>
 
-                                                <span className="song-artist" onClick={(e) => { onArtistClick && onArtistClick(track); e.stopPropagation(); e.preventDefault(); }}>
+                                                <span className="song-artist" onClick={(e) => { onArtistClick && onArtistClick(track) }}>
 
 
                                                     {forInfo ? track && track.name :
@@ -167,12 +171,12 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
                                                             track.name} */}
                                                         {track.name}&nbsp;
                                                         {!forInfo ?
-                                                        <div className="song-release-date">
-                                                            (
-                                                            {track.album && track.album.release_date ? track.album.name : "Unknown album"}&nbsp;
-                                                            {track.album && track.album.release_date ? new Date(track.album.release_date).getFullYear() : "Unknown Release Date"}
-                                                            )
-                                                        </div> : null}
+                                                            <div className="song-release-date">
+                                                                (
+                                                                {track.album && track.album.release_date ? track.album.name : "Unknown album"}&nbsp;
+                                                                {track.album && track.album.release_date ? new Date(track.album.release_date).getFullYear() : "Unknown Release Date"}
+                                                                )
+                                                            </div> : null}
                                                     </span>
                                                 </td>
                                             </tr> : null}
@@ -188,7 +192,7 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
                                             </tr> : null} */}
 
                                         <tr>
-                                            <td colSpan={2} style={{float:"left"}} >
+                                            <td colSpan={2} style={{ float: "left" }} >
                                                 <div className="song-duration">
                                                     {!forPlayer && formatTime(track.duration_ms)}
 

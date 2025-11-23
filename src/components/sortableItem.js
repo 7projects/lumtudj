@@ -41,26 +41,44 @@ const SortableItem = ({ enableDrag, source, track, forInfo, onClick, onArtistCli
         zIndex: isDragging ? 999 : undefined,
     };
 
+    const getTrackRowClass = () => {
+
+        let clss = isMobile() ? 'item-row-mobile' : 'item-row';
+
+        // if (playing)
+        //     clss = 'track-row-selected track-row-playing'
+
+        if (selected)
+            clss = isMobile() ? 'item-row-selected-mobile' : "item-row-selected"
+
+        if (forPlayer)
+            clss = clss + " for-player";
+
+
+
+        return clss;
+    }
+
     return (
-        <li ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`}>
-            <table style={{ width: "100%" }} className={isMobile() ? "item-row-mobile" : "item-row"}>
+        <li ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`} onClick={() => onClick?.(track)} onContextMenu={onContextMenu} onMouseDown={onMouseDown} onDoubleClick={onDoubleClick}>
+            <table style={{ width: "100%" }} className={getTrackRowClass()}>
                 <tbody>
                     <tr>
                         {/* Main content cell */}
-                        <td style={{ width: "auto" }}>
+                        <td style={{ width: "auto" }} >
                             <TrackRow
                                 source={source}
                                 track={track}
                                 forInfo={forInfo}
-                                onClick={onClick}
+
                                 onArtistClick={onArtistClick}
-                                onDoubleClick={onDoubleClick}
-                                onMouseDown={onMouseDown}
+                               
+
                                 index={index}
                                 onDrop={onDrop}
                                 selected={selected}
-                                onContextMenu={onContextMenu}
-                                forPlaylist
+                                
+
                                 forPlayer={forPlayer}
                                 hideImage={hideImage}
                                 playing={playing}

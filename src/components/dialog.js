@@ -135,30 +135,31 @@ export default function Dialog({
 
             <div className="dialog-body">{children}</div>
 
-            <div className="dialog-footer">
-              {buttons && Array.isArray(buttons) ? (
-                buttons.map((btn, i) => (
-                  <button
-                    key={i}
-                    className={`dialog-btn ${btn.primary ? "primary" : ""}`}
-                    onClick={btn.onClick}
-                  >
-                    {btn.label}
-                  </button>
-                ))
-              ) : (
-                <>
-                  {showCancel && (
-                    <button className="dialog-btn" onClick={() => onCancel?.() || onClose?.()}>
-                      {cancelText}
+            {buttons && buttons.length !== 0 ?
+              <div className="dialog-footer">
+                {buttons && Array.isArray(buttons) ? (
+                  buttons.map((btn, i) => (
+                    <button
+                      key={i}
+                      className={`dialog-btn ${btn.primary ? "primary" : ""}`}
+                      onClick={btn.onClick}
+                    >
+                      {btn.label}
                     </button>
-                  )}
-                  <button className="dialog-btn primary" onClick={() => onOk?.()}>
-                    {okText}
-                  </button>
-                </>
-              )}
-            </div>
+                  ))
+                ) : (
+                  <>
+                    {showCancel && (
+                      <button className="dialog-btn" onClick={() => onCancel?.() || onClose?.()}>
+                        {cancelText}
+                      </button>
+                    )}
+                    <button className="dialog-btn primary" onClick={() => onOk?.()}>
+                      {okText}
+                    </button>
+                  </>
+                )}
+              </div> : null}
           </motion.div>
         </motion.div>
       )}

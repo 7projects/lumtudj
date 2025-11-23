@@ -7,7 +7,7 @@ import { useLongPress } from 'use-long-press';
 import { useSwipeable } from 'react-swipeable';
 import useAppStore from '../AppStore';
 
-const PlaylistRow = ({ id, index, playlist, onClick, onDoubleClick, bulbOn, onBulbClick, selected, bulbCheckOn, onBulbCheckClick, icon, onLongPress, onSwipedLeft, onDrop, onSwipedRight, album = false }) => {
+const PlaylistRow = ({onContextMenu, id, index, playlist, onClick, onDoubleClick, bulbOn, onBulbClick, selected, bulbCheckOn, onBulbCheckClick, icon, onLongPress, onSwipedLeft, onDrop, onSwipedRight, album = false }) => {
 
   const { library, setSelectedLibraryIndex, selectedLibraryIndex, dragTrack, setDragTrack, setDragSourceIndex, setDragSource, dragSource } = useAppStore();
 
@@ -38,7 +38,7 @@ const PlaylistRow = ({ id, index, playlist, onClick, onDoubleClick, bulbOn, onBu
 
   return (
     playlist &&
-    <div draggable={playlist.type != "featured"} onDragStart={() => { setDragSource("library"); setDragSourceIndex(index) }} onDragOver={(e) => { if (dragSource != "library") e.preventDefault() }} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(playlist) }} id={id} {...longPressHandler()} {...swipeHandler} className={selected ? 'item-row-selected' : 'item-row'} key={playlist.id} onClick={() => { setSelectedLibraryIndex(index); onClick && onClick(playlist.id) }} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
+    <div onContextMenu={(e)=>{e.preventDefault(); onContextMenu?.(e, playlist, index)}} draggable={playlist.type != "featured"} onDragStart={() => { setDragSource("library"); setDragSourceIndex(index) }} onDragOver={(e) => { if (dragSource != "library") e.preventDefault() }} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(playlist) }} id={id} {...longPressHandler()} {...swipeHandler} className={selected ? 'item-row-selected' : 'item-row'} key={playlist.id} onClick={() => { setSelectedLibraryIndex(index); onClick && onClick(playlist.id) }} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
       <table style={{ width: "100%" }}>
         <tbody>
           <tr>
@@ -47,7 +47,7 @@ const PlaylistRow = ({ id, index, playlist, onClick, onDoubleClick, bulbOn, onBu
               <td style={{ width: 20, textAlign: "center", verticalAlign: "middle" }}>
                 {icon ? icon :
                   <div>
-                    <img className="playlists-image" src={playlist.images && playlist.images[2] ? playlist.images[2].url : playlist.images && playlist.images[0].url} />
+                    <img className="playlists-image" src={playlist?.images?.[2]?.url || playlist?.images?.[0]?.url} />
                   </div>
                 }
               </td> : null}

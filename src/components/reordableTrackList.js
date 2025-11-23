@@ -27,7 +27,7 @@ import {
 import { KeyboardVoiceSharp } from "@mui/icons-material";
 
 
-const ReordableTrackList = ({ enableDrag, source, trackList, onClick, onDoubleClick, dragEndHandler, keys, onSwipedRight, onDrop }) => {
+const ReordableTrackList = ({ ref, onContextMenu, enableDrag, source, trackList, onClick, onDoubleClick, dragEndHandler, keys, onSwipedRight, onDrop, selectedIndex }) => {
 
     const { selectedTrack, setSelectedTrack, menuPosition, setMenuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, dragTrack, setDragTrack, dragSource, setDragSource, locked, dragSourceIndex, setDragSourceIndex } = useAppStore();
 
@@ -45,25 +45,21 @@ const ReordableTrackList = ({ enableDrag, source, trackList, onClick, onDoubleCl
         })
     );
 
-    const handleContextMenu = (e) => {
-        e.preventDefault();
-        setMenuPosition({ x: e.pageX, y: e.pageY });
-    };
-
     return (
         <>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={dragEndHandler} modifiers={[restrictToVerticalAxis]}>
                 <SortableContext items={(trackList || []).map((i, index) => keys + index + "-" + i.id)} strategy={rectSortingStrategy}>
                     <Virtuoso
-                        style={{ height: '100%' }}
+                        ref={ref}
+                        style={{ height: "calc(100% - 40px)" }}
                         totalCount={trackList.length}
                         itemContent={(index) => {
                             const tr = trackList[index];
                             if (!tr) return null;
 
                             return isMobile() ?
-                                <SortableItem enableDrag={enableDrag} source={source} id={keys + index + "-" + tr.id} value={tr.name} key={KeyboardVoiceSharp + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, keys + index + "-" + tr.id, index) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onDrop={(index) => onDrop(dragTrack, index)} track={tr} onClick={() => { onDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-                                <SortableItem enableDrag={enableDrag} source={source} id={keys + index + "-" + tr.id} value={tr.name} key={keys + index + "-" + tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => onDrop(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onDoubleClick(tr, index)} />
+                                <SortableItem onContextMenu={(e) => { onContextMenu?.(e, tr, index) }} enableDrag={enableDrag} source={source} id={keys + index + "-" + tr.id} value={tr.name} key={KeyboardVoiceSharp + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, keys + index + "-" + tr.id, index) }} index={index} selected={index == selectedIndex} onDrop={(index) => onDrop(dragTrack, index)} track={tr} onClick={() => onClick?.(tr, index)} /> :
+                                <SortableItem enableDrag={enableDrag} source={source} id={keys + index + "-" + tr.id} value={tr.name} key={keys + index + "-" + tr.id} onContextMenu={(e) => { onContextMenu?.(e, tr, index) }} index={index} selected={index == selectedIndex} onMouseDown={() => { setDragSource("playlist"); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => onDrop(dragTrack, locked ? null : index)} track={tr} onClick={() => onClick?.(tr, index)} onDoubleClick={() => onDoubleClick(tr, index)} />
                         }}
                     />
                 </SortableContext>

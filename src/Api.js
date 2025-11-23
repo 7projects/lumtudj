@@ -608,7 +608,7 @@ const getAccessTokenByAuthorizationCode = async (code) => {
 
 const savePlaylistInfo = async (playlist, name, description) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}`;
-  return fetch(url, {
+  const response = await fetch(url, {
     method: 'PUT',
     headers: {
       Authorization: `Bearer ${await getToken()}`,
@@ -619,12 +619,16 @@ const savePlaylistInfo = async (playlist, name, description) => {
       description: description,
     }),
   });
+
+  var data = await response.json();;
+  data.ok = response.ok;
+  return data;
 };
 
 const createPlaylist = async (name, description) => {
   const userId = localStorage.getItem('userId');
   const url = `https://api.spotify.com/v1/users/${userId}/playlists`;
-  return fetch(url, {
+  const response = await fetch(url, {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${await getToken()}`,
@@ -636,6 +640,28 @@ const createPlaylist = async (name, description) => {
       public: false,
     }),
   });
+
+  var data = await response.json();
+
+  let newPl = {
+    id: data.id,
+    name: name,
+    description: description,
+    tracks: [],
+    type: "playlist",
+    images: data.images,
+    snapshot_id: data.snapshot_id,
+    count: 0,
+    uri: data.uri,
+    type: "playlist"
+  }
+
+  if (response.ok) {
+    return newPl;
+  } else {
+    return null;
+  }
+
 };
 
 

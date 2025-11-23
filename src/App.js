@@ -12,6 +12,11 @@ import { loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPl
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
+import { Menu as CtxMenu, Item as CtxItem, Submenu as CtxSubmenu, MenuProvider as CtxMenuProvider, contextMenu as CtxContextMenu } from "react-contexify";
+import "react-contexify/dist/ReactContexify.css";
+
+import { ContextMenu } from 'primereact/contextmenu';
+
 import Settings from '@mui/icons-material/Settings';
 import SaveIcon from '@mui/icons-material/Save';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -46,8 +51,9 @@ import ColorLensIcon from '@mui/icons-material/ColorLens';
 import Dialog from './components/dialog';
 import PlaylistInfo from './components/playlistInfo';
 import useAppStore from './AppStore';
-
-
+import ChecklistIcon from '@mui/icons-material/Checklist';
+import LiquorIcon from '@mui/icons-material/Liquor';
+import ArtistInfo from './components/artistInfo';
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
   DndContext,
@@ -73,8 +79,10 @@ function useConstructor(callback) {
   }
 }
 
+
 function App() {
-  const { menuAnchor, setMenuAnchor, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+  const [contextMenu, setContextMenu] = useState(null);
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
@@ -85,8 +93,6 @@ function App() {
   const [playlistTracks, setPlaylistTracks] = useState([]);
 
   const [tracks, setTracks] = useState([]);
-
-  const [showPickerButtons, setShowPickerButtons] = useState(true);
 
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
 
@@ -120,6 +126,9 @@ function App() {
   const [showingPlaylistPicker, setShowingPlaylistPicker] = useState(false);
 
   const [showPlaylistInfo, setShowPlaylistInfo] = useState(false);
+
+  const [showNewPlaylistInfo, setShowNewPlaylistInfo] = useState(false);
+
 
   const inputBuffer = useRef();
 
@@ -193,8 +202,6 @@ function App() {
   const getPlaylistsAndAlbums = async () => {
 
     let cacheLibrary = await loadLibray();
-
-    debugger;
 
     if (cacheLibrary && cacheLibrary.length > 0) {
       cacheLibrary = [myShazamTracksPl, lastListenedPl, ...cacheLibrary];
@@ -274,7 +281,6 @@ function App() {
     });
 
     if (library.length == 0) {
-      debugger;
       getPlaylistsAndAlbums();
     }
 
@@ -360,14 +366,10 @@ function App() {
     changeTheme();
   };
 
-  const handleContextMenu = (e) => {
+  const handleMenu = (e) => {
     //get htlm attribute data-source from e.currentTarget
     setMenuAnchor(e.currentTarget);
     e.preventDefault();
-  };
-
-  const closeMenu = () => {
-    setMenuPosition(null);
   };
 
   const toggleMode = () => {
@@ -375,6 +377,13 @@ function App() {
     localStorage.setItem("mode", m);
     setMode(m);
   }
+
+  const togglePickers = () => {
+    localStorage.setItem("showPickers", !showPickers);
+    setShowPickers(!showPickers);
+  }
+
+  const [showPickers, setShowPickers] = useState(true);
 
   useEffect(() => {
     if (inputRef && inputRef.current) {
@@ -394,22 +403,6 @@ function App() {
 
     //prvi
     const handle = async () => {
-
-
-      // const existingScript = document.getElementById('spotify-player');
-      // if (!existingScript) {
-      //   const script = document.createElement('script');
-      //   script.id = 'spotify-player';
-      //   script.src = 'https://sdk.scdn.co/spotify-player.js';
-      //   script.async = true;
-      //   document.body.appendChild(script);
-      // }
-      // alert("use effect app");
-      // window.onSpotifyWebPlaybackSDKReady = () => {
-      //   alert("init player");
-      //   setPlaybackSDKReady(true);
-      // };
-
 
       let lckd = localStorage.getItem("lockpass")
       if (lckd == null || lckd == undefined || lckd == "") {
@@ -503,8 +496,6 @@ function App() {
           window.localStorage.setItem("token", accessToken);
           window.history.replaceState({}, document.title, '/'); // Clean URL
           if (library.length == 0) {
-
-            debugger;
             getPlaylistsAndAlbums();
             getBackgroundPlaylists();
           }
@@ -513,7 +504,6 @@ function App() {
       else {
         if (access_token) {
           if (library.length == 0) {
-            // debugger;
             // getPlaylistsAndAlbums();
             // getBackgroundPlaylists();
           }
@@ -622,30 +612,6 @@ function App() {
 
   }
 
-  // const updateLibrary = async () => {
-
-  //   setLoadingLibrary("LOADING LIBRARY...")
-
-  //   try {
-  //     const plsts = await api.getFullPlaylists((i, l) => setLoadingLibrary("LOADING PLAYLISTS " + i + "/" + l));
-  //     savePlaylists(plsts);
-  //     setLibrary(plsts);
-  //     setFilteredLibrary(plsts);
-
-  //     const albms = await api.getFullAlbums((i, l) => setLoadingLibrary("LOADING ALBUMS " + i + "/" + l));
-  //     saveAlbums(albms);
-  //     setAlbums(albms);
-
-  //     setLoadingLibrary(null);
-
-  //   }
-  //   catch {
-  //     //go to login page
-  //     setToken("");
-  //   }
-
-  // }
-
   const checkForUpdates = async () => {
     const cached = (await loadLibray()).filter(x => x.type != "featured"); // Load back
 
@@ -686,7 +652,6 @@ function App() {
             pl.type = "playlist";
             updatedPl.type = "playlist";
 
-            debugger;
             for (const tr of updatedPl.tracks) {
               const oldtr = pl.tracks.find(t => t.id === tr.id);
               if (oldtr) {
@@ -697,7 +662,7 @@ function App() {
         }
 
         saveLibrary(updatedPlaylists);
-        debugger;
+
         await getPlaylistsAndAlbums(); // Reload playlists from IndexedDB
         setLoadingLibrary(null);
       }
@@ -746,8 +711,8 @@ function App() {
         updated.push(p);
       }
 
-      if (cachedPlaylist.name == "Klinci") {
-        debugger;
+      if (cachedPlaylist?.name == "Klinci") {
+
       }
     }
 
@@ -915,7 +880,7 @@ function App() {
         setLibrary(pls);
         setFilteredLibrary(pls);
         saveLibrary([pl]);
-        closeMenu();
+        closeContextMenu();
       }
     }
   }
@@ -933,14 +898,14 @@ function App() {
         let pl = [...playlistTracks];
         pl.splice(index, 1);
         setPlaylistTracks(pl);
-        closeMenu();
+        closeContextMenu();
       }, 250);
     } else {
       if (dragSource == "playlist") {
         let pl = [...playlistTracks];
         pl.splice(selectedPlaylistTrackIndex, 1);
         setPlaylistTracks(pl);
-        closeMenu();
+        closeContextMenu();
         return;
       }
 
@@ -956,7 +921,7 @@ function App() {
   //   let pl = [...playlist];
   //   pl.splice(selectedPlaylistTrackIndex, 1);
   //   setPlaylistTracks(pl);
-  //   closeMenu();
+  //   closeContextMenu();
   // }
 
   const isLocked = () => {
@@ -999,6 +964,7 @@ function App() {
   }
 
   const onPlaylistTrackDoubleClick = (tr, index) => {
+
     if (isLocked()) { return; }
     play(tr);
     setPlayPosition("playlist");
@@ -1039,7 +1005,7 @@ function App() {
     }
 
     await saveLibrary(pls);
-    debugger;
+
     getPlaylistsAndAlbums();
 
   }
@@ -1180,8 +1146,8 @@ function App() {
           if (!tr) return null;
 
           return isMobile() ?
-            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-            <TrackRow id={tr.id} key={tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
+            <TrackRow id={tr.id} key={tr.id} value={tr.name} onSwipedRight={() => { addToPlaylist(tr, null, tr.id) }} onContextMenu={handleMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
+            <TrackRow id={tr.id} key={tr.id} onContextMenu={handleMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
         }}
       />
     </>
@@ -1221,28 +1187,6 @@ function App() {
     addToPlaylist(tr, null, id);
   }
 
-  // const getReordableTrackList = (trackList, dragEndHandler, key, onSwipedRight) => {
-  //   return (
-  //     <>
-  //       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={dragEndHandler} modifiers={[restrictToVerticalAxis]}>
-  //         <SortableContext items={(trackList || []).map((i, index) => key + index + "-" + i.id)} strategy={rectSortingStrategy}>
-  //           <Virtuoso
-  //             style={{ height: '100%' }}
-  //             totalCount={trackList.length}
-  //             itemContent={(index) => {
-  //               const tr = trackList[index];
-  //               if (!tr) return null;
-
-  //               return isMobile() ?
-  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onSwipedRight={() => { onSwipedRight(tr, key + index + "-" + tr.id, index) }} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, index)} track={tr} onClick={() => { onPlaylistTrackDoubleClick(tr, index); setSelectedTrack(tr) }} /> :
-  //                 <SortableItem id={key + index + "-" + tr.id} value={tr.name} key={key + index + "-" + tr.id} onContextMenu={handleContextMenu} index={index} selected={index == selectedPlaylistTrackIndex} onMouseDown={() => { setDragSource("playlist"); setDragTrack(tr); setDragSourceIndex(index); setSelectedPlaylistTrackIndex(index) }} onDrop={(index) => addToPlaylist(dragTrack, locked ? null : index)} track={tr} onClick={() => setSelectedTrack(tr)} onDoubleClick={() => onPlaylistTrackDoubleClick(tr, index)} />
-  //             }}
-  //           />
-  //         </SortableContext>
-  //       </DndContext>
-  //     </>
-  //   );
-  // };
 
   const getLastListened = async () => {
 
@@ -1252,34 +1196,7 @@ function App() {
       return b.datePlayed - a.datePlayed;
     });
 
-
     return lastTracks;
-
-    // setTracks(lastTracks);
-
-
-    // let lastTracks = [];
-    // for (const pl of library) {
-    //   for (const tr of pl.tracks) {
-    //     if (tr.datePlayed) {
-    //       lastTracks.push(tr);
-    //     }
-    //   }
-    // }
-
-    // lastTracks.sort((a, b) => {
-    //   return b.datePlayed - a.datePlayed;
-    // });
-
-    // const distinctTracks = Array.from(
-    //   new Map(lastTracks.map(obj => [obj.id, obj])).values()
-    // );
-
-    // setTracks([...new Set(distinctTracks)]);
-
-    const element = document.getElementById('panel-main');
-    if (element && element.scrollTop)
-      element.scrollTop = 0;
   }
 
   const getMyShazamTracks = async () => {
@@ -1295,14 +1212,7 @@ function App() {
 
     setLoadingTracks(false);
     return tracks;
-    // if (tracks)
-    //   setTracks(tracks);
-
-    // setLoadingTracks(false);
   }
-
-  const [selectedArtist, setSelectedArtist] = useState(null);
-  const [loadingArtistInfo, setLoadingArtistInfo] = useState(false);
 
   const loadArtistInfo = async (track) => {
 
@@ -1329,7 +1239,11 @@ function App() {
 
   useEffect(() => {
     if (selectedTrack) {
-      // loadArtistInfo(selectedTrack);
+
+      if (selectedArtist?.id != selectedTrack?.artists?.[0]?.id) {
+        loadArtistInfo(selectedTrack);
+      }
+
     }
   }, [selectedTrack]);
 
@@ -1342,9 +1256,19 @@ function App() {
     setTracks(tracks);
   }
 
+  const tracksRef = useRef(null);
+
   const loadPlaylistPrev = async (pl) => {
     setCurrentTab("plprev");
     // pl.tracks.map((tr) => tr.uid = newGuid());
+
+    if (tracksRef.current) {
+      tracksRef.current.scrollToIndex({
+        index: 0,
+        align: 'start',
+        behavior: 'auto', // or 'smooth'
+      });
+    }
 
     setLoadingTracks(true);
 
@@ -1360,6 +1284,9 @@ function App() {
     setSelectedLibraryItem(pl);
     setPlaylistChanged(false);
     setSelectedPlaylistTracks(pl.tracks);
+
+    setSelectedPlaylistTrackIndex(-1);
+    setSelectedPlaylistTrack(null);
 
     setLoadingTracks(false);
   }
@@ -1398,26 +1325,239 @@ function App() {
   }
 
   const onPlaylistInfoSave = async (playlist, name, description) => {
-      const result = await api.savePlaylistInfo(playlist, name, description);
-      if (result) {
-        let pls = [...library];
-        let pl = pls.find(x => x.id == playlist.id);
-        pl.name = name;
-        pl.description = description;
-        setLibrary(pls);
-        setFilteredLibrary(pls);
-        saveLibrary(pls);
-        setSelectedLibraryItem(playlist);
-      }
-
-
+    const result = await api.savePlaylistInfo(playlist, name, description);
+    if (result) {
+      let pls = [...library];
+      let pl = pls.find(x => x.id == playlist.id);
+      pl.name = name;
+      pl.description = description;
+      setLibrary(pls);
+      setFilteredLibrary(pls);
+      saveLibrary(pls);
+      setSelectedLibraryItem(playlist);
+    }
   }
 
+  const onNewPlaylistInfoSave = async (playlist, name, description) => {
+
+    const newPl = await api.createPlaylist(name, description);
+    if (newPl) {
+      let pls = [...library];
+      pls.unshift(newPl);
+      setLibrary(pls);
+      setFilteredLibrary(pls);
+      saveLibrary(pls);
+      setSelectedLibraryItem(newPl);
+    }
+  }
+
+  const [contextMenuItems, setContextMenuItems] = useState([]);
+
+  const handleContextMenu = (e) => {
+
+
+    // CtxContextMenu.show({
+    //   id: MENU_ID,
+    //   event: e
+    // });
+
+    e.preventDefault();
+    setMenuPosition({ x: e.pageX, y: e.pageY });
+  };
+
+  const onLibraryItemContextMenu = (e, playlist, index) => {
+    loadPlaylistPrev(playlist);
+    let items = [];
+    items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true) });
+    items.push({ label: "Delete playlist", onClick: () => setShowPlaylistInfo(true) });
+
+    setContextMenuItems(items);
+    setSelectedLibraryIndex(index);
+    setSelectedLibraryItem(playlist);
+
+    handleContextMenu(e);
+  }
+
+  const closeContextMenu = () => {
+    setMenuPosition(null);
+  };
+
+
+  const [ctxAlbums, setCtxAlbums] = useState([]);
+
+
+  const loadCtxAlbums = () => async () => {
+
+
+    console.log("Loading albums for track");
+
+    const artistId = selectedTrack?.artists?.[0]?.id;
+    if (!artistId) return;
+    const albums = await api.getArtistAlbums(artistId);
+    let items = albums.map(album => ({
+      label: album.name,
+      onClick: () => { onAlbumClick(album); }
+    }));
+    setCtxAlbums(items);
+  }
+
+  const onTrackContextMenu = (e, track, index) => {
+    let items = [];
+    items.push({ label: "Add to playlist", onClick: () => { setSelectedTrack(track); setShowPlaylistPicker(true); } });
+    items.push({ label: "Artist", onClick: () => { setSelectedTrack(track); setShowPlaylistPicker(true); } });
+    items[1].items = [
+      { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
+      { label: "Albums", onClick: async () => { }, onEnter: (track) => loadCtxAlbums(track) }
+    ];
+
+    items[1].items[1].items = ctxAlbums;
+
+    setContextMenuItems(items);
+
+    setSelectedTrackIndex(index);
+    setSelectedTrack(track);
+    handleContextMenu(e);
+  }
+
+  const onPlaylistContextMenu = (e, track, index) => {
+    let items = [];
+    items.push({ label: "Remove from playlist", onClick: () => { removeTrackFromPlaylist(); } });
+    setContextMenuItems(items);
+    setPlaylistIndex(index);
+    setSelectedTrack(track);
+    handleContextMenu(e);
+  }
+
+
+
+  let loading = false;
+  let subItems = ["Option 1", "Option 2", "Option 3"];
+  const MENU_ID = "my-context-menu";
+
+
+  const getSelectedTrack = () => {
+    return selectedTrack;
+  }
+
+
   return (
+
+
+
+
     <>
 
+      {/* <CtxMenu id={MENU_ID}>
+        <CtxItem >Refresh</CtxItem>
 
-      {menuAnchor &&
+        <CtxSubmenu label="More Options">
+          {loading && <CtxItem disabled>Loading...</CtxItem>}
+
+          {!loading && subItems.map(i => (
+            <CtxItem key={i}>{i}</CtxItem>
+          ))}
+        </CtxSubmenu>
+
+        <CtxItem>Settings</CtxItem>
+      </CtxMenu > */}
+
+      {/* <CtxMenu id={MENU_ID}>
+        {contextMenuItems.map((item, index) => (
+          item.items ?
+            <CtxSubmenu key={index} label={item.label}>
+
+
+              {item.items.map((subItem, subIndex) => (
+                subItem.items ?
+
+
+                  <CtxSubmenu key={subIndex}
+
+                    label={
+                      <div
+                        onMouseEnter={() => subItem.onEnter && subItem.onEnter()(getSelectedTrack())}
+                      >
+                        {subItem.label}
+                      </div>
+                    }
+                  >
+
+                    {subItem.label == "Albums" ?
+
+                      ctxAlbums.map((subSubItem, subSubIndex) => (
+                        <CtxItem key={subSubIndex}
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/plain", item);
+                          }}
+                          onMouseDown={(e) => { subSubItem.onClick(); e.stopPropagation(); closeContextMenu(); }}
+
+                        >{subSubIndex}</CtxItem>
+
+                      )) :
+                      subItem.items.map((subSubItem, subSubIndex) => (
+                        <CtxItem key={subSubIndex}
+                          draggable
+                          onDragStart={(e) => {
+                            e.dataTransfer.setData("text/plain", item);
+                          }}
+                          onMouseDown={(e) => { subSubItem.onClick(); e.stopPropagation(); closeContextMenu(); }}
+
+                        >{subSubItem.label}</CtxItem>
+
+                      ))
+                    }
+
+                  </CtxSubmenu>
+
+                  :
+                  <CtxItem key={subIndex}
+                    draggable
+
+                    onDragStart={(e) => {
+                      e.dataTransfer.setData("text/plain", item);
+                    }}
+                    onMouseDown={(e) => { subItem.onClick(); e.stopPropagation(); closeContextMenu(); }}
+
+                  >{subItem.label}
+
+                  </CtxItem>
+
+              ))}
+
+
+
+
+            </CtxSubmenu>
+            :
+            <CtxItem
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.setData("text/plain", item);
+              }}
+              onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >{item.label}</CtxItem>
+
+        ))}
+      </CtxMenu > */}
+
+      {menuPosition && (
+        <div className="context-menu"
+          style={{
+            top: menuPosition.y,
+            left: menuPosition.x,
+          }}
+        >
+          {contextMenuItems.map((item, index) => (
+            <div key={index} onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >
+              {item.label}
+            </div>
+          ))}
+        </div>
+      )
+      }
+
+      {
+        menuAnchor &&
         <Menu
           anchorEl={menuAnchor}
           id="account-menu"
@@ -1429,13 +1569,19 @@ function App() {
         >
 
           {menuAnchor.getAttribute("menu-target") == "library" ?
-            <MenuItem onClick={() => setShowPlaylistInfo(true)}>
+            <MenuItem onClick={() => setShowNewPlaylistInfo(true)}>
               New playlist
             </MenuItem> : null}
 
           {menuAnchor.getAttribute("menu-target") == "library" ?
             <MenuItem onClick={checkForUpdates}>
               Update library
+            </MenuItem> : null}
+
+          {menuAnchor.getAttribute("menu-target") == "settings" ?
+            <MenuItem onClick={toggleMode}>
+              {mode == "normal" ? "Party mode" : "Standard mode"}
+
             </MenuItem> : null}
 
           {menuAnchor.getAttribute("menu-target") == "settings" ?
@@ -1448,10 +1594,22 @@ function App() {
               Edit playlist
             </MenuItem> : null}
 
+          {menuAnchor.getAttribute("menu-target") == "tracks" ?
+            <MenuItem onClick={() => setPlaylistTracks([])}>
+              Something
+            </MenuItem> : null}
+
+          {menuAnchor.getAttribute("menu-target") == "playlist" ?
+            <MenuItem onClick={() => setPlaylistTracks([])}>
+              Clear playlist
+            </MenuItem> : null}
+
+
+
         </Menu>
       }
 
-      <Moveable
+      {/* <Moveable
         target={document.querySelector("#artist-info")}
         draggable={true}
         edge={false}
@@ -1464,59 +1622,72 @@ function App() {
         onDrag={e => {
           e.target.style.transform = e.transform;
         }}
-      />
+      /> */}
 
-      {showPlaylistInfo ?
-        <PlaylistInfo onSave={onPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))} playlist={selectedLibraryItem}></PlaylistInfo> : null}
+      {
+        showPlaylistInfo ?
+          <PlaylistInfo onSave={onPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))} playlist={selectedLibraryItem}></PlaylistInfo> : null
+      }
 
-      {dragTrack ?
-        <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
-          <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
-        </div> : null}
+      {
+        showNewPlaylistInfo ?
+          <PlaylistInfo onSave={onNewPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))}></PlaylistInfo> : null
+      }
 
-      {selectedArtist || loadingArtistInfo ?
-        <div className='panel-dialog target' id="artist-info">
-          <div className="close-btn" onClick={() => { setSelectedArtist(null); setLoadingArtistInfo(false) }}>x</div>
+      {
+        dragTrack ?
+          <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
+            <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
+          </div> : null
+      }
 
-          {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
-            <>
-              <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
-              <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
-              <Tabs style={{ width: "100%" }}>
-                <TabList className="custom-tablist">
-                  <Tab className="custom-tab">
-                    Top Tracks
-                  </Tab>
-                  <Tab className="custom-tab">
-                    Albums
-                  </Tab>
-                </TabList>
+      <ArtistInfo></ArtistInfo>
 
-                <TabPanel>
-                  {selectedArtist && selectedArtist.tracks.map((tr, index) => {
-                    return <TrackRow forInfo id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleContextMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                  })}
-                </TabPanel>
-                <TabPanel>
-                  {selectedArtist && selectedArtist.albums.map((a, index) => {
-                    return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
-                      <img
+      {
+        // selectedArtist || loadingArtistInfo ?
+        //   <div className='panel-dialog target' id="artist-info">
+        //     <div className="close-btn" onClick={() => { setSelectedArtist(null); setLoadingArtistInfo(false) }}>x</div>
 
-                        className="artist-info-album-img"
-                        src={a.images && a.images[2] && a.images[2].url}
-                        alt={a.name}
-                      />
-                      <div className="artist-info-album-details">
-                        <div className="artist-info-album-name">{a.name}</div>
-                        <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
-                        <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
-                      </div>
-                    </div>
-                  })}
-                </TabPanel>
-              </Tabs></>}
+        //     {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
+        //       <>
+        //         <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
+        //         <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
+        //         <Tabs style={{ width: "100%" }}>
+        //           <TabList className="custom-tablist">
+        //             <Tab className="custom-tab">
+        //               Top Tracks
+        //             </Tab>
+        //             <Tab className="custom-tab">
+        //               Albums
+        //             </Tab>
+        //           </TabList>
 
-        </div> : null}
+        //           <TabPanel>
+        //             {selectedArtist && selectedArtist.tracks.map((tr, index) => {
+        //               return <TrackRow id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+        //             })}
+        //           </TabPanel>
+        //           <TabPanel>
+        //             {selectedArtist && selectedArtist.albums.map((a, index) => {
+        //               return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
+        //                 <img
+
+        //                   className="artist-info-album-img"
+        //                   src={a.images && a.images[2] && a.images[2].url}
+        //                   alt={a.name}
+        //                 />
+        //                 <div className="artist-info-album-details">
+        //                   <div className="artist-info-album-name">{a.name}</div>
+        //                   <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
+        //                   <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
+        //                 </div>
+        //               </div>
+        //             })}
+        //           </TabPanel>
+        //         </Tabs></>}
+
+        //   </div> : null
+      }
 
       <Snackbar
         message={snackbarMessage}
@@ -1535,96 +1706,97 @@ function App() {
 
       <canvas id="field" className="universe"></canvas>
 
-      {!token ? (
+      {
+        !token ? (
 
-        loadingToken ?
-          <div className='menu-container' style={{ height: "100vh", width: "100vw", top: "0", left: "0", position: "absolute" }}>
-            <div className='loader' style={{ position: "absolute" }}></div>
-          </div>
-          :
-          <div className='menu-container' style={{ height: "100vh" }}>
-            <button style={{ fontSize: 20 }} onClick={handleLogin}>Login with Spotify</button>
-          </div>
+          loadingToken ?
+            <div className='menu-container' style={{ height: "100vh", width: "100vw", top: "0", left: "0", position: "absolute" }}>
+              <div className='loader' style={{ position: "absolute" }}></div>
+            </div>
+            :
+            <div className='menu-container' style={{ height: "100vh" }}>
+              <button style={{ fontSize: 20 }} onClick={handleLogin}>Login with Spotify</button>
+            </div>
 
-      ) : (
+        ) : (
 
-        isMobile() ?
-          <div className='layout' onMouseDown={closeMenu}>
+          isMobile() ?
+            <div className='layout'>
 
-            <AnimatePresence>
-              {showplaylistPicker ?
+              <AnimatePresence>
+                {showplaylistPicker ?
 
-                <motion.div
-                  key="playlistPicker"
-                  initial={{ x: "-100%" }}
-                  animate={{ x: 0 }}
-                  exit={{ x: "-100%" }}
-                  style={{ zIndex: 9999 }}
-                  transition={{ duration: 0.2, ease: "easeInOut" }}
-                  className="fixed top-0 left-0 w-72 h-full bg-gray-900 text-white shadow-lg"
-                >
-                  <PlaylistPicker onClick={addToSpotifyPlaylist} track={selectedTrack} onSwipedLeft={() => setShowPlaylistPicker(false)} onClose={() => setShowPlaylistPicker(false)} playlists={library} />
+                  <motion.div
+                    key="playlistPicker"
+                    initial={{ x: "-100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "-100%" }}
+                    style={{ zIndex: 9999 }}
+                    transition={{ duration: 0.2, ease: "easeInOut" }}
+                    className="fixed top-0 left-0 w-72 h-full bg-gray-900 text-white shadow-lg"
+                  >
+                    <PlaylistPicker onClick={addToSpotifyPlaylist} track={selectedTrack} onSwipedLeft={() => setShowPlaylistPicker(false)} onClose={() => setShowPlaylistPicker(false)} playlists={library} />
 
 
-                </motion.div>
+                  </motion.div>
 
-                : null}
-            </AnimatePresence>
-            <table style={{ width: "100%", tableLayout: "fixed", borderSpacing: 3 }}>
-              <tbody>
-                <tr>
-                  <td className={tab == 1 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1) }}>
-                    <PlaylistAddCheckIcon></PlaylistAddCheckIcon>
-                  </td>
-                  {/* <td className={tab == 1.5 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1.5) }}>
+                  : null}
+              </AnimatePresence>
+              <table style={{ width: "100%", tableLayout: "fixed", borderSpacing: 3 }}>
+                <tbody>
+                  <tr>
+                    <td className={tab == 1 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1) }}>
+                      <PlaylistAddCheckIcon></PlaylistAddCheckIcon>
+                    </td>
+                    {/* <td className={tab == 1.5 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1.5) }}>
                     <AlbumIcon></AlbumIcon>
                   </td> */}
-                  <td className={tab == 2 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(2) }}>
-                    <SearchIcon></SearchIcon>
-                  </td>
-                  {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
+                    <td className={tab == 2 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(2) }}>
+                      <SearchIcon></SearchIcon>
+                    </td>
+                    {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
                     <HistoryIcon></HistoryIcon>
                   </td>
                   <td className='tab' onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     SHZM
                   </td> */}
-                  {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
+                    {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
                     <HistoryIcon></HistoryIcon>
                   </td>
                   <td className='tab' {...longPressHandler()} onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     {myShazamTracksPlIconMobile}
                   </td> */}
-                  <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
-                    <PlaylistPlayIcon></PlaylistPlayIcon>
-                  </td>
-                  <td className={tab == 4 ? 'tab-selected' : 'tab'} style={{ width: 40 }} onClick={() => { setCurrentTab(4) }}>
-                    <Settings></Settings>
-                  </td>
-                </tr>
-                <tr>
-                  {tab != 4 ? <td colSpan={4} className='tab-panel'>
-                    <Activity mode={tab == "1" ? "visible" : "hidden"}>
-                      <PanelLibrary onMenuClick={handleContextMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
-                    </Activity>
-                    <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
-                      <div className="toolbar-wrapper">
-                        <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedLibraryItem && selectedLibraryItem.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
-                      </div>
-                      <div className='panel-playlist-mobile'>
-                        {false ?
-                          <>
-                            <div className="loader-text">{loadingLibrary}</div>
-                            <div className='loader'>
+                    <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
+                      <PlaylistPlayIcon></PlaylistPlayIcon>
+                    </td>
+                    <td className={tab == 4 ? 'tab-selected' : 'tab'} style={{ width: 40 }} onClick={() => { setCurrentTab(4) }}>
+                      <Settings></Settings>
+                    </td>
+                  </tr>
+                  <tr>
+                    {tab != 4 ? <td colSpan={4} className='tab-panel'>
+                      <Activity mode={tab == "1" ? "visible" : "hidden"}>
+                        <PanelLibrary onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                      </Activity>
+                      <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
+                        <div className="toolbar-wrapper">
+                          <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedLibraryItem && selectedLibraryItem.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+                        </div>
+                        <div className='panel-playlist-mobile'>
+                          {false ?
+                            <>
+                              <div className="loader-text">{loadingLibrary}</div>
+                              <div className='loader'>
 
-                            </div>
-                          </>
-                          :
-                          <>
-                            <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-                          </>}
-                      </div>
-                    </Activity>
-                    {/* <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
+                              </div>
+                            </>
+                            :
+                            <>
+                              <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                            </>}
+                        </div>
+                      </Activity>
+                      {/* <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
                       <div className='panel-playlists-mobile'>
                         {loadingLibrary ?
                           <>
@@ -1640,233 +1812,249 @@ function App() {
                       </div>
                     </Activity> */}
 
-                    <Activity mode={tab == "2" ? "visible" : "hidden"}>
-                      <div className="toolbar-wrapper">
-                        <SearchIcon className="search-icon" />
-                        <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                      </div>
-                      <div className="panel-search-mobile">
-                        {getTracksPanel()}
-                      </div>
-                    </Activity>
-
-                    <Activity mode={tab == "3" ? "visible" : "hidden"}>
-
-                      {
-                        playlistTracks.length > 0 ?
-                          <div className='panel-playlist-mobile'>
-                            <ReordableTrackList enableDrag={true} onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
-                          </div>
-                          :
-                          <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
-                            <SwipeRightIcon style={{ fontSize: 50 }}></SwipeRightIcon>
-
-                            <div style={{ fontSize: 20 }}>swipe right song<br></br> to add to queue</div>
-                          </div>
-                      }
-
-                    </Activity>
-                  </td> : null}
-                  {tab == 4 ? <td colSpan={4} className='tab-panel'>
-                    <button style={{ float: "right" }}>{time}</button>
-                    <button style={{ float: "right" }} onClick={logout}>Logout</button>
-                    <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
-                    <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon> </button>
-                    <button onClick={checkForUpdates}>Check for updates</button>
-                    {/* <button onClick={refreshAccessToken}>refresh at</button> */}
-                    <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
-                    <button onClick={() => { setToken(crypto.randomUUID()) }}>change token</button>
-                  </td> : null}
-                </tr>
-
-              </tbody>
-            </table >
-
-            <div className='footer-mobile player'>
-
-              {token ?
-                // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
-                <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
-
-                : null}
-            </div>
-          </div >
-          :
-          <div className='layout' >
-
-            {menuPosition && (
-              <div className="context-menu"
-                style={{
-                  top: menuPosition.y,
-                  left: menuPosition.x,
-                }}
-              >
-                {/* <div>Copy</div>
-                <div>Paste</div> */}
-                <div onMouseDown={(e) => { removeTrackFromPlaylist(); e.stopPropagation() }} >Remove from playlist</div>
-                <div onMouseDown={(e) => { removeTrackFromPlaylist(); e.stopPropagation() }} >Remove from playlist2</div>
-              </div>
-            )}
-
-            <div className="header">
-              <table style={{ width: "100%", tableLayout: "fixed" }}>
-                <tbody>
-                  <tr>
-                    <td >
-                      <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
-                        <div onContextMenu={handleContextMenu} className='app-title'>
-                          <span>LUMTU</span>
-                          <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
-                          {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                      <Activity mode={tab == "2" ? "visible" : "hidden"}>
+                        <div className="toolbar-wrapper">
+                          <SearchIcon className="search-icon" />
+                          <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                         </div>
-                        {mode == "compact" ?
-                          <div className="toolbar-wrapper">
-                            {/* <SearchIcon className="search-icon" /> */}
-                            <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                          </div> : null}
-                        {/* <button onClick={updateLibrary}>Update playlists</button>*/}
-                        {/* <button onClick={checkForUpdates}>Check for updates</button> */}
-                        {/* <button onClick={checkForUpdates}>Check for updates</button> */}
-                        {/* <button onClick={refreshAccessToken}>refresh at</button> */}
-                        {/* <button onClick={startUniverse}>start</button> */}
+                        <div className="panel-search-mobile">
+                          {getTracksPanel()}
+                        </div>
+                      </Activity>
 
-                        {/* <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button> */}
-                        <button className='header-button-small' onClick={toggleMode}><PlaylistAddCheckIcon></PlaylistAddCheckIcon></button>
+                      <Activity mode={tab == "3" ? "visible" : "hidden"}>
 
+                        {
+                          playlistTracks.length > 0 ?
+                            <div className='panel-playlist-mobile'>
+                              <ReordableTrackList enableDrag={true} onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
+                            </div>
+                            :
+                            <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
+                              <SwipeRightIcon style={{ fontSize: 50 }}></SwipeRightIcon>
 
-                        {/* <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button> */}
-                        {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
-                      </div>
-                    </td>
-                    {mode == "normal" ?
-                      <td style={{ display: "flex", textAlign: "center", justifyContent: "center", padding: 5 }}>
-                        {/* <button onClick={getTopTracks}>Top tracks</button>*/}
-                        {/* <button onClick={getRecommendations}>Recommendations</button> */}
+                              <div style={{ fontSize: 20 }}>swipe right song<br></br> to add to queue</div>
+                            </div>
+                        }
 
-                        {/* <div className="toolbar-wrapper">
+                      </Activity>
+                    </td> : null}
+                    {tab == 4 ? <td colSpan={4} className='tab-panel'>
+                      <button style={{ float: "right" }}>{time}</button>
+                      <button style={{ float: "right" }} onClick={logout}>Logout</button>
+                      <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
+                      <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon> </button>
+                      <button onClick={checkForUpdates}>Check for updates</button>
+                      {/* <button onClick={refreshAccessToken}>refresh at</button> */}
+                      <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
+                      <button onClick={() => { setToken(crypto.randomUUID()) }}>change token</button>
+                    </td> : null}
+                  </tr>
+
+                </tbody>
+              </table >
+
+              <div className='footer-mobile player'>
+
+                {token ?
+                  // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
+                  <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+
+                  : null}
+              </div>
+            </div >
+            :
+            <div className='layout' onMouseDown={closeContextMenu} >
+              <div className="header">
+                <table style={{ width: "100%", tableLayout: "fixed" }}>
+                  <tbody>
+                    <tr>
+                      <td >
+                        <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
+                          <div onContextMenu={handleMenu} className='app-title'>
+                            <span>LUMTU</span>
+                            <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
+                            {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                          </div>
+
+                          {mode == "compact" ?
+                            <div className="toolbar-wrapper">
+                              {/* <SearchIcon className="search-icon" /> */}
+                              <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                            </div> : null}
+                          {/* <button onClick={updateLibrary}>Update playlists</button>*/}
+                          {/* <button onClick={checkForUpdates}>Check for updates</button> */}
+                          {/* <button onClick={checkForUpdates}>Check for updates</button> */}
+                          {/* <button onClick={refreshAccessToken}>refresh at</button> */}
+                          {/* <button onClick={startUniverse}>start</button> */}
+
+                          {/* <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button> */}
+
+                          {mode == "normal" ?
+                            <button className='header-button-small' onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button> : null}
+
+                          <button className='header-button-small' onClick={toggleMode}><LiquorIcon></LiquorIcon></button>
+
+                          {/* <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button> */}
+                          {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
+                        </div>
+                      </td>
+                      {mode == "normal" ?
+                        <td style={{ display: "flex", textAlign: "center", justifyContent: "center", padding: 5 }}>
+                          {/* <button onClick={getTopTracks}>Top tracks</button>*/}
+                          {/* <button onClick={getRecommendations}>Recommendations</button> */}
+
+                          {/* <div className="toolbar-wrapper">
                           <SearchIcon className="search-icon" />
                           <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
                         </div> */}
-                        {/* <button onClick={getRecentTracks}>Recently played</button> */}
-                      </td> : null}
-                    <td>
-                      <div onContextMenu={handleContextMenu} className='app-title'>
-                        {mode == "compact" ? <span>QUEUE</span> : null}
-                        {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
-                        {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
-                      </div>
+                          {/* <button onClick={getRecentTracks}>Recently played</button> */}
+                        </td> : null}
+                      <td>
+                        <div onContextMenu={handleMenu} className='app-title2'>
+                          {/* {mode == "compact" ? <span>QUEUE</span> : null} */}
+                          {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
+                          {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                        </div>
 
-                      <button style={{ float: "right" }} menu-target="settings" onMouseDown={handleContextMenu}><MoreVertIcon></MoreVertIcon></button>
+                        <button style={{ float: "right" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
 
-                      <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon></button>
+                        <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon></button>
 
-                      {locked ?
-                        <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                        : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                        {locked ?
+                          <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                          : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
-                      <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                        <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
 
-                      <button
-                        style={{ height: 40, float: "right" }}
-                        onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
-                        🍺 Buy me a beer
-                      </button>
+                        <button
+                          style={{ height: 40, float: "right" }}
+                          onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
+                          🍺 Buy me a beer
+                        </button>
 
-                      {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
-                      {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
-                      {/* <button style={{ float: "right" }}>{time}</button> */}
+                        {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
+                        {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
+                        {/* <button style={{ float: "right" }}>{time}</button> */}
 
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              {mode == "normal" && showPickerButtons ?
-                <table style={{ width: "100%", display: "inline-block" }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ width: 30, padding: 5 }}>
-                        <img
-                          src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
-                          style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: 8 }}
-                        />
-                      </td>
-                      <td className='selected-track-container'>
-                        {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                       </td>
                     </tr>
                   </tbody>
-                </table> : null}
-            </div>
-            <div className="main">
-              {mode == "normal" ?
-                <div className={'panel'}>
-                  <PanelLibrary onDrop={onLibrayRowDrop} onMenuClick={handleContextMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                </table>
+                {mode == "normal" && showPickers ?
+                  <table style={{ width: "100%", display: "inline-block" }}>
+                    <tbody>
+                      <tr>
+                        <td style={{ width: 30, padding: 5 }}>
+                          <img
+                            src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
+                            style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: 8 }}
+                          />
+                        </td>
+                        <td className='selected-track-container'>
+                          {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table> : null}
+              </div>
+              <div className="main">
+                {mode == "normal" ?
+                  <div className="panel">
+                    <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                  </div>
+                  : null}
+                <div id="panel-main" className="panel-main">
+                  {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
+
+                  {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
+                  {true ? <div className="toolbar-wrapper">
+
+                    {mode == "normal" ?
+                      <>
+                        <div className='toolbar-search'>
+                          <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
+                          {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem?.images?.[2]?.url || selectedLibraryItem?.images?.[0]?.url} />
+
+                            : null}
+
+                          <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                        </div>
+
+                        {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
+
+                        <div className='toolbar-icons'>
+                          <SwapVertIcon className='toolbar-button'></SwapVertIcon>
+                          <MoreVertIcon onClick={handleMenu} menu-target="tracks" className='toolbar-button'></MoreVertIcon>
+                        </div>
+                      </> : null}
+                  </div> : null}
+                  {
+                    loadingTracks ? <div className='loader'></div> :
+                      <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
+                    // getTracksPanel()
+                  }
                 </div>
-                : null}
-              <div id="panel-main" className="panel-main">
-                {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
+                <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
 
-                {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
-                {!isMobile() || true ? <div className="toolbar-wrapper">
-
-                  {/* {selectedLibraryItem ?
-                    <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
-                    :
-                    <SearchIcon></SearchIcon>
-                  } */}
-
-                  {mode == "normal" ?
-                    <>
-                      <div className='toolbar-search'>
-                        <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
-                        {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[2] ? selectedLibraryItem.images[2].url : selectedLibraryItem && selectedLibraryItem.images && selectedLibraryItem.images[0].url} />
-
-                          : null}
-
-                        <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                      </div>
-
-                      {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
-
-                      <div className='toolbar-icons'>
-                        <SwapVertIcon className='toolbar-button'></SwapVertIcon>
-                        <MoreVertIcon className='toolbar-button'></MoreVertIcon>
-                      </div>
-                    </> : null}
-
-
-
-                </div> : null}
-                {
-                  loadingTracks ? <div className='loader'></div> :
-                    <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-
-                  // getTracksPanel()
-                }
-              </div>
-              <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
-                {
-                  playlistTracks.length > 0 ?
-                    <ReordableTrackList enableDrag source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-
-                    :
-                    <div className='QueueMusicIcon'>
-                      <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
-                      <div style={{ fontSize: 20 }}>drag to queue</div>
+                  <div className="toolbar-wrapper">
+                    <div className='toolbar-search'>
+                      <div>QUEUE</div>
                     </div>
-                }
+                    <div className='toolbar-icons'>
+                      {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
+                      <MoreVertIcon onClick={handleMenu} menu-target="playlist" className='toolbar-button'></MoreVertIcon>
+                    </div>
+                  </div>
+
+                  {
+                    playlistTracks.length > 0 ?
+                      <ReordableTrackList enableDrag onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
+                      :
+                      <div className='QueueMusicIcon'>
+                        <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
+                        <div style={{ fontSize: 20 }}>drag to queue</div>
+                      </div>
+                  }
+                </div>
               </div>
-            </div>
-            <div className="footer player">
-              {/* {playbackSDKReady && token ?
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              <div className="footer player">
+                {/* {playbackSDKReady && token ?
                 <Player locked={locked} onNext={() => { if (isLocked()) { return; } nextTrack() }} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={() => setSelectedTrack(track)} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
 
 
                 : null} */}
-              <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+              </div>
             </div>
-          </div>
-      )
+        )
       }
     </>
 

@@ -34,12 +34,21 @@ const useAppStore = create((set) => ({
   selectedPlaylistTrackIndex: -1,
   setSelectedPlaylistTrackIndex: (index) => set({ selectedPlaylistTrackIndex: index }),
 
+  playlistIndex: -1,
+  setPlaylistIndex: (index) => set({ playlistIndex: index }),
+
   selectedPlaylistChanged: false,
   setSelectedPlaylistChanged: (value) => set({ selectedPlaylistChanged: value }),
 
   playlistChanged: false,
   setPlaylistChanged: (value) => set({ playlistChanged: value }),
 
+  selectedArtist: null,
+  setSelectedArtist: (info) => set({ selectedArtist: info }),
+
+  loadingArtistInfo: false,
+  setLoadingArtistInfo: (loading) => set({ loadingArtistInfo: loading }),
+  
   // --- Drag & drop state ---
   dragTrack: null,
   setDragTrack: (track) => set({ dragTrack: track }),
@@ -53,6 +62,8 @@ const useAppStore = create((set) => ({
   // --- UI lock state ---
   locked: false,
   setLocked: (value) => set({ locked: value }),
+
+
 
 }))
 

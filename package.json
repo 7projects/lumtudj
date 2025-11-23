@@ -24,6 +24,7 @@
     "framer-motion": "^12.23.22",
     "primereact": "^10.9.7",
     "react": "^19.2.0",
+    "react-contexify": "^4.0.0",
     "react-dom": "^19.2.0",
     "react-fast-marquee": "^1.6.5",
     "react-moveable": "^0.56.0",

@@ -1465,6 +1465,9 @@ code {
   font-size: 10px;
   padding-top: 5px;
 }
+.song-artist {
+  font-weight: bold;
+}
 .song-artist:hover {
   font-weight: bold;
 }
@@ -2743,4 +2746,3 @@ button:active {
 .dialog-footer .dialog-btn.primary:hover {
   background: #72c2e9;
 }
-/*# sourceMappingURL=./blue.css.map */

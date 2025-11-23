@@ -1466,6 +1466,9 @@ code {
   font-size: 10px;
   padding-top: 5px;
 }
+.song-artist {
+  font-weight: bold;
+}
 .song-artist:hover {
   font-weight: bold;
 }
@@ -2744,4 +2747,3 @@ button:active {
 .dialog-footer .dialog-btn.primary:hover {
   background: #1f1f1f;
 }
-/*# sourceMappingURL=./mono.css.map */

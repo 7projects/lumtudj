@@ -1046,7 +1046,6 @@ td {
   font-family: "Anton", monospace;
   font-size: 20px;
   color: #ffffff;
-  float: left;
   padding: 5px;
   letter-spacing: 8px;
   margin-left: 8px;
@@ -1108,18 +1107,18 @@ code {
   /* border: 4px solid white; */
   margin: 5px;
   overflow-x: hidden;
+  overflow-y: hidden;
 }
 .panel-main {
-  overflow-y: hidden;
-  overflow-x: hidden;
+  width: 50%;
   padding: 1px;
   background-color: #0d0d0d;
-  width: 50%;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
-  margin-top: 5px;
-  margin-bottom: 5px;
+  margin: 5px;
+  overflow-x: hidden;
+  overflow-y: hidden;
 }
 .panel-image {
   position: fixed;
@@ -1464,6 +1463,9 @@ code {
   font-weight: normal;
   font-size: 10px;
   padding-top: 5px;
+}
+.song-artist {
+  font-weight: bold;
 }
 .song-artist:hover {
   font-weight: bold;
@@ -1856,7 +1858,7 @@ button:active {
   /* creates padding around thumb */
 }
 ::-webkit-scrollbar-thumb {
-  background: #383838;
+  background: #474747;
   cursor: pointer;
   border-radius: 5px;
 }
@@ -2346,6 +2348,13 @@ button:active {
   line-height: 1;
   padding: 10px;
 }
+.artist-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 /* Artist image on top */
 .artist-info-img {
   width: 150px;
@@ -2743,4 +2752,3 @@ button:active {
 .dialog-footer .dialog-btn.primary:hover {
   background: #070707;
 }
-/*# sourceMappingURL=./spotify.css.map */
