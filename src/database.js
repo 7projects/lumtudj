@@ -69,6 +69,21 @@ export async function saveLibrary(library) {
   db.close();
 }
 
+export async function deleteFromLibrary(item) {
+  const db = await openDB();
+  const tx = db.transaction(LIBRARY_STORE_NAME, 'readwrite');
+  const store = tx.objectStore(LIBRARY_STORE_NAME);
+
+  await new Promise((resolve, reject) => {
+    const request = store.delete(item.id);
+    request.onsuccess = resolve;
+    request.onerror = reject;
+  });
+
+  db.close();
+}
+
+
 // export async function savePlaylists(playlists) {
 //   const db = await openDB();
 //   const tx = db.transaction(PLAYLISTS_STORE_NAME, 'readwrite');

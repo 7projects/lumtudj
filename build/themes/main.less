@@ -1747,8 +1747,9 @@ button:active {
     cursor: pointer;
     font-weight: 500;
     list-style: none;
+    color: @button-color;
     /* remove default list styles */
-    transition: color 0.2s, border-bottom 0.2s;
+    // transition: color 0.2s, border-bottom 0.2s;
     border-bottom: 2px solid transparent;
     /* default underline */
 }
@@ -1756,13 +1757,13 @@ button:active {
 /* Highlight selected tab */
 .custom-tab--selected {
     border-bottom: 3px solid #0070f3;
-    color: #0070f3;
+     
     font-weight: bold;
 }
 
 .react-tabs__tab--selected {
     font-weight: bold;
-    color: white;
+    
     border: none;
 }
 
@@ -2082,6 +2083,7 @@ button:active {
 
 .dialog-header {
     background: @background-color;
+    color: @button-color;
     padding: 12px 16px;
     display: flex;
     justify-content: space-between;

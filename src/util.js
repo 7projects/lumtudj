@@ -84,6 +84,8 @@ export const isMobile = () => {
   );
 }
 
+
+
 export function fullscreen() {
   const elem = document.getElementById("html");
 
@@ -93,6 +95,7 @@ export function fullscreen() {
     !document.msFullscreenElement) {
 
     // Enter fullscreen
+
     if (elem.requestFullscreen) {
       elem.requestFullscreen();
     } else if (elem.webkitRequestFullscreen) { // Safari
@@ -101,6 +104,7 @@ export function fullscreen() {
       elem.msRequestFullscreen();
     }
 
+    return true;
   } else {
     // Exit fullscreen
     if (document.exitFullscreen) {
@@ -110,6 +114,8 @@ export function fullscreen() {
     } else if (document.msExitFullscreen) { // IE11
       document.msExitFullscreen();
     }
+
+    return false;
   }
 }
 

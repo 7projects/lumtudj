@@ -665,6 +665,74 @@ const createPlaylist = async (name, description) => {
 };
 
 
+
+const deletePlaylist = async (playlist) => {
+  const url = `https://api.spotify.com/v1/playlists/${playlist.id}/followers`;
+
+  debugger;
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  debugger;
+  if (!response.ok) {
+    errorHandler();
+    const error = await response.json();
+    console.error("Failed to delete/unfollow playlist:", error);
+    return null;
+  }
+
+  return { ok: true };
+};
+
+const unfollowAlbum = async (album) => {
+  const url = `https://api.spotify.com/v1/me/albums?ids=${album.id}`;
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    const error = await response.json();
+    console.error("Failed to unfollow album:", error);
+    return null;
+  }
+
+  return { ok: true };
+};
+
+const unfollowArtist = async (artist) => {
+  const url = `https://api.spotify.com/v1/me/following?type=artist&ids=${artist.id}`;
+
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    const error = await response.json();
+    console.error("Failed to unfollow artist:", error);
+    return null;
+  }
+
+  return { ok: true };
+};
+
+
+
 export default {
   getToken,
   shouldRefreshToken,
@@ -692,7 +760,10 @@ export default {
   getArtistInfo,
   changeTrackPosition,
   savePlaylistInfo,
-  createPlaylist
+  createPlaylist,
+  deletePlaylist,
+  unfollowAlbum,
+  unfollowArtist
 };
 
 

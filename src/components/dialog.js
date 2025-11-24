@@ -19,6 +19,7 @@ export default function Dialog({
   closeOnBackdrop = true,
   blockBackground = true,
   buttons = null,
+  header
 }) {
   const dialogRef = useRef(null);
   const previouslyFocused = useRef(null);
@@ -129,8 +130,20 @@ export default function Dialog({
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div className="dialog-header" onMouseDown={onMouseDown}>
-              <div className="dialog-title">{title}</div>
-              <button className="dialog-close" onClick={onClose}>×</button>
+              <table style={{ width: "100%"}}>
+                <tr>
+                  <td style={{ width: "100%", display: "inline-block" }}>
+                    <div className="dialog-title" style={{ display: "inline-block" }}>{title}</div>
+                    <button className="dialog-close" style={{ display: "inline-block", float:"right" }} onClick={onClose}>×</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                      {header}
+                  </td>
+                </tr>
+              </table>
+
             </div>
 
             <div className="dialog-body">{children}</div>

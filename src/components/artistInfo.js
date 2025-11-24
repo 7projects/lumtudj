@@ -9,8 +9,8 @@ import { text } from "@fortawesome/fontawesome-svg-core";
 // - Has a button to edit (opens Dialog)
 // - Dialog contains name + description inputs
 
-export default function ArtistInfo({ onClose }) {
-    const { menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }) {
+    const { menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
 
     const isLocked = () => {
         let l = localStorage.getItem("locked") == "true";
@@ -38,54 +38,64 @@ export default function ArtistInfo({ onClose }) {
             open={true}
             onClose={() => onClose?.()}
             title="Artist Info"
+            header={!loadingArtistInfo ? <div style={{ width: "100%", textAlign: "center" }}>
+                <img draggable="false" className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
+                <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
+            </div> : null}
             style={{ textAlign: "center" }}
             blockBackground={false}
             buttons={[]}
+            onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }}
         >
-            {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
-                <div className="artist-info" style={{}}>
-                    <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
-                    <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
-                    <Tabs style={{ width: "100%" }}>
-                        <TabList className="custom-tablist">
-                            <Tab className="custom-tab">
-                                Top Tracks
-                            </Tab>
-                            <Tab className="custom-tab">
-                                Albums
-                            </Tab>
-                        </TabList>
+            <div className="artist-info">
+                {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
 
-                        <TabPanel>
-                            <div style={{ overflowY: "auto", maxHeight: "40vh" }}>
-                                {selectedArtist && selectedArtist.tracks.map((tr, index) => {
-                                    // return <TrackRow id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                                    return <TrackRow forInfo id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } }} />
-                                })}
-                            </div>
+                    <>
 
-                        </TabPanel>
-                        <TabPanel>
-                            <div style={{ overflowY: "auto", maxHeight: "40vh" }}>
-                                {selectedArtist && selectedArtist.albums.map((a, index) => {
-                                    return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { }}>
-                                        <img
+                        <Tabs style={{ width: "100%" }}>
+                            <TabList className="custom-tablist">
+                                <Tab className="custom-tab">
+                                    Top Tracks
+                                </Tab>
+                                <Tab className="custom-tab">
+                                    Albums
+                                </Tab>
+                            </TabList>
 
-                                            className="artist-info-album-img"
-                                            src={a.images && a.images[2] && a.images[2].url}
-                                            alt={a.name}
-                                        />
-                                        <div className="artist-info-album-details">
-                                            <div className="artist-info-album-name">{a.name}</div>
-                                            <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
-                                            <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
+                            <TabPanel>
+                                <div style={{ overflowY: "auto", height: "45vh" }}>
+                                    {selectedArtist && selectedArtist.tracks.map((tr, index) => {
+                                        // return <TrackRow id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+                                        return <TrackRow forInfo id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("artist-info"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
+                                    })}
+                                </div>
+
+                            </TabPanel>
+                            <TabPanel>
+                                <div style={{ overflowY: "auto", height: "45vh" }}>
+                                    {selectedArtist && selectedArtist.albums.map((a, index) => {
+                                        return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick?.(a) }}>
+                                            <img
+
+                                                className="artist-info-album-img"
+                                                src={a.images && a.images[2] && a.images[2].url}
+                                                alt={a.name}
+                                            />
+                                            <div className="artist-info-album-details">
+                                                <div className="artist-info-album-name">{a.name}</div>
+                                                <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
+                                                <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                })}</div>
-                        </TabPanel>
-                    </Tabs>
-                </div>}
+                                    })}</div>
+                            </TabPanel>
+                        </Tabs>
+                    </>
+
+
+
+                } </div>
         </Dialog >
 
 

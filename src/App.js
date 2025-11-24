@@ -8,7 +8,7 @@ import api from './Api';
 import PlaylistRow from './components/playlistRow';
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
 import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
-import { loadLibray, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
+import { loadLibray, deleteFromLibrary, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 
@@ -47,6 +47,7 @@ import ReordableTrackList from './components/reordableTrackList';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PanelLibrary from './components/panelLibrary';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
+import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import ColorLensIcon from '@mui/icons-material/ColorLens';
 import Dialog from './components/dialog';
 import PlaylistInfo from './components/playlistInfo';
@@ -204,9 +205,9 @@ function App() {
     let cacheLibrary = await loadLibray();
 
     if (cacheLibrary && cacheLibrary.length > 0) {
-      cacheLibrary = [myShazamTracksPl, lastListenedPl, ...cacheLibrary];
+      cacheLibrary = [...cacheLibrary];
       setLibrary(cacheLibrary);
-      setFilteredLibrary(cacheLibrary);
+      // setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...cacheLibrary]);
     } else {
       updateLibrary();
     }
@@ -596,11 +597,11 @@ function App() {
       albms.forEach(alb => { alb.type = "album"; });
       plsts.forEach(pl => { pl.type = "playlist"; });
 
-      const lib = [myShazamTracksPl, lastListenedPl, ...plsts, ...albms];
+      const lib = [...plsts, ...albms];
 
       saveLibrary(lib);
       setLibrary(lib);
-      setFilteredLibrary(lib);
+      // setFilteredLibrary(lib);
 
       setLoadingLibrary(null);
 
@@ -675,10 +676,10 @@ function App() {
 
       alert("Playlists deleted: " + deleted.map(p => p.name).join(", "));
 
-      let newLibrary = [myShazamTracksPl, lastListenedPl, ...library];
+      let newLibrary = [...library];
       newLibrary = newLibrary.filter(pl => !deleted.some(d => d.id === pl.id));
       setLibrary(newLibrary);
-      setFilteredLibrary(newLibrary);
+      // setFilteredLibrary(newLibrary);
       saveLibrary(newLibrary);
 
     }
@@ -878,7 +879,7 @@ function App() {
         pl.snapshot_id = res.snapshot_id;
         setSelectedPlaylistTracks(pl.tracks);
         setLibrary(pls);
-        setFilteredLibrary(pls);
+        // setFilteredLibrary(pls);
         saveLibrary([pl]);
         closeContextMenu();
       }
@@ -1109,15 +1110,15 @@ function App() {
   }
 
   const onPlaylistFilterChange = async (text) => {
-    setPlaylistsFilterText(text);
-    //filter playlists by text
-    let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
-    if (text.trim() == "") {
-      setFilteredLibrary(allPlaylists);
-    } else {
-      const filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(text.toLowerCase()));
-      setFilteredLibrary(filtered);
-    }
+    // setPlaylistsFilterText(text);
+    // //filter playlists by text
+    // let allPlaylists = [...library];
+    // if (text.trim() == "") {
+    //   setFilteredLibrary(allPlaylists);
+    // } else {
+    //   const filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(text.toLowerCase()));
+    //   setFilteredLibrary(filtered);
+    // }
   }
 
   const onTrackLongPress = (track, e) => {
@@ -1241,7 +1242,8 @@ function App() {
     if (selectedTrack) {
 
       if (selectedArtist?.id != selectedTrack?.artists?.[0]?.id) {
-        loadArtistInfo(selectedTrack);
+        if (showArtistInfo)
+          loadArtistInfo(selectedTrack);
       }
 
     }
@@ -1253,7 +1255,7 @@ function App() {
     setLoadingTracks(true);
     let tracks = await api.getAlbumTracks(album.id);
     setLoadingTracks(false);
-    setTracks(tracks);
+    setSelectedPlaylistTracks(tracks);
   }
 
   const tracksRef = useRef(null);
@@ -1332,7 +1334,7 @@ function App() {
       pl.name = name;
       pl.description = description;
       setLibrary(pls);
-      setFilteredLibrary(pls);
+      // setFilteredLibrary(pls);
       saveLibrary(pls);
       setSelectedLibraryItem(playlist);
     }
@@ -1345,7 +1347,7 @@ function App() {
       let pls = [...library];
       pls.unshift(newPl);
       setLibrary(pls);
-      setFilteredLibrary(pls);
+      // setFilteredLibrary(pls);
       saveLibrary(pls);
       setSelectedLibraryItem(newPl);
     }
@@ -1365,11 +1367,54 @@ function App() {
     setMenuPosition({ x: e.pageX, y: e.pageY });
   };
 
+
+  const deletePlaylist = async (pl) => {
+
+    if (!window.confirm("Are you sure you want to delete this playlist?")) {
+      closeContextMenu();
+      return;
+    }
+
+    debugger;
+    if (pl) {
+      await api.deletePlaylist(pl);
+      let pls = [...library];
+      pls = pls.filter(x => x.id != pl.id);
+      setLibrary(pls);
+      // setFilteredLibrary(pls);
+      await deleteFromLibrary(pl);
+      setSelectedLibraryItem(null);
+      closeContextMenu();
+    }
+  }
+
+  const unfollowAlbum = async (album) => {
+    await api.unfollowAlbum(album);
+    let pls = [...library];
+    pls = pls.filter(x => x.id != album.id);
+    setLibrary(pls);
+    // setFilteredLibrary(pls);
+    await deleteFromLibrary(album);
+    setSelectedLibraryItem(null);
+    closeContextMenu();
+  }
+
+
   const onLibraryItemContextMenu = (e, playlist, index) => {
     loadPlaylistPrev(playlist);
     let items = [];
     items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true) });
-    items.push({ label: "Delete playlist", onClick: () => setShowPlaylistInfo(true) });
+
+
+    if (playlist.type == "playlist")
+      items.push({ label: "Delete playlist", onClick: () => deletePlaylist(playlist) });
+
+    if (playlist.type == "album")
+      items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(playlist) });
+
+    // selectedLibraryItem.type == "artist" &&
+    //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
+
 
     setContextMenuItems(items);
     setSelectedLibraryIndex(index);
@@ -1404,7 +1449,7 @@ function App() {
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
     items.push({ label: "Add to playlist", onClick: () => { setSelectedTrack(track); setShowPlaylistPicker(true); } });
-    items.push({ label: "Artist", onClick: () => { setSelectedTrack(track); setShowPlaylistPicker(true); } });
+    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
     items[1].items = [
       { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
       { label: "Albums", onClick: async () => { }, onEnter: (track) => loadCtxAlbums(track) }
@@ -1439,6 +1484,11 @@ function App() {
     return selectedTrack;
   }
 
+
+
+  const [showArtistInfo, setShowArtistInfo] = useState(false);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
 
@@ -1635,13 +1685,16 @@ function App() {
       }
 
       {
-        dragTrack ?
+        dragTrack && dragSource != "artist-info" ?
           <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
             <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
           </div> : null
       }
 
-      <ArtistInfo></ArtistInfo>
+
+      {showArtistInfo ?
+        <ArtistInfo onAlbumClick={onAlbumClick} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
+      }
 
       {
         // selectedArtist || loadingArtistInfo ?
@@ -1843,7 +1896,14 @@ function App() {
                       <button style={{ float: "right" }}>{time}</button>
                       <button style={{ float: "right" }} onClick={logout}>Logout</button>
                       <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
-                      <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon> </button>
+                      <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
+
+                        {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
+                          <FullscreenIcon></FullscreenIcon>}
+
+                      </button>
+
+
                       <button onClick={checkForUpdates}>Check for updates</button>
                       {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                       <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
@@ -1919,7 +1979,10 @@ function App() {
 
                         <button style={{ float: "right" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
 
-                        <button style={{ float: "right" }} onClick={fullscreen}><FullscreenIcon></FullscreenIcon></button>
+                        <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
+                          {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
+                            <FullscreenIcon></FullscreenIcon>}
+                        </button>
 
                         {locked ?
                           <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>

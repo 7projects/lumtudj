@@ -2439,20 +2439,18 @@ button:active {
   cursor: pointer;
   font-weight: 500;
   list-style: none;
+  color: #e2e2e2;
   /* remove default list styles */
-  transition: color 0.2s, border-bottom 0.2s;
   border-bottom: 2px solid transparent;
   /* default underline */
 }
 /* Highlight selected tab */
 .custom-tab--selected {
   border-bottom: 3px solid #0070f3;
-  color: #0070f3;
   font-weight: bold;
 }
 .react-tabs__tab--selected {
   font-weight: bold;
-  color: white;
   border: none;
 }
 .reconnecting-container {
@@ -2700,6 +2698,7 @@ button:active {
 }
 .dialog-header {
   background: #353535;
+  color: #e2e2e2;
   padding: 12px 16px;
   display: flex;
   justify-content: space-between;

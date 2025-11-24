@@ -76,15 +76,30 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
     const [filter, setFilter] = useState("");
 
     useEffect(() => {
+
+        debugger;
         if (filteredLibrary.length == 0) {
             setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...library]);
+        } else {
+
+            let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
+            let filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+
+            if (filtered.length != filteredLibrary.length)
+                setFilteredLibrary(filtered);
         }
     }, [library])
+
+    useEffect(() => {
+
+    }, [filteredLibrary])
+
+
 
     const onFilterChange = async (text) => {
         setFilter(text);
         //filter playlists by text
-        let allPlaylists = [...library];
+        let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
         if (text.trim() == "") {
             setFilteredLibrary(allPlaylists);
         } else {
