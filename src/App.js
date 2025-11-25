@@ -776,7 +776,7 @@ function App() {
 
   const allowDrop = (e) => e.preventDefault();
 
-  const addToPlaylist = (track, position, id) => {
+  const addToPlaylist = async (track, position, id) => {
 
     let newTrack = { ...track };
 
@@ -796,6 +796,14 @@ function App() {
     if (dragSource == "library" && !locked) {
       const selPl = filteredLibrary[dragSourceIndex];
       pl = [...playlistTracks, ...selPl.tracks];
+      setPlaylistTracks(pl);
+      return;
+    }
+
+    if (dragSource == "artist-info-album" && !locked) {
+      const selPl = selectedArtist.albums[dragSourceIndex];
+      const trcks = await api.getAlbumTracks(selPl.id);
+      pl = [...playlistTracks, ...trcks];
       setPlaylistTracks(pl);
       return;
     }
@@ -1242,8 +1250,8 @@ function App() {
     if (selectedTrack) {
 
       if (selectedArtist?.id != selectedTrack?.artists?.[0]?.id) {
-        if (showArtistInfo)
-          loadArtistInfo(selectedTrack);
+        if (showArtistInfo) { }
+        // loadArtistInfo(selectedTrack);
       }
 
     }
@@ -1252,6 +1260,8 @@ function App() {
   const inputRef = useRef(null);
 
   const onAlbumClick = async (album) => {
+    setSelectedLibraryItem(album);
+    setSearchText(album.name);
     setLoadingTracks(true);
     let tracks = await api.getAlbumTracks(album.id);
     setLoadingTracks(false);
@@ -1328,7 +1338,7 @@ function App() {
 
   const onPlaylistInfoSave = async (playlist, name, description) => {
     const result = await api.savePlaylistInfo(playlist, name, description);
-    if (result) {
+    if (result.ok) {
       let pls = [...library];
       let pl = pls.find(x => x.id == playlist.id);
       pl.name = name;
@@ -1467,6 +1477,7 @@ function App() {
   const onPlaylistContextMenu = (e, track, index) => {
     let items = [];
     items.push({ label: "Remove from playlist", onClick: () => { removeTrackFromPlaylist(); } });
+    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
     setContextMenuItems(items);
     setPlaylistIndex(index);
     setSelectedTrack(track);
@@ -1681,11 +1692,11 @@ function App() {
 
       {
         showNewPlaylistInfo ?
-          <PlaylistInfo onSave={onNewPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))}></PlaylistInfo> : null
+          <PlaylistInfo title="New playlist" onSave={onNewPlaylistInfoSave} onClose={(() => setShowNewPlaylistInfo(false))}></PlaylistInfo> : null
       }
 
       {
-        dragTrack && dragSource != "artist-info" ?
+        dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" ?
           <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
             <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
           </div> : null

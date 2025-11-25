@@ -2702,7 +2702,6 @@ button:active {
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  cursor: move;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
 }

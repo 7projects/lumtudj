@@ -607,6 +607,7 @@ const getAccessTokenByAuthorizationCode = async (code) => {
 }
 
 const savePlaylistInfo = async (playlist, name, description) => {
+
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}`;
   const response = await fetch(url, {
     method: 'PUT',
@@ -620,9 +621,8 @@ const savePlaylistInfo = async (playlist, name, description) => {
     }),
   });
 
-  var data = await response.json();;
-  data.ok = response.ok;
-  return data;
+
+  return  response;
 };
 
 const createPlaylist = async (name, description) => {

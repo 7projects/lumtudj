@@ -6,7 +6,7 @@ import Dialog from "../components/dialog";
 // - Has a button to edit (opens Dialog)
 // - Dialog contains name + description inputs
 
-export default function PlaylistInfo({ playlist, onSave, onClose }) {
+export default function PlaylistInfo({ playlist, title, onSave, onClose }) {
     // const [open, setOpen] = useState(true);
     const [name, setName] = useState(playlist?.name || "");
     const [description, setDescription] = useState(playlist?.description || "");
@@ -21,7 +21,7 @@ export default function PlaylistInfo({ playlist, onSave, onClose }) {
             <Dialog
                 open={true}
                 onClose={() => onClose?.()}
-                title="Edit Playlist"
+                title={title || "Edit Playlist"}
                 blockBackground={true}
                 buttons={[
                     {
