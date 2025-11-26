@@ -77,7 +77,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
 
     useEffect(() => {
 
-        debugger;
+
         if (filteredLibrary.length == 0) {
             setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...library]);
         } else {

@@ -82,7 +82,7 @@ function useConstructor(callback) {
 
 
 function App() {
-  const { menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+  const { menuAnchor, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
   const [contextMenu, setContextMenu] = useState(null);
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
@@ -209,7 +209,11 @@ function App() {
       setLibrary(cacheLibrary);
       // setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...cacheLibrary]);
     } else {
-      updateLibrary();
+
+      let token = localStorage.getItem("token");
+      if (!token) return;
+
+      await updateLibrary();
     }
 
 
@@ -226,25 +230,6 @@ function App() {
     //   })
     // }
 
-
-    // if (cachedPlaylists && cachedPlaylists.length > 0) {
-    //   setLibrary([...cachedPlaylists]);
-    //   setFilteredLibrary([...cachedPlaylists]);
-    // }
-
-    // if (cachedAlbums && cachedAlbums.length > 0) {
-    //   setAlbums(cachedAlbums);
-    // }
-
-    // if (cachedPlaylists == null || cachedPlaylists.length == 0) {
-    //   updateLibrary();
-    //   return;
-    // }
-
-    // if (cachedAlbums == null || cachedAlbums.length == 0) {
-    //   updateLibrary();
-    //   return;
-    // }
 
   };
 
@@ -282,7 +267,7 @@ function App() {
     });
 
     if (library.length == 0) {
-      getPlaylistsAndAlbums();
+      await getPlaylistsAndAlbums();
     }
 
     document.addEventListener('keydown', function (e) {
@@ -422,6 +407,17 @@ function App() {
       }
 
 
+      if (localStorage.getItem("showPickers") == "true") {
+        setShowPickers(true);
+      } else {
+        setShowPickers(false);
+      }
+
+      let aiposition = localStorage.getItem("artistInfoPosition");
+      if (aiposition) {
+        setArtistInfoPosition(JSON.parse(aiposition));
+      }
+
 
       const theme = localStorage.getItem("theme");
       if (theme) {
@@ -462,12 +458,15 @@ function App() {
           //brišemo iz adress url /?code=wr4ri489f9334....
           window.history.replaceState({}, document.title, window.location.pathname);
           window.location = "/#tab1";
+  
           setToken(data.access_token)
+          window.localStorage.setItem("token", data.access_token);
+          getPlaylistsAndAlbums();
           setLoadingToken(false);
           if (data.refresh_token) {
             localStorage.setItem('refresh_token', data.refresh_token);
           }
-          ;
+ 
         }
       } else {
 
@@ -479,7 +478,7 @@ function App() {
           //   setToken(data.access_token);
 
         } else {
-
+ 
           setToken(localStorage.getItem("token"));
         }
       }
@@ -498,7 +497,7 @@ function App() {
           window.history.replaceState({}, document.title, '/'); // Clean URL
           if (library.length == 0) {
             getPlaylistsAndAlbums();
-            getBackgroundPlaylists();
+            // await getBackgroundPlaylists();
           }
         }
       }
@@ -550,11 +549,18 @@ function App() {
 
       //filter all tracks from library (each playlist in libray contains tracks) whose name contains st
       let allTracks = [];
+      let filtered = [];
+
       library.forEach(pl => {
+
+        if (pl.name.toLowerCase().includes(st.toLowerCase())) {
+          filtered.push(...pl.tracks);
+        }
+
         allTracks = allTracks.concat(pl.tracks);
       });
 
-      let filtered = allTracks.filter(tr => tr.name.toLowerCase().includes(st.toLowerCase()) || tr.artists && tr.artists.length > 1 && tr.artists[0].name.toLowerCase().includes(st.toLowerCase()));
+      filtered.push(...allTracks.filter(tr => tr.name.toLowerCase().includes(st.toLowerCase()) || tr.artists?.[0]?.name.toLowerCase().includes(st.toLowerCase())));
 
       const distinct = [...new Map(filtered.map(item => [item.id, item])).values()];
 
@@ -663,7 +669,7 @@ function App() {
         }
 
         saveLibrary(updatedPlaylists);
-
+  
         await getPlaylistsAndAlbums(); // Reload playlists from IndexedDB
         setLoadingLibrary(null);
       }
@@ -778,6 +784,11 @@ function App() {
 
   const addToPlaylist = async (track, position, id) => {
 
+    // if(dragSource == "playlist") 
+    //   return;
+    setDragSource(null);
+    setDragTrack(null);
+
     let newTrack = { ...track };
 
     if (isMobile())
@@ -785,13 +796,13 @@ function App() {
 
     let pl = [...playlistTracks];
 
-    // if (dragSource == "playlist") {
-    //   if (locked) {
-    //     return
-    //   } else {
-    //     pl.splice(dragSourceIndex, 1);
-    //   }
-    // }
+    if (dragSource == "playlist") {
+      if (locked) {
+        return
+      } else {
+        pl.splice(dragSourceIndex, 1);
+      }
+    }
 
     if (dragSource == "library" && !locked) {
       const selPl = filteredLibrary[dragSourceIndex];
@@ -875,16 +886,17 @@ function App() {
     if (dragSource == "plprev") {
       if (selectedLibraryIndex) {
 
-        let pl = library[selectedLibraryIndex];
+        let pl = filteredLibrary[selectedLibraryIndex];
         const tr = pl.tracks[dragSourceIndex];
         pl.tracks.splice(dragSourceIndex, 1);
         setSelectedTrackIndex(-1);
         const res = await api.removeTrackFromPlaylist(pl, tr);
 
         let pls = [...library];
-        pls[selectedLibraryIndex] = pl;
-        pl.count = pl.tracks.length;
-        pl.snapshot_id = res.snapshot_id;
+        let oldPl = pls.find(x => x.id == pl.id);
+        oldPl = pl;
+        oldPl.count = pl.tracks.length;
+        oldPl.snapshot_id = res.snapshot_id;
         setSelectedPlaylistTracks(pl.tracks);
         setLibrary(pls);
         // setFilteredLibrary(pls);
@@ -1214,7 +1226,7 @@ function App() {
     const id = localStorage.getItem("myShazamTracksID");
     if (!id) {
       alert("Cant find My Shazam tracks id");
-      return;
+      return [];
     }
 
     const tracks = await api.getTracks(id, 50);
@@ -1385,7 +1397,7 @@ function App() {
       return;
     }
 
-    debugger;
+
     if (pl) {
       await api.deletePlaylist(pl);
       let pls = [...library];
@@ -1458,7 +1470,7 @@ function App() {
 
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
-    items.push({ label: "Add to playlist", onClick: () => { setSelectedTrack(track); setShowPlaylistPicker(true); } });
+    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
     items[1].items = [
       { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
@@ -1476,7 +1488,7 @@ function App() {
 
   const onPlaylistContextMenu = (e, track, index) => {
     let items = [];
-    items.push({ label: "Remove from playlist", onClick: () => { removeTrackFromPlaylist(); } });
+    // items.push({ label: "Remove from queue", onClick: () => { removeTrackFromPlaylist(); } });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
     setContextMenuItems(items);
     setPlaylistIndex(index);
@@ -1696,7 +1708,7 @@ function App() {
       }
 
       {
-        dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" ?
+        dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" ?
           <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
             <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
           </div> : null
@@ -1929,13 +1941,13 @@ function App() {
 
                 {token ?
                   // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
-                  <SpotifyPlayer onNext={nextTrack} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => loadArtistInfo(track)} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                  <SpotifyPlayer onNext={nextTrack} onClick={() => { showArtistInfo(true); loadArtistInfo(track) }} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
 
                   : null}
               </div>
             </div >
             :
-            <div className='layout' onMouseDown={closeContextMenu} >
+            <div className='layout' onContextMenu={(e) => e.preventDefault()} onMouseDown={closeContextMenu} >
               <div className="header">
                 <table style={{ width: "100%", tableLayout: "fixed" }}>
                   <tbody>
@@ -1953,7 +1965,7 @@ function App() {
                               {/* <SearchIcon className="search-icon" /> */}
                               <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                             </div> : null}
-                          {/* <button onClick={updateLibrary}>Update playlists</button>*/}
+
                           {/* <button onClick={checkForUpdates}>Check for updates</button> */}
                           {/* <button onClick={checkForUpdates}>Check for updates</button> */}
                           {/* <button onClick={refreshAccessToken}>refresh at</button> */}
@@ -2052,7 +2064,7 @@ function App() {
 
                             : null}
 
-                          <input ref={inputRef} className="toolbar-input-search" placeholder="Search songs, artists, albums" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                          <input ref={inputRef} className="toolbar-input-search" placeholder="Search" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                         </div>
 
                         {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
@@ -2125,7 +2137,7 @@ function App() {
 
 
                 : null} */}
-                <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => loadArtistInfo(tr)} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track) }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
               </div>
             </div>
         )

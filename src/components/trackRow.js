@@ -17,9 +17,9 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
 
     const getTrackRowClass = () => {
 
-        if(!forInfo) return "";
-        
-        let clss = isMobile()  ? 'item-row-mobile' : 'item-row';
+        if (!forInfo) return "";
+
+        let clss = isMobile() ? 'item-row-mobile' : 'item-row';
 
 
         // if (playing)
@@ -64,7 +64,7 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
 
     return (
         track &&
-        <div id={id} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); }}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={onContextMenu} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
+        <div id={id} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={onContextMenu} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
 
             <table style={{ width: "100%" }}>
                 <tbody>
@@ -170,12 +170,13 @@ const TrackRow = ({ source, track, forPlaylist, forInfo, onClick, onArtistClick,
                                                             :
                                                             track.name} */}
                                                         {track.name}&nbsp;
-                                                        {!forInfo ?
+                                                        <br></br>
+                                                        {!forInfo && track?.album ?
                                                             <div className="song-release-date">
-                                                                (
-                                                                {track.album && track.album.release_date ? track.album.name : "Unknown album"}&nbsp;
-                                                                {track.album && track.album.release_date ? new Date(track.album.release_date).getFullYear() : "Unknown Release Date"}
-                                                                )
+                                                                
+                                                                {track?.album?.name} &nbsp;
+                                                                {track?.album?.release_date?.substring(0, 4)}
+                                                                
                                                             </div> : null}
                                                     </span>
                                                 </td>

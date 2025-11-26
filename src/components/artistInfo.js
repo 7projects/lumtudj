@@ -11,7 +11,7 @@ import PlaylistRow from "./playlistRow";
 // - Dialog contains name + description inputs
 
 export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }) {
-    const { menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+    const { artistInfoPosition, setArtistInfoPosition, menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
 
     const isLocked = () => {
         let l = localStorage.getItem("locked") == "true";
@@ -36,6 +36,8 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }
     return (
 
         <Dialog
+            position={artistInfoPosition}
+            onDragEnd={(pos) => { setArtistInfoPosition(pos); localStorage.setItem("artistInfoPosition", JSON.stringify(pos)); }}
             open={true}
             onClose={() => onClose?.()}
             title="Artist Info"

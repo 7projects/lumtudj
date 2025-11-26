@@ -1054,7 +1054,6 @@ td {
 .context-menu {
   position: absolute;
   background: #1b1b1b;
-  border: 1px solid #363636;
   z-index: 1000;
   border-radius: 4px;
 }
@@ -1063,6 +1062,7 @@ td {
   color: #f1f1f1;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 16px;
 }
 .context-menu div:hover {
   background-color: #353535;
@@ -2468,15 +2468,15 @@ button:active {
   align-items: center;
   /* vertical center */
   z-index: 99999;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(10, 39, 22, 0.38);
   /* optional overlay */
 }
 .reconnecting-dots {
   font-family: sans-serif;
   font-size: 20px;
   font-weight: 500;
-  color: #333;
-  background: #000000c7;
+  color: red;
+  background: black;
   padding: 50px;
   /* border: 2px solid gray; */
   border-radius: 20px;
@@ -2485,6 +2485,7 @@ button:active {
   font-family: monospace, Sans-serif;
 }
 .reconnecting-dots span {
+  color: white;
   display: inline-block;
   width: 6px;
   animation: blink 1.4s infinite;
@@ -2544,7 +2545,7 @@ button:active {
   margin: 0;
 }
 /* 🔴 Blinking animation */
-@keyframes blink {
+@keyframes blink2 {
   0%,
   100% {
     background-color: black;
@@ -2577,7 +2578,7 @@ button:active {
 }
 /* Combine both animations for 2s total */
 .blinking {
-  animation: blink 0.5s linear 0s 4, shake 0.1s linear 0s 20;
+  animation: blink2 0.5s linear 0s 4, shake 0.1s linear 0s 20;
 }
 .toolbar-wrapper {
   display: flex;

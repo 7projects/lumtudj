@@ -1053,7 +1053,6 @@ td {
 .context-menu {
   position: absolute;
   background: #a3a3a3;
-  border: 1px solid #fafafa;
   z-index: 1000;
   border-radius: 4px;
 }
@@ -1062,6 +1061,7 @@ td {
   color: #575757;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 16px;
 }
 .context-menu div:hover {
   background-color: #bcbcbc;
@@ -2751,4 +2751,3 @@ button:active {
 .dialog-footer .dialog-btn.primary:hover {
   background: #f3f3f3;
 }
-/*# sourceMappingURL=./slate.css.map */

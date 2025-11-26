@@ -1053,7 +1053,6 @@ td {
 .context-menu {
   position: absolute;
   background: #000000;
-  border: 1px solid #161616;
   z-index: 1000;
   border-radius: 4px;
 }
@@ -1062,6 +1061,7 @@ td {
   color: #f1f1f1;
   cursor: pointer;
   border-radius: 4px;
+  font-size: 16px;
 }
 .context-menu div:hover {
   background-color: #1a1a1a;
@@ -2750,4 +2750,3 @@ button:active {
 .dialog-footer .dialog-btn.primary:hover {
   background: #070707;
 }
-/*# sourceMappingURL=./spotify.css.map */

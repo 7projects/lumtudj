@@ -10,6 +10,7 @@ import { useLongPress } from 'use-long-press';
 import useAppStore from '../AppStore';
 import DeleteIcon from '@mui/icons-material/Delete';
 
+
 export default function SpotifyPlayer({
   locked,
   token,
@@ -27,7 +28,7 @@ export default function SpotifyPlayer({
   const tokenRef = useRef(token);
   const onNextRef = useRef(null);
 
-  const { dragTrack, setDragTrack } = useAppStore();
+
 
   const [deviceId, setDeviceId] = useState(null);
   const [position, setPosition] = useState(0);
@@ -253,6 +254,9 @@ export default function SpotifyPlayer({
   // -------------------------------
   // Render mobile/desktop
   // -------------------------------
+  const { setDragTrack, setDragSource, setMenuAnchor, library, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+
+
   return (
     <div style={{ width: "100%", textAlign: "center", bottom: 0, position: "absolute" }} {...longPressHandler()} onClick={onClick}>
       {isMobile() ? (
@@ -331,7 +335,7 @@ export default function SpotifyPlayer({
               style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: 8 }}
             />
           </div>
-          <div className="div2" style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
+          <div className="div2" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
             {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
             {track && track.name}<br></br>
             {playlists && playlists.map((p) =>

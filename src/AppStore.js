@@ -49,7 +49,12 @@ const useAppStore = create((set) => ({
   loadingArtistInfo: false,
   setLoadingArtistInfo: (loading) => set({ loadingArtistInfo: loading }),
   
+  
   // --- Drag & drop state ---
+
+  artistInfoPosition: { x: 100, y: 100 },
+  setArtistInfoPosition: (position) => set({ artistInfoPosition: position }),
+
   dragTrack: null,
   setDragTrack: (track) => set({ dragTrack: track }),
 

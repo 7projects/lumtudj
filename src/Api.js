@@ -172,7 +172,6 @@ const getPlaylists = async () => {
 const getAlbums = async () => {
   // let data = await request('/me/playlists');
 
-  ;
   let albums = [];
 
   let url = 'https://api.spotify.com/v1/me/albums?limit=50';
@@ -194,7 +193,7 @@ const getAlbums = async () => {
       addedAt: item.added_at,
       name: item.album.name,
       artists: item.album.artists,
-      releaseDate: item.album.release_date,
+      release_date: item.album.release_date,
       count: item.album.total_tracks,
       albumUrl: item.album.external_urls.spotify,
       images: item.album.images,

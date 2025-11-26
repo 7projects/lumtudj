@@ -19,12 +19,14 @@ export default function Dialog({
   closeOnBackdrop = true,
   blockBackground = true,
   buttons = null,
-  header
+  header,
+  onDragEnd,
+  position
 }) {
   const dialogRef = useRef(null);
   const previouslyFocused = useRef(null);
 
-  const [pos, setPos] = useState({ x: null, y: null });
+  const [pos, setPos] = useState(position || { x: null, y: null });
   const [dragging, setDragging] = useState(false);
   const dragStart = useRef({ x: 0, y: 0 });
 
@@ -56,8 +58,17 @@ export default function Dialog({
     });
   }
 
-  function onMouseUp() {
+  function onMouseUp(e) {
     setDragging(false);
+    let pos = {
+      x: e.clientX - dragStart.current.x,
+      y: e.clientY - dragStart.current.y,
+    };
+
+    setPos(pos);
+
+    if (onDragEnd) onDragEnd(pos);
+
   }
 
   useEffect(() => {
@@ -130,16 +141,16 @@ export default function Dialog({
             onMouseDown={(e) => e.stopPropagation()}
           >
             <div className="dialog-header" onMouseDown={onMouseDown}>
-              <table style={{ width: "100%"}}>
+              <table style={{ width: "100%" }}>
                 <tr>
                   <td style={{ width: "100%", display: "inline-block" }}>
                     <div className="dialog-title" style={{ display: "inline-block" }}>{title}</div>
-                    <button className="dialog-close" style={{ display: "inline-block", float:"right" }} onClick={onClose}>×</button>
+                    <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}>×</button>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                      {header}
+                    {header}
                   </td>
                 </tr>
               </table>
