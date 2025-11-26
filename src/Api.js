@@ -274,7 +274,7 @@ const getArtistInfo = async (id) => {
 
 const getArtistAlbums = async (id) => {
   let albums = [];
-  let url = `https://api.spotify.com/v1/artists/${id}/albums?include_groups=album,single,appears_on,compilation&market=US&limit=50`;
+  let url = `https://api.spotify.com/v1/artists/${id}/albums?include_groups=album&market=US&limit=50`;
 
   const response = await fetch(url, {
     headers: { Authorization: `Bearer ${await getToken()}` }
