@@ -103,7 +103,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
         if (text.trim() == "") {
             setFilteredLibrary(allPlaylists);
         } else {
-            const filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(text.toLowerCase()));
+            const filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(text.toLowerCase()) || p.artists?.some(a => a.name.toLowerCase().includes(text.toLowerCase())));
             setFilteredLibrary(filtered);
         }
     }
