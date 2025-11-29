@@ -152,7 +152,8 @@ const getPlaylists = async () => {
       snapshot_id: item.snapshot_id,
       collaborative: item.collaborative,
       public: item.public,
-      owner_id: item.owner.id
+      owner_id: item.owner.id,
+      shuffle: 0
     }));
 
     playlists.push(...simplified);
@@ -201,7 +202,8 @@ const getAlbums = async () => {
       images: item.album.images,
       tracks: [],
       uri: item.album.uri,
-      snapshot_id: item.snapshot_id
+      snapshot_id: item.snapshot_id,
+      shuffle: 0
     }));
 
     albums.push(...simplified);
@@ -687,7 +689,8 @@ const createPlaylist = async (name, description) => {
     type: "playlist",
     owner_id: userId,
     public: data.public,
-    collaborative: data.collaborative
+    collaborative: data.collaborative,
+    shuffle: 0
   }
 
   if (response.ok) {

@@ -7,7 +7,8 @@ export const myShazamTracksPl = {
   name: "My shazamed tracks",
   total: 0,
   type: "featured",
-  tracks: []
+  tracks: [],
+  shuffle: 2
 }
 
 export const lastListenedPl = {
@@ -16,7 +17,8 @@ export const lastListenedPl = {
   name: "Last listened",
   total: 0,
   type: "featured",
-  tracks: []
+  tracks: [],
+  shuffle: 2
 }
 
 

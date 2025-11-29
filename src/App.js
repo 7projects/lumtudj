@@ -1812,14 +1812,15 @@ function App() {
         onClose={() => setSnackbarMessage("")}
       />
 
-      <div
-        className="reconnecting-container"
-        style={{ zIndex: 99999, display: reconnecting ? "flex" : "none" }}
-      >
-        <div className="reconnecting-dots">
-          reconnecting<span>.</span><span>.</span><span>.</span>
-        </div>
-      </div>
+      {isMobile() ?
+        <div
+          className="reconnecting-container"
+          style={{ zIndex: 99999, display: reconnecting ? "flex" : "none" }}
+        >
+          <div className="reconnecting-dots">
+            reconnecting<span>.</span><span>.</span><span>.</span>
+          </div>
+        </div> : null}
 
       <canvas id="field" className="universe"></canvas>
 
@@ -1995,11 +1996,17 @@ function App() {
                     <tr>
                       <td >
                         <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
-                          <div onContextMenu={handleMenu} className='app-title'>
-                            <span>LUMTU</span>
-                            <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
-                            {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
-                          </div>
+
+                          {reconnecting ?
+                            <div className="reconnecting-dots">
+                              reconnecting<span>.</span><span>.</span><span>.</span>
+                            </div> :
+                            <div onContextMenu={handleMenu} className='app-title'>
+                              <span>LUMTU</span>
+                              <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
+                              {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                            </div>}
+
 
                           {mode == "compact" ?
                             <div className="toolbar-wrapper">
@@ -2077,7 +2084,7 @@ function App() {
                         <td style={{ width: 30, padding: 5 }}>
                           <img
                             src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
-                            style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: 8 }}
+                            style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: "50%" }}
                           />
                         </td>
                         <td className='selected-track-container'>
@@ -2129,7 +2136,7 @@ function App() {
 
                   <div className="toolbar-wrapper">
                     <div className='toolbar-search'>
-                      <div>QUEUE</div>
+                      <div>QUEUE</div> ({playlistTracks?.length || 0} tracks)
                     </div>
                     <div className='toolbar-icons'>
                       {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}

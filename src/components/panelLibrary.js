@@ -83,7 +83,11 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
         } else {
 
             let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
-            let filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+            let filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())).sort((a, b) => {
+                if (a.shuffle == null) return 1;
+                if (b.shuffle == null) return -1;
+                return b.shuffle - a.shuffle;
+            });;
 
             if (filtered.length != filteredLibrary.length)
                 setFilteredLibrary(filtered);

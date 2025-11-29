@@ -186,10 +186,10 @@ code {
 }
 
 .panel-main {
-
     width: 50%;
     padding: 1px;
-    background-color: #282828;
+    
+    background-color: lighten(@primary-color, 5%);
     text-wrap: auto;
     border-radius: 10px;
     /* border: 4px solid white; */
@@ -744,7 +744,7 @@ button:active {
 }
 
 .player-buttons {
-    margin-top: 0px;
+    margin-top: -8px;
 }
 
 .player-button {
@@ -757,7 +757,7 @@ button:active {
     /* width: 30px; */
     // background-color: transparent !important;
     padding: 10px;
-    background-color: transparent;
+    
     display: inline-block;
     vertical-align: middle;
     height: 24px;
@@ -765,7 +765,8 @@ button:active {
     border-radius: 5px;
     cursor: pointer;
     color: @player-color;
-    border: 1px solid #3f3f3f;
+    border: 1px solid fade(@player-gradient2, 20%);
+    background-color: fade(@player-gradient2, 10%);
 }
 
 .player-button:hover {
@@ -778,6 +779,7 @@ button:active {
     box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); /* Optional: inner shadow */
     background-color: #5a59592e; /* Slightly darker background on press */
 }
+
 
 .player-button-mobile {
     margin: 0px;
@@ -1795,18 +1797,33 @@ button:active {
     /* optional overlay */
 }
 
+// .reconnecting-dots {
+//     font-family: sans-serif;
+//     font-size: 20px;
+//     font-weight: 500;
+//     color: red;
+//     background: black;
+//     padding: 50px;
+//     /* border: 2px solid gray; */
+//     border-radius: 20px;
+//     color: white;
+//     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+//     font-family: @font-family;
+// }
+
 .reconnecting-dots {
     font-family: sans-serif;
-    font-size: 20px;
+    font-size: 10px;
     font-weight: 500;
-    color: red;
-    background: black;
-    padding: 50px;
+    color: @bulb-off-color;
+    background: @button-background-color;
+    padding: 5px;
     /* border: 2px solid gray; */
     border-radius: 20px;
     color: white;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     font-family: @font-family;
+    padding-left: 20px;;
 }
 
 .reconnecting-dots span {
@@ -1846,47 +1863,24 @@ button:active {
 }
 
 .parent {
-    display: grid;
-    grid-template-columns:
-        100px
-        /* column 1 */
-        calc((100% - 30% - 250px) / 2)
-        /* column 2 */
-        30%
-        /* column 3, center column */
-        calc((100% - 30% - 250px) / 2)
-        /* column 4 */
-        150px;
-    /* column 5 */
-    grid-template-rows: repeat(2, 1fr);
-    /* two rows for stacking div3 and div4 */
-    grid-column-gap: 0;
-    grid-row-gap: 0;
+  display: grid;
+  grid-template-columns: 1fr 400px 1fr;
+  width: 100%;
 }
 
 .div1 {
-    grid-area: 1 / 1 / 3 / 2;
+
 }
 
 .div2 {
-    grid-area: 1 / 2 / 3 / 3;
+    width: 400px;
 }
 
 .div3 {
-    grid-area: 1 / 3 / 2 / 4;
+  
 }
 
-.div4 {
-    grid-area: 2 / 3 / 3 / 4;
-}
 
-.div5 {
-    grid-area: 1 / 4 / 3 / 5;
-}
-
-.div6 {
-    grid-area: 1 / 5 / 3 / 6;
-}
 
 
 .reorder-group {
