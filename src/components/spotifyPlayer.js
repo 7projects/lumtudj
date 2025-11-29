@@ -344,7 +344,7 @@ export default function SpotifyPlayer({
                 <td>
 
                   {!artist ?
-                    <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}>
+                    <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid #313131" }}>
                       <div className="loader"></div>
                     </div>
 
