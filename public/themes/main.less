@@ -186,18 +186,18 @@ code {
 }
 
 .panel-main {
-
     width: 50%;
-    // border: 1px solid darken(@primary-color, 2%);
-    // overflow-y: auto;
     padding: 1px;
+    
     background-color: lighten(@primary-color, 5%);
     text-wrap: auto;
     border-radius: 10px;
     /* border: 4px solid white; */
-    margin: 5px;
+    /* margin: 5px; */
     overflow-x: hidden;
     overflow-y: hidden;
+    margin-top: 5px;
+    margin-bottom: 5px;
 
 }
 
@@ -744,7 +744,7 @@ button:active {
 }
 
 .player-buttons {
-    margin-top: 0px;
+    margin-top: -8px;
 }
 
 .player-button {
@@ -757,7 +757,7 @@ button:active {
     /* width: 30px; */
     // background-color: transparent !important;
     padding: 10px;
-    background-color: transparent;
+    
     display: inline-block;
     vertical-align: middle;
     height: 24px;
@@ -765,10 +765,19 @@ button:active {
     border-radius: 5px;
     cursor: pointer;
     color: @player-color;
+    border: 1px solid fade(@player-gradient2, 20%);
+    background-color: fade(@player-gradient2, 10%);
 }
 
 .player-button:hover {
-    background-color: lighten(@player-background-color, 7%);
+    background-color: #7573732e;
+}
+
+.player-button:active {
+    /* Makes the button look pressed */
+    transform: translateY(2px); /* Moves it slightly down */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); /* Optional: inner shadow */
+    background-color: #5a59592e; /* Slightly darker background on press */
 }
 
 
@@ -1839,47 +1848,24 @@ button:active {
 }
 
 .parent {
-    display: grid;
-    grid-template-columns:
-        100px
-        /* column 1 */
-        calc((100% - 30% - 250px) / 2)
-        /* column 2 */
-        30%
-        /* column 3, center column */
-        calc((100% - 30% - 250px) / 2)
-        /* column 4 */
-        150px;
-    /* column 5 */
-    grid-template-rows: repeat(2, 1fr);
-    /* two rows for stacking div3 and div4 */
-    grid-column-gap: 0;
-    grid-row-gap: 0;
+  display: grid;
+  grid-template-columns: 1fr 400px 1fr;
+  width: 100%;
 }
 
 .div1 {
-    grid-area: 1 / 1 / 3 / 2;
+
 }
 
 .div2 {
-    grid-area: 1 / 2 / 3 / 3;
+    width: 400px;
 }
 
 .div3 {
-    grid-area: 1 / 3 / 2 / 4;
+  
 }
 
-.div4 {
-    grid-area: 2 / 3 / 3 / 4;
-}
 
-.div5 {
-    grid-area: 1 / 4 / 3 / 5;
-}
-
-.div6 {
-    grid-area: 1 / 5 / 3 / 6;
-}
 
 
 .reorder-group {

@@ -49,7 +49,8 @@ const useAppStore = create((set) => ({
   loadingArtistInfo: false,
   setLoadingArtistInfo: (loading) => set({ loadingArtistInfo: loading }),
   
-  
+  playedFrom: null,
+  setPlayedFrom: (source) => set({ playedFrom: source }),
   // --- Drag & drop state ---
 
   artistInfoPosition: { x: 100, y: 100 },

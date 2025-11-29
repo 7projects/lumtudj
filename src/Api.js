@@ -3,10 +3,9 @@ import { time } from 'framer-motion';
 import { generateRandomString, generateCodeChallenge } from './pkceUtils';
 
 const BASE_URL = 'https://api.spotify.com/v1';
-// const FIREBASE_FUNCTIONS_URL = process.env.NODE_ENV === 'development' ? 'http://127.0.0.1:5001/lumtudj-dfd38/us-central1/api' : 'https://us-central1-lumtudj-dfd38.cloudfunctions.net/api';
 const FIREBASE_FUNCTIONS_URL = 'https://us-central1-lumtudj-dfd38.cloudfunctions.net/api'; //samo produkcija
 
-const REDIRECT_URI = process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://lumtudj.net';
+const REDIRECT_URI = process.env.NODE_ENV === 'development' ? 'https://localhost:3000' : 'https://lumtudj.net';
 const CLIENT_ID = '6b690613cc6d481d97a3b75c2c0cf947';
 
 const getToken = async () => {
@@ -150,7 +149,10 @@ const getPlaylists = async () => {
       images: item.images,          // array of image objects
       tracks: [],                   // you can fill this later with actual track data
       uri: item.uri,
-      snapshot_id: item.snapshot_id
+      snapshot_id: item.snapshot_id,
+      collaborative: item.collaborative,
+      public: item.public,
+      owner_id: item.owner.id
     }));
 
     playlists.push(...simplified);
@@ -480,6 +482,30 @@ const addTrackToPlaylist = async (playlist, track) => {
   }
 };
 
+const addTracksToPlaylist = async (playlist, tracks) => {
+  const url = `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      uris: tracks.map(t => t.uri), // example: ['spotify:track:4uLU6hMCjMI75M1A2tKUQC']
+    }),
+  });
+
+  if (!response.ok) {
+    errorHandler();
+
+    const error = await response.json();
+    console.error('Failed to add track:', error);
+  } else {
+    return await response.json();
+    console.log('Track added successfully!');
+  }
+};
+
 const changeTrackPosition = async (playlistId, oldIndex, newIndex) => {
   const url = `https://api.spotify.com/v1/playlists/${playlistId}/tracks`;
 
@@ -605,9 +631,9 @@ const getAccessTokenByAuthorizationCode = async (code) => {
   return data;
 }
 
-const savePlaylistInfo = async (playlist, name, description) => {
-
+const savePlaylistInfo = async (playlist, name, description, isPublic = true, isCollaborative = true) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}`;
+  
   const response = await fetch(url, {
     method: 'PUT',
     headers: {
@@ -617,12 +643,18 @@ const savePlaylistInfo = async (playlist, name, description) => {
     body: JSON.stringify({
       name: name,
       description: description,
+
     }),
   });
 
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(`Failed to update playlist: ${errorData.error.message}`);
+  }
 
-  return  response;
+  return response;
 };
+
 
 const createPlaylist = async (name, description) => {
   const userId = localStorage.getItem('userId');
@@ -652,7 +684,10 @@ const createPlaylist = async (name, description) => {
     snapshot_id: data.snapshot_id,
     count: 0,
     uri: data.uri,
-    type: "playlist"
+    type: "playlist",
+    owner_id: userId,
+    public: data.public,
+    collaborative: data.collaborative
   }
 
   if (response.ok) {
@@ -748,6 +783,7 @@ export default {
   getFullPlaylists,
   updateLibrary,
   addTrackToPlaylist,
+  addTracksToPlaylist,
   removeTrackFromPlaylist,
   refreshAccessToken,
   getAccessTokenByAuthorizationCode,

@@ -1113,13 +1113,15 @@ code {
 .panel-main {
   width: 50%;
   padding: 1px;
-  background-color: #202020;
+  background-color: #282828;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
-  margin: 5px;
+  /* margin: 5px; */
   overflow-x: hidden;
   overflow-y: hidden;
+  margin-top: 5px;
+  margin-bottom: 5px;
 }
 .panel-image {
   position: fixed;
@@ -1675,9 +1677,19 @@ button:active {
   border-radius: 5px;
   cursor: pointer;
   color: #e2e2e2;
+  border: 1px solid #3f3f3f;
 }
 .player-button:hover {
-  background-color: #487ca9;
+  background-color: #7573732e;
+}
+.player-button:active {
+  /* Makes the button look pressed */
+  transform: translateY(2px);
+  /* Moves it slightly down */
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
+  /* Optional: inner shadow */
+  background-color: #5a59592e;
+  /* Slightly darker background on press */
 }
 .player-button-mobile {
   margin: 0px;

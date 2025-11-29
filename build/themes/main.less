@@ -188,16 +188,16 @@ code {
 .panel-main {
 
     width: 50%;
-    // border: 1px solid darken(@primary-color, 2%);
-    // overflow-y: auto;
     padding: 1px;
-    background-color: lighten(@primary-color, 5%);
+    background-color: #282828;
     text-wrap: auto;
     border-radius: 10px;
     /* border: 4px solid white; */
-    margin: 5px;
+    /* margin: 5px; */
     overflow-x: hidden;
     overflow-y: hidden;
+    margin-top: 5px;
+    margin-bottom: 5px;
 
 }
 
@@ -765,12 +765,19 @@ button:active {
     border-radius: 5px;
     cursor: pointer;
     color: @player-color;
+    border: 1px solid #3f3f3f;
 }
 
 .player-button:hover {
-    background-color: lighten(@player-background-color, 7%);
+    background-color: #7573732e;
 }
 
+.player-button:active {
+    /* Makes the button look pressed */
+    transform: translateY(2px); /* Moves it slightly down */
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2); /* Optional: inner shadow */
+    background-color: #5a59592e; /* Slightly darker background on press */
+}
 
 .player-button-mobile {
     margin: 0px;

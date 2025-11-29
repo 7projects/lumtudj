@@ -9,7 +9,7 @@ import Marquee from "react-fast-marquee";
 import { useLongPress } from 'use-long-press';
 import useAppStore from '../AppStore';
 import DeleteIcon from '@mui/icons-material/Delete';
-
+import api from '../Api';
 
 export default function SpotifyPlayer({
   locked,
@@ -160,12 +160,12 @@ export default function SpotifyPlayer({
   // Play a track
   const playTrack = async (trackId) => {
     if (!trackId || !deviceId || !tokenRef.current) return;
-
+    setArtist(null);
     trackIdRef.current = trackId;
     trackEndedFor.current = null; // reset for new track
     setLoadingTrack(true);
     setPosition(0);
-
+    getArtist();
     try {
       await fetch(`https://api.spotify.com/v1/me/player/play?device_id=${deviceId}`, {
         method: "PUT",
@@ -178,6 +178,11 @@ export default function SpotifyPlayer({
       setLoadingTrack(false);
     }
   };
+
+  const getArtist = async () => {
+    const info = await api.getArtistInfo(track.artists[0].id);
+    setArtist(info);
+  }
 
   const pauseTrack = async (e) => {
     e.stopPropagation();
@@ -246,6 +251,8 @@ export default function SpotifyPlayer({
     playerRef.current?.setVolume(vol);
   };
 
+  const [artist, setArtist] = useState(null);
+
   // Play new track when track prop changes
   useEffect(() => {
     if (track && playerReady) playTrack(track.id);
@@ -254,11 +261,13 @@ export default function SpotifyPlayer({
   // -------------------------------
   // Render mobile/desktop
   // -------------------------------
-  const { setDragTrack, setDragSource, setMenuAnchor, library, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+  const { setDragTrack, setDragSource, playedFrom, setMenuAnchor, library, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
 
   return (
-    <div style={{ width: "100%", textAlign: "center", bottom: 0, position: "absolute" }} {...longPressHandler()} onClick={onClick}>
+    <div style={{ width: "100%", textAlign: "center", position: "absolute" }} {...longPressHandler()} onClick={onClick}>
+
+
       {isMobile() ? (
         <table style={{ width: "100%", height: "100%" }}>
           <tbody>
@@ -329,48 +338,65 @@ export default function SpotifyPlayer({
       ) : (
 
         <div className="parent">
-          <div className="div1">
-            <img
-              src={track && track.album && (track.album.images[2].url || track.album.images[1].url || track.album.images[0].url)}
-              style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: 8 }}
-            />
-          </div>
-          <div className="div2" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
-            {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
-            {track && track.name}<br></br>
-            {playlists && playlists.map((p) =>
-              <div key={p.id} className='littleBulbOn'>
+          <div className="div1" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
+            <table>
+              <tr>
+                <td>
 
-              </div>
-            )
-            }
+                  {!artist ?
+                    <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke"}}>
+                      <div className="loader"></div>
+                    </div>
+
+                    :
+                    <img
+                      src={artist?.images?.[0]?.url}
+                      style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
+
+                    />}
+                </td>
+                <td style={{ textAlign: "left", paddingLeft: 10 }}>
+                  {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
+                  {track && track.name}<br></br>
+                  {playlists && playlists.map((p) =>
+                    <div key={p.id} className='littleBulbOn'>
+
+                    </div>
+                  )
+                  }
+                </td>
+              </tr>
+            </table>
           </div>
-          <div className="div3">
+          <div className="div2">
             <table style={{ width: "100%" }}>
               <tbody>
                 <tr>
                   <td style={{ textAlign: "right", padding: 10, width: "40px" }}>{formatTime(position)}</td>
                   <td>
                     <div className="player-progress-bar" id="progressBar" onClick={seek}>
+
                       <div className="player-progress-bar-fill" style={{ width: `${(position / duration) * 100}%` }}></div>
                     </div>
                   </td>
                   <td style={{ textAlign: "left", padding: 10, width: "40px" }}>{formatTime(duration)}</td>
                 </tr>
+                <tr>
+                  <td colSpan={3} style={{ textAlign: "center" }}>
+                    <div className="player-buttons">
+                      <div className="player-button" onClick={prev}><SkipPreviousIcon /></div>
+                      {paused ?
+                        <div className="player-button" onClick={resumeTrack}><PlayCircleOutlineIcon /></div> :
+                        <div className="player-button" onClick={pauseTrack}><PauseCircleOutlineIcon /></div>}
+                      <div className="player-button" onClick={next}><SkipNextIcon /></div>
+                    </div>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
-          <div className="div4">
-            <div className="player-buttons">
-              <div className="player-button" onClick={prev}><SkipPreviousIcon /></div>
-              {paused ?
-                <div className="player-button" onClick={resumeTrack}><PlayCircleOutlineIcon /></div> :
-                <div className="player-button" onClick={pauseTrack}><PauseCircleOutlineIcon /></div>}
-              <div className="player-button" onClick={next}><SkipNextIcon /></div>
-            </div>
-          </div>
-          <div className="div5"> </div>
-          <div className="div6" style={{ paddingRight: 20 }}>
+
+          <div className="div3" style={{ paddingRight: 20, textAlign: "right" }}>
 
             {/* {dragTrack ?
               <div onDragOver={(e) => e.stopPropagation()}>
@@ -380,6 +406,7 @@ export default function SpotifyPlayer({
             } */}
 
             <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
+
           </div>
 
           {/* <Marquee style={{ fontSize: 73, position: "absolute", fontWeight: "bold", color: "#4545451c", zIndex: 1 }}>

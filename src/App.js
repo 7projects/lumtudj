@@ -82,10 +82,12 @@ function useConstructor(callback) {
 
 
 function App() {
-  const { menuAnchor, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+  const { menuAnchor, playedFrom, setPlayedFrom, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
   const [contextMenu, setContextMenu] = useState(null);
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
+
+  const [shufflePlaylist, setShufflePlaylist] = useState(false);
 
   const urlParams = new URLSearchParams(window.location.search);
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -128,8 +130,9 @@ function App() {
 
   const [showPlaylistInfo, setShowPlaylistInfo] = useState(false);
 
-  const [showNewPlaylistInfo, setShowNewPlaylistInfo] = useState(false);
+  const [showPlaylistSaveAs, setShowPlaylistSaveAs] = useState(false);
 
+  const [showNewPlaylistInfo, setShowNewPlaylistInfo] = useState(false);
 
   const inputBuffer = useRef();
 
@@ -458,7 +461,7 @@ function App() {
           //brišemo iz adress url /?code=wr4ri489f9334....
           window.history.replaceState({}, document.title, window.location.pathname);
           window.location = "/#tab1";
-  
+
           setToken(data.access_token)
           window.localStorage.setItem("token", data.access_token);
           getPlaylistsAndAlbums();
@@ -466,7 +469,7 @@ function App() {
           if (data.refresh_token) {
             localStorage.setItem('refresh_token', data.refresh_token);
           }
- 
+
         }
       } else {
 
@@ -478,7 +481,7 @@ function App() {
           //   setToken(data.access_token);
 
         } else {
- 
+
           setToken(localStorage.getItem("token"));
         }
       }
@@ -669,7 +672,7 @@ function App() {
         }
 
         saveLibrary(updatedPlaylists);
-  
+
         await getPlaylistsAndAlbums(); // Reload playlists from IndexedDB
         setLoadingLibrary(null);
       }
@@ -1004,8 +1007,9 @@ function App() {
     // }
   }
 
-  const play = async (track) => {
+  const play = async (track, plFrom) => {
 
+    setPlayedFrom(plFrom);
     // alert("play");
 
     console.log(track);
@@ -1032,6 +1036,7 @@ function App() {
   }
 
   const nextTrack = async (cached) => {
+    setPlayedFrom("");
     // if (playPosition == "playlist") {
     //   setPlayIndex(playIndex + 1);
     //   play(playlist[playIndex + 1]);
@@ -1043,15 +1048,20 @@ function App() {
     if (playlistTracks.length > 0) {
       let pl = [...playlistTracks];
 
-
-      flyToPlayer("pl0-" + pl[0].id);
-
-
-      play(pl[0]);
-
-      pl.shift();
-      setPlaylistTracks(pl);
-      return;
+      if (shufflePlaylist) {
+        const randomIndex = Math.floor(Math.random() * pl.length);
+        play(pl[randomIndex]);
+        flyToPlayer("pl" + randomIndex + "-" + pl[randomIndex].id);
+        pl.splice(randomIndex, 1);
+        setPlaylistTracks(pl);
+        return;
+      } else {
+        flyToPlayer("pl0-" + pl[0].id);
+        play(pl[0]);
+        pl.shift();
+        setPlaylistTracks(pl);
+        return;
+      }
     }
 
 
@@ -1097,9 +1107,7 @@ function App() {
 
     randomTrIndex = pl.tracks.indexOf(tr);
 
-
-
-    play(pl.tracks[randomTrIndex]);
+    play(pl.tracks[randomTrIndex], pl.name);
   }
 
 
@@ -1348,13 +1356,16 @@ function App() {
     setDragSourceIndex(-1);
   }
 
-  const onPlaylistInfoSave = async (playlist, name, description) => {
-    const result = await api.savePlaylistInfo(playlist, name, description);
+  const onPlaylistInfoSave = async (playlist, name, description, isPublic, collaborative) => {
+    const result = await api.savePlaylistInfo(playlist, name, description, isPublic, collaborative);
     if (result.ok) {
       let pls = [...library];
       let pl = pls.find(x => x.id == playlist.id);
       pl.name = name;
       pl.description = description;
+      pl.public = isPublic;
+      pl.collaborative = collaborative;
+
       setLibrary(pls);
       // setFilteredLibrary(pls);
       saveLibrary(pls);
@@ -1372,6 +1383,22 @@ function App() {
       // setFilteredLibrary(pls);
       saveLibrary(pls);
       setSelectedLibraryItem(newPl);
+    }
+  }
+
+  const savePlaylistAs = async (pl, name, description, isPublic, collaborative) => {
+    debugger;
+    const newPl = await api.createPlaylist(name, description, isPublic, collaborative);
+    const result = await api.addTracksToPlaylist(newPl, playlistTracks);
+    if (result) {
+      newPl.snapshot_id = result.snapshot_id;
+      newPl.count = playlistTracks.length;
+      newPl.tracks = [...playlistTracks];
+      let pls = [...library];
+      pls.unshift(newPl);
+      setLibrary(pls);
+      setFilteredLibrary(myShazamTracksPl, lastListenedPl, pls);
+      saveLibrary(pls);
     }
   }
 
@@ -1425,7 +1452,11 @@ function App() {
   const onLibraryItemContextMenu = (e, playlist, index) => {
     loadPlaylistPrev(playlist);
     let items = [];
-    items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true) });
+
+    let userID = localStorage.getItem("userId");
+
+    if (playlist.owner_id == userID)
+      items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true) });
 
 
     if (playlist.type == "playlist")
@@ -1470,8 +1501,9 @@ function App() {
 
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
-    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
+    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
+
     items[1].items = [
       { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
       { label: "Albums", onClick: async () => { }, onEnter: (track) => loadCtxAlbums(track) }
@@ -1677,6 +1709,10 @@ function App() {
               Clear playlist
             </MenuItem> : null}
 
+          {menuAnchor.getAttribute("menu-target") == "playlist" ?
+            <MenuItem onClick={() => setShowPlaylistSaveAs(true)}>
+              Save as
+            </MenuItem> : null}
 
 
         </Menu>
@@ -1705,6 +1741,11 @@ function App() {
       {
         showNewPlaylistInfo ?
           <PlaylistInfo title="New playlist" onSave={onNewPlaylistInfoSave} onClose={(() => setShowNewPlaylistInfo(false))}></PlaylistInfo> : null
+      }
+
+      {
+        showPlaylistSaveAs ?
+          <PlaylistInfo title="New playlist" onSave={savePlaylistAs} onClose={(() => setShowPlaylistSaveAs(false))}></PlaylistInfo> : null
       }
 
       {
@@ -1973,10 +2014,8 @@ function App() {
 
                           {/* <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button> */}
 
-                          {mode == "normal" ?
-                            <button className='header-button-small' onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button> : null}
 
-                          <button className='header-button-small' onClick={toggleMode}><LiquorIcon></LiquorIcon></button>
+                          {/* <button className='header-button-small' onClick={toggleMode}><LiquorIcon></LiquorIcon></button> */}
 
                           {/* <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button> */}
                           {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
@@ -2012,6 +2051,10 @@ function App() {
                           : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
                         <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+
+                        {mode == "normal" ?
+                          <button className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button> : null}
+
 
                         <button
                           style={{ height: 40, float: "right" }}
@@ -2090,6 +2133,8 @@ function App() {
                     </div>
                     <div className='toolbar-icons'>
                       {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
+                      <svg onClick={() => setShufflePlaylist(!shufflePlaylist)} className={shufflePlaylist ? "bulbOnColor" : "bulbOffColor"} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path d="M237.66 178.34a8 8 0 0 1 0 11.32l-24 24a8 8 0 0 1-11.32-11.32L212.69 192h-11.75a72.12 72.12 0 0 1-58.59-30.15l-41.72-58.4A56.1 56.1 0 0 0 55.06 80H32a8 8 0 0 1 0-16h23.06a72.12 72.12 0 0 1 58.59 30.15l41.72 58.4A56.1 56.1 0 0 0 200.94 176h11.75l-10.35-10.34a8 8 0 0 1 11.32-11.32ZM143 107a8 8 0 0 0 11.16-1.86l1.2-1.67A56.1 56.1 0 0 1 200.94 80h11.75l-10.35 10.34a8 8 0 0 0 11.32 11.32l24-24a8 8 0 0 0 0-11.32l-24-24a8 8 0 0 0-11.32 11.32L212.69 64h-11.75a72.12 72.12 0 0 0-58.59 30.15l-1.2 1.67A8 8 0 0 0 143 107Zm-30 42a8 8 0 0 0-11.16 1.86l-1.2 1.67A56.1 56.1 0 0 1 55.06 176H32a8 8 0 0 0 0 16h23.06a72.12 72.12 0 0 0 58.59-30.15l1.2-1.67A8 8 0 0 0 113 149Z" />
+                      </svg>
                       <MoreVertIcon onClick={handleMenu} menu-target="playlist" className='toolbar-button'></MoreVertIcon>
                     </div>
                   </div>

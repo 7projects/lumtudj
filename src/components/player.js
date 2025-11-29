@@ -584,10 +584,10 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                                     </td>
                                                     <td>
                                                         <div className='player-buttons'>
-                                                            <div className='player-button' onClick={prev}><SkipPreviousIcon /></div>
-                                                            {playerState != "playing" ? <div className='player-button' onClick={resumeTrack}><PlayCircleOutlineIcon /></div> : null}
-                                                            {playerState == "playing" ? <div className='player-button' onClick={pauseTrack}><PauseCircleOutlineIcon /></div> : null}
-                                                            <div className='player-button' onClick={next}><SkipNextIcon /></div>
+                                                            <button className='player-button' onClick={prev}><SkipPreviousIcon /></button>
+                                                            {playerState != "playing" ? <button className='player-button' onClick={resumeTrack}><PlayCircleOutlineIcon /></button> : null}
+                                                            {playerState == "playing" ? <button className='player-button' onClick={pauseTrack}><PauseCircleOutlineIcon /></button> : null}
+                                                            <button className='player-button' onClick={next}><SkipNextIcon /></button>
                                                             {/* <br></br>
                                                             player state: {playerState} */}
                                                             {/* <button className='player-button' onClick={resumeTrack}><RepeatIcon /></button>
