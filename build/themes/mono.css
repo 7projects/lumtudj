@@ -2461,8 +2461,7 @@ button:active {
   font-weight: bold;
 }
 .react-tabs__tab--selected {
-  font-weight: bold;
-  border: none;
+  text-decoration: underline ;
 }
 .reconnecting-container {
   position: fixed;
@@ -2485,17 +2484,16 @@ button:active {
 }
 .reconnecting-dots {
   font-family: sans-serif;
-  font-size: 10px;
+  font-size: 20px;
   font-weight: 500;
-  color: #505050;
-  background: #1f1f1f;
-  padding: 5px;
+  color: red;
+  background: black;
+  padding: 50px;
   /* border: 2px solid gray; */
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
   font-family: monospace, Sans-serif;
-  padding-left: 20px;
 }
 .reconnecting-dots span {
   color: white;

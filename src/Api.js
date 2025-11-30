@@ -589,7 +589,7 @@ const refreshAccessToken = async () => {
     // alert("Token refreshed successfully!");
 
     if (timeLeft < 1) {
-      window.location.reload();
+      // window.location.reload();
     }
 
   } else {

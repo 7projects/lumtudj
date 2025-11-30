@@ -1772,9 +1772,13 @@ button:active {
 }
 
 .react-tabs__tab--selected {
-    font-weight: bold;
+    // background-color: @bulb-on-color;
+    // border: 1px solid darken(@bulb-on-color, 10%);
+    // color: @bulb-off-color;
+    // border-radius: 5px;
+    // text-shadow: 0 0 5px 1px lighten(@bulb-on-color, 10%);
     
-    border: none;
+    text-decoration: underline ;
 }
 
 .reconnecting-container {
@@ -1797,34 +1801,34 @@ button:active {
     /* optional overlay */
 }
 
-// .reconnecting-dots {
-//     font-family: sans-serif;
-//     font-size: 20px;
-//     font-weight: 500;
-//     color: red;
-//     background: black;
-//     padding: 50px;
-//     /* border: 2px solid gray; */
-//     border-radius: 20px;
-//     color: white;
-//     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-//     font-family: @font-family;
-// }
-
 .reconnecting-dots {
     font-family: sans-serif;
-    font-size: 10px;
+    font-size: 20px;
     font-weight: 500;
-    color: @bulb-off-color;
-    background: @button-background-color;
-    padding: 5px;
+    color: red;
+    background: black;
+    padding: 50px;
     /* border: 2px solid gray; */
     border-radius: 20px;
     color: white;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
     font-family: @font-family;
-    padding-left: 20px;;
 }
+
+// .reconnecting-dots {
+//     font-family: sans-serif;
+//     font-size: 10px;
+//     font-weight: 500;
+//     color: @bulb-off-color;
+//     background: @button-background-color;
+//     padding: 5px;
+//     /* border: 2px solid gray; */
+//     border-radius: 20px;
+//     color: white;
+//     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+//     font-family: @font-family;
+//     padding-left: 20px;;
+// }
 
 .reconnecting-dots span {
     color: white;

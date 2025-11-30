@@ -192,14 +192,28 @@ function App() {
   }
 
   useEffect(() => {
+    const init = async () => {
+      const user = localStorage.getItem("userId");
+      const token = localStorage.getItem("token");
+
+      if (api.shouldRefreshToken() && token && user) {
+        setReconnecting(true);
+        await refreshAccessToken();
+        setReconnecting(false);
+      }
+
+      if (!intervalRef.current) startTimer();
+    };
+
+    init();
+
     // cleanup on unmount
     return () => clearInterval(intervalRef.current);
   }, []);
 
 
+
   useEffect(() => {
-    if (!intervalRef.current)
-      startTimer();
 
   }, [token]);
 
@@ -302,9 +316,9 @@ function App() {
   const [reconnecting, setReconnecting] = useState(false);
 
   const refreshAccessToken = async () => {
-    setReconnecting(true);
+
+    debugger;
     let data = await api.refreshAccessToken();
-    setReconnecting(false);
     if (data.access_token) {
       setToken(data.access_token);
     }
@@ -1812,15 +1826,20 @@ function App() {
         onClose={() => setSnackbarMessage("")}
       />
 
-      {isMobile() ?
-        <div
-          className="reconnecting-container"
-          style={{ zIndex: 99999, display: reconnecting ? "flex" : "none" }}
-        >
-          <div className="reconnecting-dots">
-            reconnecting<span>.</span><span>.</span><span>.</span>
-          </div>
-        </div> : null}
+
+      <div
+        className="reconnecting-container"
+        style={{ zIndex: 99999, display: reconnecting ? "flex" : "none" }}
+      >
+
+        <div className="reconnecting-dots">
+          <img
+            src={process.env.PUBLIC_URL + '/logo.png'}
+            style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
+          />
+          connecting to Spotify<span>.</span><span>.</span><span>.</span>
+        </div>
+      </div>
 
       <canvas id="field" className="universe"></canvas>
 
@@ -1833,6 +1852,10 @@ function App() {
             </div>
             :
             <div className='menu-container' style={{ height: "100vh" }}>
+              <img
+                src={process.env.PUBLIC_URL + '/logo.png'}
+                style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
+              />
               <button style={{ fontSize: 20 }} onClick={handleLogin}>Login with Spotify</button>
             </div>
 
@@ -1932,11 +1955,13 @@ function App() {
 
                       <Activity mode={tab == "2" ? "visible" : "hidden"}>
                         <div className="toolbar-wrapper">
-                          <SearchIcon className="search-icon" />
+                          {/* <SearchIcon className="search-icon" /> */}
                           <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                         </div>
                         <div className="panel-search-mobile">
-                          {getTracksPanel()}
+                          <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
+
                         </div>
                       </Activity>
 
@@ -1997,15 +2022,12 @@ function App() {
                       <td >
                         <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
 
-                          {reconnecting ?
-                            <div className="reconnecting-dots">
-                              reconnecting<span>.</span><span>.</span><span>.</span>
-                            </div> :
-                            <div onContextMenu={handleMenu} className='app-title'>
-                              <span>LUMTU</span>
-                              <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
-                              {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
-                            </div>}
+
+                          <div onContextMenu={handleMenu} className='app-title'>
+                            <span>LUMTU</span>
+                            <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
+                            {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                          </div>
 
 
                           {mode == "compact" ?
@@ -2117,10 +2139,10 @@ function App() {
                           <input ref={inputRef} className="toolbar-input-search" placeholder="Search" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                         </div>
 
-                        {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null}
+                        {/* {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null} */}
 
                         <div className='toolbar-icons'>
-                          <SwapVertIcon className='toolbar-button'></SwapVertIcon>
+                          {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
                           <MoreVertIcon onClick={handleMenu} menu-target="tracks" className='toolbar-button'></MoreVertIcon>
                         </div>
                       </> : null}

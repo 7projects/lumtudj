@@ -1,35 +1,42 @@
 @import "main.less";
-@primary-color: rgb(255, 255, 255);
+// Modern Light Blue Theme (Ice Blue + White + Soft Gray)
 
-@background-color: @primary-color;
+@primary-color: #ffffff;                       // pure white base
+@background-color: #f3f8ff;                    // very light ice-blue wash
 
-@logo-color: rgb(58, 58, 58);
-@logo-shadow-color: rgb(153, 153, 153);
+@logo-color: #0d3b66;                          // deep ocean blue
+@logo-shadow-color: #7cc8ff;                   // bright icy glow
 
-@track-row-background-color: rgb(240, 240, 240);
-@track-row-color: rgb(94, 94, 94);
-@track-row-border-bottom-color: #ececec;
+@track-row-background-color: #ffffff;
+@track-row-color: #1c1c1c;                     // crisp readable text
+@track-row-border-bottom-color: #d8e6f5;       // soft blue-gray divider
 
-@button-background-color: rgba(0,0,0,0.05);
-@button-color: rgb(58, 58, 58);
+@button-background-color: #e7f2ff;             // pale sky-blue
+@button-color: #0d3b66;                        // deep blue text
 
-@scrollbar-background-color: rgb(240, 240, 240);
-@scrollbar-thumb-color: #dadada;
+@scrollbar-background-color: #e0ecf7;
+@scrollbar-thumb-color: #b7d4ee;               // frosty blue-gray
 
-@bulb-off-color: #a7a7a7;
-@bulb-on-color: #7fe2ff;
+@bulb-off-color: #2e2e2e;
+@bulb-on-color: #4dbbff;                       // bright ice blue
 
-@player-background-color: #a5a5a5;
-@player-slider-background-color: rgb(163, 163, 163);
-@player-color: rgb(31, 31, 31);
-@player-gradient1: rgb(255, 255, 255);
-@player-gradient2:  rgb(241, 241, 241);
+@player-background-color: #ffffff;
+@player-slider-background-color: #4dbbff;      // ice blue slider
+@player-color: #1c1c1c;
+@player-gradient1: #d8eefe;                    // subtle top gradient
+@player-gradient2: #f3f8ff;                    // lighter bottom blend
 
-@loader-color1: rgb(31, 240, 118);
-@loader-color2: #8f8f8f;
-@loader-text-color: #868686;
+@loader-color1: #4dbbff;
+@loader-color2: #c7dff3;
+@loader-text-color: #8ea3b8;
 
-@search-input-background-color: #ececec;
-@search-input-color: rgb(58, 58, 58);
+@search-input-background-color: #ffffff;
+@search-input-color: #0d3b66;
 
-@font-family: Monospace, Sans-serif;
+@selected-background-color: #e7f2ff;           // light blue highlight
+@selected-color: @track-row-color;
+
+@panel-background-color: #eef5ff;              // panel blue-tinted white
+@panel-color: @track-row-color;
+
+@font-family: monospace, Sans-serif;

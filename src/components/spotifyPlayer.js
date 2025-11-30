@@ -11,6 +11,7 @@ import useAppStore from '../AppStore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../Api';
 
+
 export default function SpotifyPlayer({
   locked,
   token,
@@ -344,9 +345,11 @@ export default function SpotifyPlayer({
                 <td>
 
                   {!artist ?
-                    <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid #313131" }}>
-                      <div className="loader"></div>
-                    </div>
+                    <img
+                      src={process.env.PUBLIC_URL + '/logo.png'}
+                      style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent" }}
+
+                    />
 
                     :
                     <img
@@ -355,7 +358,7 @@ export default function SpotifyPlayer({
 
                     />}
                 </td>
-                <td style={{ textAlign: "left", paddingLeft: 10 }}>
+                <td style={{ textAlign: "left", paddingLeft: 10, height: 100 }}>
                   {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
                   {track && track.name}<br></br>
                   {playlists && playlists.map((p) =>
@@ -364,10 +367,11 @@ export default function SpotifyPlayer({
                     </div>
                   )
                   }
-                  {playedFrom ?
-                    <div style={{fontSize:10}}>
-                      playing from {playedFrom}
-                    </div> : null}
+
+                  <div style={{ fontSize: 10, height: 16 }}>
+                    {playedFrom ?
+                      <>playing from {playedFrom}</> : null}
+                  </div>
                 </td>
               </tr>
             </table>
@@ -409,7 +413,7 @@ export default function SpotifyPlayer({
               <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
             } */}
 
-            <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px" }} />
+            <input type="range" min={0} max={100} onClick={e => e.stopPropagation()} onChange={e => { setVolume(e.target.value * 0.01); e.stopPropagation(); }} style={{ width: "100%", maxWidth: "120px", marginTop: 45 }} />
 
           </div>
 
