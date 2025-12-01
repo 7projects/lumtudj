@@ -199,6 +199,7 @@ function App() {
       if (api.shouldRefreshToken() && token && user) {
         setReconnecting(true);
         await refreshAccessToken();
+        window.location.reload();
         setReconnecting(false);
       }
 
