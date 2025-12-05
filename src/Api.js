@@ -82,6 +82,7 @@ const getAuthUrl = async () => {
     'playlist-read-collaborative',
     'playlist-modify-public',
     'playlist-modify-private',
+    'user-library-modify',
 
   ];
 
@@ -123,6 +124,25 @@ const search = async (query) => {
   return data.tracks.items;
 };
 
+const simplifiPlaylist = (item) => {
+
+  debugger;
+  return {
+    id: item.id,
+    name: item.name,
+    count: item.tracks.total,     // total number of tracks
+    images: item.images,          // array of image objects
+    tracks: [],                   // you can fill this later with actual track data
+    uri: item.uri,
+    snapshot_id: item.snapshot_id,
+    collaborative: item.collaborative,
+    public: item.public,
+    owner_id: item.owner.id,
+    shuffle: 0,
+    type: "playlist"
+  };
+};
+
 const getPlaylists = async () => {
   // let data = await request('/me/playlists');
 
@@ -142,19 +162,7 @@ const getPlaylists = async () => {
 
     const data = await response.json();
 
-    const simplified = data.items.map(item => ({
-      id: item.id,
-      name: item.name,
-      count: item.tracks.total,     // total number of tracks
-      images: item.images,          // array of image objects
-      tracks: [],                   // you can fill this later with actual track data
-      uri: item.uri,
-      snapshot_id: item.snapshot_id,
-      collaborative: item.collaborative,
-      public: item.public,
-      owner_id: item.owner.id,
-      shuffle: 0
-    }));
+    const simplified = data.items.map(item => simplifiPlaylist(item));
 
     playlists.push(...simplified);
     url = data.next; // Spotify gives the next page URL, or null
@@ -170,6 +178,12 @@ const getPlaylists = async () => {
   playlists = playlists.filter(playlist => playlist.name !== 'My Shazam Tracks');
 
   return playlists;
+};
+
+const searchAlbums = async (query) => {
+  let data = await request(`/search?q=${query}&type=album`);
+  const simplified = data.albums.items.map(item => simplifiAlbum(item));
+  return simplified;
 };
 
 const getAlbums = async () => {
@@ -191,21 +205,9 @@ const getAlbums = async () => {
 
     const data = await response.json();
 
-    const simplified = data.items.map(item => ({
-      id: item.album.id,
-      addedAt: item.added_at,
-      name: item.album.name,
-      artists: item.album.artists,
-      release_date: item.album.release_date,
-      count: item.album.total_tracks,
-      albumUrl: item.album.external_urls.spotify,
-      images: item.album.images,
-      tracks: [],
-      uri: item.album.uri,
-      snapshot_id: item.snapshot_id,
-      shuffle: 0
-    }));
-
+    debugger;
+    const simplified = data.items.map(item => simplifiAlbum(item));
+    debugger;
     albums.push(...simplified);
 
     url = data.next; // Spotify gives the next page URL, or null
@@ -213,6 +215,25 @@ const getAlbums = async () => {
 
   return albums;
 };
+
+const simplifiAlbum = (item) => {
+  return {
+    id: item.id || item.album?.id,
+    addedAt: item.added_at || item.album?.added_at,
+    name: item.name || item.album?.name,
+    artists: item.artists || item.album?.artists,
+    release_date: item.release_date || item.album?.release_date,
+    count: item.total_tracks || item.album?.total_tracks,
+    albumUrl: item.external_urls?.spotify || item.album?.external_urls?.spotify,
+    images: item.images || item.album?.images,
+    tracks: [],
+    uri: item.uri || item.album?.uri,
+    snapshot_id: item.snapshot_id || item.album?.snapshot_id,
+    shuffle: 0,
+    type: "album"
+  };
+}
+
 
 const getTracks = async (playlistID, limit) => {
   let tracks = [];
@@ -361,6 +382,8 @@ const updateAlbums = async (albums, callback) => {
   ;
   return fullAlbums;
 }
+
+
 
 
 const getTopTracks = async () => {
@@ -635,7 +658,7 @@ const getAccessTokenByAuthorizationCode = async (code) => {
 
 const savePlaylistInfo = async (playlist, name, description, isPublic = true, isCollaborative = true) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}`;
-  
+ debugger;
   const response = await fetch(url, {
     method: 'PUT',
     headers: {
@@ -747,6 +770,28 @@ const unfollowAlbum = async (album) => {
   return { ok: true };
 };
 
+const followAlbum = async (album) => {
+  const url = `https://api.spotify.com/v1/me/albums?ids=${album.id}`;
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${await getToken()}`,
+      "Content-Type": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    errorHandler();
+    const error = await response.json();
+    console.error("Failed to follow album:", error);
+    return null;
+  }
+
+  return { ok: true };
+};
+
+
+
 const unfollowArtist = async (artist) => {
   const url = `https://api.spotify.com/v1/me/following?type=artist&ids=${artist.id}`;
 
@@ -801,7 +846,11 @@ export default {
   createPlaylist,
   deletePlaylist,
   unfollowAlbum,
-  unfollowArtist
+  unfollowArtist,
+  searchAlbums,
+  followAlbum,
+  simplifiPlaylist,
+  simplifiAlbum,
 };
 
 

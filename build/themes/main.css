@@ -572,433 +572,6 @@
   font-display: swap;
   src: url(https://fonts.gstatic.com/s/flowcircular/v15/lJwB-pc4j2F-H8YKuyvfxdZ45ic.ttf) format('truetype');
 }
-@font-face {
-  font-family: 'Anton';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/anton/v27/1Ptgg87LROyAm0K0.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 100;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFOOOezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFuOKezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFZuKezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFOOKezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFCuKezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphF5uWezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphF3-Wezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFuOWezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Doto';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/doto/v3/t5tJIRMbNJ6TQG7Il_EKPqP9zTnvqqGNcuvLMt1JIphFkeWezw.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 100;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHTmbUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHbmaUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHWeaUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHTmaUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHQuaUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHeedUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHd6dUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHbmdUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Handjet';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/handjet/v22/oY1n8eXHq7n1OnbQrOY_2FrEwYEMLlcdP1mCtZaLaTutCwcIhGZ0lGU0akFcO3XFHZCdUkU.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Major Mono Display';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/majormonodisplay/v18/RWmVoLyb5fEqtsfBX9PDZIGr2tFubRhLCg.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNiLXA3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNi83A3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNirXA3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNin3A3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNic3c3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNiSnc3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNiLXc3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: italic;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXK3I6Li01BKofIMPyPbj8d7IEAGXNiBHc3ig.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDDshRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDOUhRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDLshRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDIkhRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDGUmRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDFwmRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDDsmRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Nunito';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/nunito/v32/XRXI3I6Li01BKofiOc5wtlZ2di8HDBImRTM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G83JfniM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G80XfniM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G81JfniM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G817fniM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G82XeXiM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G82ueXiM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Oxanium';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/oxanium/v21/RrQPboN_4yJ0JmiMUW7sIGjd1IA9G83JeXiM.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 100;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLirETNbFtZCeGqgRXXQwHoLA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ63JDMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ8nKDMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLgrETNbFtZCeGqgRXXe2U.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ5HLDMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ73MDMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ9nNDMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ8XODMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: italic;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLjrETNbFtZCeGqgRXXQ-HPDMA.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 100;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLgrETNbFtZCeGqgR2xe2U.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 200;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR0dWkXI.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 300;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR15WUXI.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 400;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLmrETNbFtZCeGqgSXV.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 500;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR0hWEXI.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 600;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR0NX0XI.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 700;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR1pXkXI.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 800;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR11XUXI.ttf) format('truetype');
-}
-@font-face {
-  font-family: 'Tomorrow';
-  font-style: normal;
-  font-weight: 900;
-  font-display: swap;
-  src: url(https://fonts.gstatic.com/s/tomorrow/v19/WBLhrETNbFtZCeGqgR1RXEXI.ttf) format('truetype');
-}
 :root {
   color-scheme: dark;
 }
@@ -1054,7 +627,7 @@ td {
 .context-menu {
   position: absolute;
   background: #1d1d1d;
-  z-index: 1000;
+  z-index: 99999;
   border-radius: 4px;
 }
 .context-menu div {
@@ -1102,7 +675,7 @@ code {
 .panel {
   flex: 1 1 0;
   padding: 1px;
-  background-color: #202020;
+  background-color: #4f4f4f;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
@@ -1113,7 +686,7 @@ code {
 .panel-main {
   width: 50%;
   padding: 1px;
-  background-color: #202020;
+  background-color: #4f4f4f;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
@@ -1174,9 +747,9 @@ code {
   /* Standard syntax */
   border-bottom: 1px solid #929292;
   background-color: transparent;
-  color: #f1f1f1;
   cursor: pointer;
-  background-color: #434343;
+  background-color: #373737;
+  color: #f1f1f1;
 }
 .playlists-row-mobile {
   background-color: transparent;
@@ -1205,11 +778,11 @@ code {
   user-select: none;
   border-bottom: 1px solid #363636;
   background-color: #0000002e;
-  color: #f1f1f1;
   border: 1px solid #141414;
   border-radius: 10px;
   margin: 3px;
-  background-color: #1616162e;
+  background-color: #373737;
+  color: #f1f1f1;
 }
 .playlists-name {
   font-weight: bold;
@@ -1378,10 +951,10 @@ code {
   /* Standard syntax */
   border-bottom: 1px solid #929292;
   background-color: transparent;
-  color: #f1f1f1;
   cursor: pointer;
   font-size: 18px;
-  background-color: #37373752;
+  background-color: #373737;
+  color: #f1f1f1;
 }
 .item-row-selected-mobile {
   align-items: center;
@@ -1395,10 +968,10 @@ code {
   /* Standard syntax */
   border-bottom: 1px solid #929292;
   background-color: transparent;
-  color: #f1f1f1;
   cursor: pointer;
   font-size: 18px;
-  background-color: #0000007a;
+  background-color: #373737;
+  color: #f1f1f1;
 }
 .track-row {
   align-items: center;
@@ -1427,9 +1000,9 @@ code {
   /* Standard syntax */
   border-bottom: 1px solid #929292;
   background-color: transparent;
-  color: #f1f1f1;
   cursor: pointer;
-  background-color: rgba(67, 67, 67, 0.2);
+  background-color: #373737;
+  color: #f1f1f1;
 }
 .track-row-playing {
   align-items: center;
@@ -2582,6 +2155,7 @@ button:active {
   gap: 10px;
   gap: 0.5rem;
   padding-left: 32px;
+  color: #e2e2e2;
 }
 .toolbar-search {
   display: flex;
@@ -2589,6 +2163,7 @@ button:active {
   flex: 1;
   /* takes remaining space */
   gap: 8px;
+  color: #e2e2e2;
 }
 .toolbar-input-search {
   flex: 1;

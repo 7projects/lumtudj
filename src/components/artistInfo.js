@@ -10,8 +10,8 @@ import PlaylistRow from "./playlistRow";
 // - Has a button to edit (opens Dialog)
 // - Dialog contains name + description inputs
 
-export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }) {
-    const { artistInfoPosition, setArtistInfoPosition, menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick, onArtistAlbumContextMenu, onArtistTrackContextMenu }) {
+    const { selectedArtistTrackIndex, setSelectedArtistTrackIndex, selectedArtistAlbumIndex, setSelectedArtistAlbumIndex, artistInfoPosition, setArtistInfoPosition, menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
 
     const isLocked = () => {
         let l = localStorage.getItem("locked") == "true";
@@ -36,12 +36,13 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }
     return (
 
         <Dialog
+            onMouseDown={() => setMenuPosition(null)}
             position={artistInfoPosition}
             onDragEnd={(pos) => { setArtistInfoPosition(pos); localStorage.setItem("artistInfoPosition", JSON.stringify(pos)); }}
             open={true}
             onClose={() => onClose?.()}
             title="Artist Info"
-            header={<div style={{ width: "100%", textAlign: "center", minHeight: "170px" }}>
+            header={<div onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center", minHeight: "170px" }}>
                 {!loadingArtistInfo ?
                     <>
                         <img draggable="false" className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
@@ -54,7 +55,7 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }
             buttons={[]}
             onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }}
         >
-            <div className="artist-info">
+            <div className="artist-info" onMouseDown={() => setMenuPosition(null)}>
                 {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
                     <>
                         <Tabs style={{ width: "100%" }}>
@@ -71,7 +72,7 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }
                                 <div style={{ overflowY: "auto", height: "45vh" }}>
                                     {selectedArtist && selectedArtist.tracks.map((tr, index) => {
                                         // return <TrackRow id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                                        return <TrackRow source={"artist-info-track"} forInfo id={"atr" + tr.id} index={index} track={tr} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
+                                        return <TrackRow onClick={() => { setSelectedTrack(tr); setSelectedArtistTrackIndex(index) }} selected={selectedArtistTrackIndex === index} onContextMenu={onArtistTrackContextMenu} source={"artist-info-track"} forInfo id={"atr" + tr.id} index={index} track={tr} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
                                     })}
                                 </div>
 
@@ -80,7 +81,7 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick }
                                 <div style={{ overflowY: "auto", height: "45vh" }}>
                                     {selectedArtist && selectedArtist.albums.map((p, index) => {
 
-                                        return (<PlaylistRow draggable source={"artist-info-album"} index={index} id={"pl" + p.id} playlist={p} onClick={() => { onAlbumClick?.(p) }} />)
+                                        return (<PlaylistRow onClick={() => { onAlbumClick?.(p); setSelectedArtistAlbumIndex(index) }} draggable selected={selectedArtistAlbumIndex === index} onContextMenu={onArtistAlbumContextMenu} source={"artist-info-album"} index={index} id={"pl" + p.id} playlist={p} />)
                                         //onContextMenu={onContextMenu}
                                         //onSwipedRight={onSwipedRight}
                                         //onDrop={onDrop} 

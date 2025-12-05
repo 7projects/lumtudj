@@ -71,7 +71,7 @@ const myShazamTracksPlIconMobile = <svg className='icon-color' width="24px" heig
 
 const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBulbClick, onBulbCheckClick, onLongPress, onShuffleClick, onDrop }) => {
 
-    const { setMenuAnchor, library, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
+    const { setMenuAnchor, library, setLoadingLibrary, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
     const [filter, setFilter] = useState("");
 
@@ -82,6 +82,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
             setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...library]);
         } else {
 
+            if (libraryFilterType == "server") return;
             let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
             let filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())).sort((a, b) => {
                 if (a.shuffle == null) return 1;
@@ -103,6 +104,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
     const onFilterChange = async (text) => {
         setFilter(text);
         //filter playlists by text
+        setLibraryFilterType("local");
         let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
         if (text.trim() == "") {
             setFilteredLibrary(allPlaylists);
@@ -128,6 +130,21 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
     }
 
     const inputRef = useRef(null);
+
+    const [libraryFilterType, setLibraryFilterType] = useState("local");
+
+    const onLibrarySearchEnter = async (e) => {
+        if (e.key === 'Enter') {
+            if (filter && filter.trim() != "") {
+                setLibraryFilterType("server");
+                setLoadingLibrary("Searching...");
+                let items = await api.searchAlbums(filter);
+                setLoadingLibrary(false);
+                setFilteredLibrary(items);
+
+            }
+        }
+    }
 
     const getIicon = (p) => {
         if (p.id == "MyShazamedTracks") {
@@ -162,7 +179,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
 
                         {!isMobile() || true ? <div className="toolbar-wrapper">
 
-                            <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={filter} onChange={(e) => onFilterChange(e.target.value)} />
+                            <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={filter} onChange={(e) => onFilterChange(e.target.value)} onKeyDown={onLibrarySearchEnter} />
 
 
                             <MoreVertIcon onClick={onMenuClick} menu-target="library" className='toolbar-button'></MoreVertIcon>
@@ -178,9 +195,9 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
                             itemContent={(index) => {
                                 const p = filteredLibrary[index];
                                 return isMobile() ?
-                                    <PlaylistRow shuffleButton onContextMenu={onContextMenu} icon={getIicon(p)} index={index} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
+                                    <PlaylistRow showLiked={libraryFilterType == "server1"} liked={library?.some(x => x.id == p.id)} shuffleButton onContextMenu={onContextMenu} icon={getIicon(p)} index={index} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} onLongPress={onLongPress} bulbCheckOn={selectedTrack && p.tracks && p.tracks.some(x => x.id == selectedTrack.id)} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && p.shuffle)} playlist={p} onClick={() => { onClick(p); setSelectedLibraryIndex(index) }} />
                                     :
-                                    <PlaylistRow shuffleButton source="library" draggable={p.type != "featured"} onContextMenu={onContextMenu} icon={getIicon(p)} index={index} onDrop={onDrop} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { setSelectedLibraryIndex(index); if (onClick) onClick(p); }} />
+                                    <PlaylistRow showLiked={libraryFilterType == "server1"} liked={library?.some(x => x.id == p.id)} shuffleButton source="library" draggable={p.type != "featured"} onContextMenu={onContextMenu} icon={getIicon(p)} index={index} onDrop={onDrop} onSwipedRight={onSwipedRight} id={"pl" + p.id} onBulbCheckClick={onBulbCheckClick} selected={selectedLibraryIndex == index} onBulbClick={addToBackgroundPlaylists} bulbOn={library && library.some(x => x.id == p.id && x.shuffle)} playlist={p} onClick={() => { setSelectedLibraryIndex(index); if (onClick) onClick(p); }} />
                             }}
                         />
                     </>

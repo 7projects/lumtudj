@@ -627,7 +627,7 @@ td {
 .context-menu {
   position: absolute;
   background: #1b1b1b;
-  z-index: 1000;
+  z-index: 99999;
   border-radius: 4px;
 }
 .context-menu div {

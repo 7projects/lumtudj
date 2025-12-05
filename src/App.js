@@ -82,7 +82,7 @@ function useConstructor(callback) {
 
 
 function App() {
-  const { menuAnchor, playedFrom, setPlayedFrom, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+  const { menuAnchor, playedFrom, setSelectedArtistTrackIndex, selectedArtistTrackIndex, setSelectedArtistAlbumIndex, setPlayedFrom, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
   const [contextMenu, setContextMenu] = useState(null);
 
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
@@ -326,11 +326,7 @@ function App() {
 
   const handleLockKeyDown = (event) => {
 
-
-    console.log("hlkd");
-
     if (localStorage.getItem("locked") != "true") return; // ignore input if already unlocked
-
 
     // Start timer on first keypressdin
     if (!timer) {
@@ -350,8 +346,6 @@ function App() {
 
     inputBuffer.current = ib;
     let pass = localStorage.getItem("lockpass");
-
-    console.log(ib);
     if (ib.includes(pass)) {
 
       inputBuffer.current = "";
@@ -532,9 +526,6 @@ function App() {
 
   }, [code]);
 
-
-
-
   const handleKeyDown = async (e) => {
 
 
@@ -629,7 +620,8 @@ function App() {
       setLoadingLibrary(null);
 
     }
-    catch {
+    catch (e) {
+      alert("Error loading library: " + e.message);
       //go to login page
       setToken("");
     }
@@ -823,10 +815,23 @@ function App() {
 
     if (dragSource == "library" && !locked) {
       const selPl = filteredLibrary[dragSourceIndex];
-      pl = [...playlistTracks, ...selPl.tracks];
-      setPlaylistTracks(pl);
-      return;
+
+      if (selPl.tracks?.length == 0) {
+        selPl.tracks = await api.getAlbumTracks(selPl.id);
+        pl = [...playlistTracks, ...selPl.tracks]
+        setPlaylistTracks(pl);
+        return;
+
+      }
+      else {
+        pl = [...playlistTracks, ...selPl.tracks];
+        setPlaylistTracks(pl);
+        return;
+      }
+
     }
+
+
 
     if (dragSource == "artist-info-album" && !locked) {
       const selPl = selectedArtist.albums[dragSourceIndex];
@@ -880,7 +885,7 @@ function App() {
 
     if (pl.id && tr) {
       if (bulbOn) {
-        await api.removeTrackFromPlaylist(pl, tr);
+        res = await api.removeTrackFromPlaylist(pl, tr);
         pl.tracks = pl.tracks.filter(x => x.id != tr.id);
       } else {
         res = await api.addTrackToPlaylist(pl, tr);
@@ -1035,7 +1040,7 @@ function App() {
     addToHistory(track);
     setTrack(track);
     setSelectedTrack(track);
-    let pls = library.filter(x => x.tracks.some(x => x.id == track.id));
+    let pls = library.filter(x => x.tracks?.some(x => x.id == track.id));
     for (const pl of pls) {
       const trs = pl.tracks.filter(x => x.id == track.id);
       for (const tr of trs) {
@@ -1049,12 +1054,39 @@ function App() {
 
   }
 
-  const nextTrack = async (cached) => {
+  const nextTrack = async (cached, newPlaylist) => {
     setPlayedFrom("");
     // if (playPosition == "playlist") {
     //   setPlayIndex(playIndex + 1);
     //   play(playlist[playIndex + 1]);
     // }
+
+
+    if (newPlaylist) {
+      if (newPlaylist.tracks?.length == 0 && newPlaylist.type == "album") {
+        newPlaylist.tracks = await api.getAlbumTracks(newPlaylist.id);
+      }
+    }
+
+    if (newPlaylist) {
+      let pl = [...newPlaylist.tracks];
+
+   
+      if (shufflePlaylist) {
+        const randomIndex = Math.floor(Math.random() * pl.length);
+        play(pl[randomIndex], "dynamic playlist");
+        flyToPlayer("pl" + randomIndex + "-" + pl[randomIndex].id);
+        pl.splice(randomIndex, 1);
+        setPlaylistTracks(pl);
+        return;
+      } else {
+        flyToPlayer("pl0-" + pl[0].id);
+        play(pl[0], "dynamic playlist");
+        pl.shift();
+        setPlaylistTracks(pl);
+        return;
+      }
+    }
 
     const bpl = cached ? cached : await loadBackgroundPlaylists();
 
@@ -1316,6 +1348,8 @@ function App() {
       });
     }
 
+    debugger;
+
     setLoadingTracks(true);
 
     if (pl.id == "MyShazamedTracks") {
@@ -1326,10 +1360,14 @@ function App() {
       pl.tracks = await getLastListened();
     }
 
+    if (pl.tracks?.length == 0 && pl.type == "album") {
+      pl.tracks = await api.getAlbumTracks(pl.id);
+    }
+
     setSearchText(pl.name);
     setSelectedLibraryItem(pl);
     setPlaylistChanged(false);
-    setSelectedPlaylistTracks(pl.tracks);
+    setSelectedPlaylistTracks(pl.tracks || []);
 
     setSelectedPlaylistTrackIndex(-1);
     setSelectedPlaylistTrack(null);
@@ -1462,6 +1500,59 @@ function App() {
     closeContextMenu();
   }
 
+  const followAlbum = async (album) => {
+    debugger;
+    const newAlbum = await api.followAlbum(album);
+    if (newAlbum.ok) {
+      let simplifiedAlbum = api.simplifiAlbum(album);
+      // await updateLibrary([simplifiedAlbum]);
+      let pls = [...library];
+      pls.unshift(simplifiedAlbum);
+      setLibrary(pls);
+      // setFilteredLibrary(pls);
+      saveLibrary([simplifiedAlbum]);
+      setSelectedLibraryItem(simplifiedAlbum);
+      closeContextMenu();
+    }
+  }
+
+  const onArtistAlbumContextMenu = (e, album, index) => {
+    let items = [];
+    if (library.some(p => p.id == album.id))
+      items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(album) });
+    if (!library.some(p => p.id == album.id))
+      items.push({ label: "Follow album", onClick: () => followAlbum(album) });
+
+    if (album.type != "featured")
+      items.push({ label: "Play in queue", onClick: () => followAlbum(album) });
+
+
+    setSelectedArtistAlbumIndex(index);
+    setContextMenuItems(items);
+    handleContextMenu(e);
+  }
+
+  const onArtistTrackContextMenu = (e, track, index) => {
+    debugger;
+    let items = [];
+    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
+    setContextMenuItems(items);
+    setSelectedArtistTrackIndex(index);
+    setSelectedTrack(track);
+    handleContextMenu(e);
+  }
+
+
+  const addLibrayItemToQueue = async (playlist) => {
+    if (playlist.tracks && playlist.tracks.length > 0) {
+      setPlaylistTracks([...playlist.tracks]);
+    } else {
+      if (playlist.type == "album") {
+        let tracks = await api.getAlbumTracks(playlist.id)
+        setPlaylistTracks(tracks);
+      }
+    }
+  }
 
   const onLibraryItemContextMenu = (e, playlist, index) => {
     loadPlaylistPrev(playlist);
@@ -1476,9 +1567,14 @@ function App() {
     if (playlist.type == "playlist")
       items.push({ label: "Delete playlist", onClick: () => deletePlaylist(playlist) });
 
-    if (playlist.type == "album")
+    if (playlist.type == "album" && library.some(p => p.id == playlist.id))
       items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(playlist) });
 
+    if (playlist.type == "album" && !library.some(p => p.id == playlist.id))
+      items.push({ label: "Follow album", onClick: () => followAlbum(playlist) });
+
+    if (playlist.type != "featured")
+      items.push({ label: "Play in queue", onClick: () => { nextTrack(null, playlist) } });
     // selectedLibraryItem.type == "artist" &&
     //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
 
@@ -1518,12 +1614,12 @@ function App() {
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
 
-    items[1].items = [
-      { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
-      { label: "Albums", onClick: async () => { }, onEnter: (track) => loadCtxAlbums(track) }
-    ];
+    // items[1].items = [
+    //   { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
+    //   { label: "Albums", onClick: async () => { }, onEnter: (track) => loadCtxAlbums(track) }
+    // ];
 
-    items[1].items[1].items = ctxAlbums;
+    // items[1].items[1].items = ctxAlbums;
 
     setContextMenuItems(items);
 
@@ -1771,7 +1867,7 @@ function App() {
 
 
       {showArtistInfo ?
-        <ArtistInfo onAlbumClick={onAlbumClick} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
+        <ArtistInfo onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={onAlbumClick} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
       }
 
       {
@@ -2099,22 +2195,7 @@ function App() {
                     </tr>
                   </tbody>
                 </table>
-                {mode == "normal" && showPickers ?
-                  <table style={{ width: "100%", display: "inline-block" }}>
-                    <tbody>
-                      <tr>
-                        <td style={{ width: 30, padding: 5 }}>
-                          <img
-                            src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
-                            style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: "50%" }}
-                          />
-                        </td>
-                        <td className='selected-track-container'>
-                          {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
-                        </td>
-                      </tr>
-                    </tbody>
-                  </table> : null}
+
               </div>
               <div className="main">
                 {mode == "normal" ?
@@ -2181,7 +2262,22 @@ function App() {
                 </div>
               </div>
 
-
+              {mode == "normal" && showPickers ?
+                <table style={{ width: "100%", display: "inline-block" }}>
+                  <tbody>
+                    <tr>
+                      <td style={{ width: 30, padding: 5 }}>
+                        <img
+                          src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
+                          style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: "50%" }}
+                        />
+                      </td>
+                      <td className='selected-track-container'>
+                        {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table> : null}
 
 
 

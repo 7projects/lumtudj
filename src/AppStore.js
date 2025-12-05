@@ -34,6 +34,12 @@ const useAppStore = create((set) => ({
   selectedPlaylistTrackIndex: -1,
   setSelectedPlaylistTrackIndex: (index) => set({ selectedPlaylistTrackIndex: index }),
 
+  selectedArtistTrackIndex: -1,
+  setSelectedArtistTrackIndex: (index) => set({ selectedArtistTrackIndex: index }),
+
+  selectedArtistAlbumIndex: -1,
+  setSelectedArtistAlbumIndex: (index) => set({ selectedArtistAlbumIndex: index }),
+
   playlistIndex: -1,
   setPlaylistIndex: (index) => set({ playlistIndex: index }),
 

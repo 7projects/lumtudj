@@ -84,14 +84,22 @@ export default function SpotifyPlayer({
         const trackEnded =
           state.duration > 0 && state.paused && state.position === 0;
 
+
+
         // Only call onNext once per track
         if (state.loading && trackEnded && trackIdRef.current && trackEndedFor.current !== trackIdRef.current) {
 
+          console.log(
+            "%cPLAYER STATE",
+            "background: #222; color: #bada55; font-size: 14px"
+          );
+          console.log(state);
+          
           trackEndedFor.current = trackIdRef.current;
 
           stateChanged?.(state);
 
-          console.log(state);
+
 
           if (onNextRef.current) {
             try {
@@ -354,7 +362,7 @@ export default function SpotifyPlayer({
                     :
                     <img
                       src={artist?.images?.[0]?.url}
-                      style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
+                      style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
 
                     />}
                 </td>
