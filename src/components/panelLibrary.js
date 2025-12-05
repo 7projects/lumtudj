@@ -78,21 +78,21 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
     useEffect(() => {
 
 
-        if (filteredLibrary.length == 0) {
-            setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...library]);
-        } else {
+        // // if (filteredLibrary.length == 0) {
+        // //     setFilteredLibrary([myShazamTracksPl, lastListenedPl, ...library]);
+        // // } else {
 
-            if (libraryFilterType == "server") return;
-            let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
-            let filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())).sort((a, b) => {
-                if (a.shuffle == null) return 1;
-                if (b.shuffle == null) return -1;
-                return b.shuffle - a.shuffle;
-            });;
+        if (libraryFilterType == "server") return;
+        let allPlaylists = [myShazamTracksPl, lastListenedPl, ...library];
+        let filtered = allPlaylists.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())).sort((a, b) => {
+            if (a.shuffle == null) return 1;
+            if (b.shuffle == null) return -1;
+            return b.shuffle - a.shuffle;
+        });;
 
-            if (filtered.length != filteredLibrary.length)
-                setFilteredLibrary(filtered);
-        }
+        // if (filtered.length != filteredLibrary.length)
+        setFilteredLibrary(filtered);
+        // }
     }, [library])
 
     useEffect(() => {
