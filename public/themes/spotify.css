@@ -626,7 +626,7 @@ td {
 .context-menu {
   position: absolute;
   background: #000000;
-  z-index: 1000;
+  z-index: 99999;
   border-radius: 4px;
 }
 .context-menu div {
@@ -2033,7 +2033,7 @@ button:active {
   font-weight: bold;
 }
 .react-tabs__tab--selected {
-  text-decoration: underline ;
+  text-decoration: underline;
 }
 .reconnecting-container {
   position: fixed;
@@ -2193,9 +2193,11 @@ button:active {
   color: #a4a4a4;
   border-radius: 0.5rem;
   cursor: pointer;
+  fill: #ffffff;
 }
 .toolbar-button:hover {
   color: #f1f1f1;
+  fill: #f1f1f1;
 }
 .trash-container {
   position: fixed;

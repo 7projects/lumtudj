@@ -121,6 +121,23 @@ export function fullscreen() {
   }
 }
 
+export const getTotalDurationString = (tracks) => {
+
+  // 1. Sum all duration_ms
+  const totalMs = tracks.reduce((sum, t) => sum + t.duration_ms, 0);
+
+  // 2. Convert to mm:ss
+  const totalSeconds = Math.floor(totalMs / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  // 3. Format with leading zero
+  const formatted = `${minutes}:${seconds.toString().padStart(2, "0")}`;
+
+  return formatted;
+
+}
+
 export const startUniverse = () => {
 
   return; // disabling for now

@@ -72,7 +72,7 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick, 
                                 <div style={{ overflowY: "auto", height: "45vh" }}>
                                     {selectedArtist && selectedArtist.tracks.map((tr, index) => {
                                         // return <TrackRow id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                                        return <TrackRow onClick={() => { setSelectedTrack(tr); setSelectedArtistTrackIndex(index) }} selected={selectedArtistTrackIndex === index} onContextMenu={onArtistTrackContextMenu} source={"artist-info-track"} forInfo id={"atr" + tr.id} index={index} track={tr} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
+                                        return <TrackRow onContextMenu={onArtistTrackContextMenu} onClick={() => { setSelectedTrack(tr); setSelectedArtistTrackIndex(index) }} selected={selectedArtistTrackIndex === index} source={"artist-info-track"} forInfo id={"atr" + tr.id} index={index} track={tr} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
                                     })}
                                 </div>
 
@@ -81,7 +81,7 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick, 
                                 <div style={{ overflowY: "auto", height: "45vh" }}>
                                     {selectedArtist && selectedArtist.albums.map((p, index) => {
 
-                                        return (<PlaylistRow onClick={() => { onAlbumClick?.(p); setSelectedArtistAlbumIndex(index) }} draggable selected={selectedArtistAlbumIndex === index} onContextMenu={onArtistAlbumContextMenu} source={"artist-info-album"} index={index} id={"pl" + p.id} playlist={p} />)
+                                        return (<PlaylistRow onContextMenu={onArtistAlbumContextMenu} onClick={() => { onAlbumClick?.(p); setSelectedArtistAlbumIndex(index) }} draggable selected={selectedArtistAlbumIndex === index} source={"artist-info-album"} index={index} id={"pl" + p.id} playlist={p} />)
                                         //onContextMenu={onContextMenu}
                                         //onSwipedRight={onSwipedRight}
                                         //onDrop={onDrop} 

@@ -6,11 +6,21 @@ import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
-import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
+import { loadThemeCSS, isMobile, fullscreen, startUniverse, getTotalDurationString, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
 import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { loadLibray, deleteFromLibrary, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
+import BlockIcon from '@mui/icons-material/Block';
+import PersonIcon from '@mui/icons-material/Person';
+import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
+import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+
+import FavoriteIcon from '@mui/icons-material/Favorite';
 
 import { Menu as CtxMenu, Item as CtxItem, Submenu as CtxSubmenu, MenuProvider as CtxMenuProvider, contextMenu as CtxContextMenu } from "react-contexify";
 import "react-contexify/dist/ReactContexify.css";
@@ -26,9 +36,9 @@ import PlaylistAddCheckIcon from '@mui/icons-material/PlaylistAddCheck';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import SearchIcon from '@mui/icons-material/Search';
 import Snackbar from './components/snackbar';
-import { AddAlertRounded, AlignVerticalCenterTwoTone, Timelapse } from '@mui/icons-material';
+import { AddAlertRounded, AlignVerticalCenterTwoTone, Favorite, PlaylistAdd, Timelapse } from '@mui/icons-material';
 import QueueMusicIcon from '@mui/icons-material/QueueMusic';
-import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+
 import HistoryIcon from '@mui/icons-material/History';
 import { Virtuoso } from 'react-virtuoso';
 import LockOpenIcon from '@mui/icons-material/LockOpen';
@@ -44,7 +54,7 @@ import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { useLongPress } from 'use-long-press';
 import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
-import DeleteIcon from '@mui/icons-material/Delete';
+
 import PanelLibrary from './components/panelLibrary';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
@@ -71,6 +81,7 @@ import {
   rectSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { icon } from '@fortawesome/fontawesome-svg-core';
 
 function useConstructor(callback) {
   const hasRun = useRef(false);
@@ -906,7 +917,15 @@ function App() {
 
   const removeTrackFromSpotifyPlaylist = async () => {
 
+
+    debugger;
     if (dragSource == "plprev") {
+
+
+      if (selectedLibraryItem && selectedLibraryItem.id == "LastListened" || selectedLibraryItem.id == "MyShazamedTracks" || selectedLibraryItem.type == "album")
+        return;
+
+
       if (selectedLibraryIndex) {
 
         let pl = filteredLibrary[selectedLibraryIndex];
@@ -936,6 +955,7 @@ function App() {
     //remove selectedPlaylistTrackindex from playlist
 
 
+    debugger;
     if (isMobile()) {
       flyToPlaylist(tr);
       setTimeout(() => {
@@ -945,16 +965,18 @@ function App() {
         closeContextMenu();
       }, 250);
     } else {
-      if (dragSource == "playlist") {
-        let pl = [...playlistTracks];
-        pl.splice(selectedPlaylistTrackIndex, 1);
-        setPlaylistTracks(pl);
-        closeContextMenu();
-        return;
-      }
 
       if (dragSource == "tracks" && selectedLibraryIndex >= 0) {
         removeTrackFromSpotifyPlaylist();
+      } else {
+        let pl = [...playlistTracks];
+        pl.splice(selectedPlaylistTrackIndex, 1);
+        setPlaylistTracks(pl);
+        setSelectedPlaylistTrackIndex(null);
+        setSelectedPlaylistTrack(null);
+        setPlaylistIndex(-1);
+        closeContextMenu();
+
       }
 
     }
@@ -1008,6 +1030,12 @@ function App() {
   }
 
   const onPlaylistTrackDoubleClick = (tr, index) => {
+
+    //remove this tr from playlistTracks and flyto player
+    let pl = [...playlistTracks];
+    pl.splice(index, 1);
+    setPlaylistTracks(pl);
+    flyToPlayer("pl" + index + "-" + tr.id);
 
     if (isLocked()) { return; }
     play(tr);
@@ -1063,8 +1091,8 @@ function App() {
     // }
 
 
-    if (newPlaylist) {
-      if (newPlaylist.tracks?.length == 0 && newPlaylist.type == "album") {
+    if (newPlaylist?.type == "album") {
+      if (newPlaylist.tracks == undefined || newPlaylist.tracks?.length == 0) {
         newPlaylist.tracks = await api.getAlbumTracks(newPlaylist.id);
       }
     }
@@ -1072,7 +1100,7 @@ function App() {
     if (newPlaylist) {
       let pl = [...newPlaylist.tracks];
 
-   
+
       if (shufflePlaylist) {
         const randomIndex = Math.floor(Math.random() * pl.length);
         play(pl[randomIndex], "dynamic playlist");
@@ -1349,8 +1377,6 @@ function App() {
       });
     }
 
-    debugger;
-
     setLoadingTracks(true);
 
     if (pl.id == "MyShazamedTracks") {
@@ -1371,6 +1397,7 @@ function App() {
     setSelectedPlaylistTracks(pl.tracks || []);
 
     setSelectedPlaylistTrackIndex(-1);
+    setSelectedTrackIndex(-1);
     setSelectedPlaylistTrack(null);
 
     setLoadingTracks(false);
@@ -1520,13 +1547,12 @@ function App() {
   const onArtistAlbumContextMenu = (e, album, index) => {
     let items = [];
     if (library.some(p => p.id == album.id))
-      items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(album) });
+      items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(album), icon: <BlockIcon /> });
     if (!library.some(p => p.id == album.id))
-      items.push({ label: "Follow album", onClick: () => followAlbum(album) });
+      items.push({ label: "Follow album", onClick: () => followAlbum(album), icon: <FavoriteIcon /> });
 
     if (album.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => followAlbum(album) });
-
+      items.push({ label: "Play in queue", onClick: () => { nextTrack(null, album) }, icon: <PlayCircleIcon /> });
 
     setSelectedArtistAlbumIndex(index);
     setContextMenuItems(items);
@@ -1536,7 +1562,7 @@ function App() {
   const onArtistTrackContextMenu = (e, track, index) => {
     debugger;
     let items = [];
-    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
+    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
     setContextMenuItems(items);
     setSelectedArtistTrackIndex(index);
     setSelectedTrack(track);
@@ -1555,6 +1581,7 @@ function App() {
     }
   }
 
+
   const onLibraryItemContextMenu = (e, playlist, index) => {
     loadPlaylistPrev(playlist);
     let items = [];
@@ -1562,22 +1589,22 @@ function App() {
     let userID = localStorage.getItem("userId");
 
     if (playlist.owner_id == userID)
-      items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true) });
-
-
-    if (playlist.type == "playlist")
-      items.push({ label: "Delete playlist", onClick: () => deletePlaylist(playlist) });
+      items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true), icon: <EditIcon /> });
 
     if (playlist.type == "album" && library.some(p => p.id == playlist.id))
-      items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(playlist) });
+      items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(playlist), icon: <BlockIcon /> });
 
     if (playlist.type == "album" && !library.some(p => p.id == playlist.id))
-      items.push({ label: "Follow album", onClick: () => followAlbum(playlist) });
+      items.push({ label: "Follow album", onClick: () => followAlbum(playlist), icon: <FavoriteIcon /> });
 
     if (playlist.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => { nextTrack(null, playlist) } });
+      items.push({ label: "Play in queue", onClick: () => { nextTrack(null, playlist) }, icon: <PlayCircleIcon /> });
     // selectedLibraryItem.type == "artist" &&
     //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
+    items.push({ label: "-" });
+
+    if (playlist.type == "playlist")
+      items.push({ label: "Delete playlist", onClick: () => deletePlaylist(playlist), icon: <DeleteIcon /> });
 
 
     setContextMenuItems(items);
@@ -1612,8 +1639,8 @@ function App() {
 
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
-    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
-    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) } });
+    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
+    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
 
     // items[1].items = [
     //   { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
@@ -1630,9 +1657,12 @@ function App() {
   }
 
   const onPlaylistContextMenu = (e, track, index) => {
+    setDragSource("playlist");
     let items = [];
     // items.push({ label: "Remove from queue", onClick: () => { removeTrackFromPlaylist(); } });
-    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) } });
+    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
+    items.push({ label: "Remove from queue", onClick: () => { removeTrackFromPlaylist() }, icon: <PlaylistRemoveIcon /> });
+
     setContextMenuItems(items);
     setPlaylistIndex(index);
     setSelectedTrack(track);
@@ -1764,9 +1794,12 @@ function App() {
           }}
         >
           {contextMenuItems.map((item, index) => (
-            <div key={index} onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >
-              {item.label}
-            </div>
+
+            item.label == "-" ?
+              <span key={index}></span> :
+              <div style={{ display: "flex", alignItems: "center", gap: 6 }} key={index} onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >
+                {item.icon ? item.icon : null} {item.label}
+              </div>
           ))}
         </div>
       )
@@ -1860,7 +1893,7 @@ function App() {
       }
 
       {
-        dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" ?
+        dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem.type != "album" && selectedLibraryItem.type != "featured" ?
           <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
             <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
           </div> : null
@@ -2225,6 +2258,14 @@ function App() {
 
                         <div className='toolbar-icons'>
                           {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
+                          <HistoryIcon className='toolbar-button' onClick={() => loadPlaylistPrev(lastListenedPl)}></HistoryIcon>
+
+                          <svg onClick={() => loadPlaylistPrev(myShazamTracksPl)} class='toolbar-button' width="22" height="22" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                            <g transform="translate(1, 1)" class='toolbar-button' >
+                              <path class='toolbar-button' d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
+                            </g>
+                          </svg>
+
                           <MoreVertIcon onClick={handleMenu} menu-target="tracks" className='toolbar-button'></MoreVertIcon>
                         </div>
                       </> : null}
@@ -2240,7 +2281,7 @@ function App() {
 
                   <div className="toolbar-wrapper">
                     <div className='toolbar-search'>
-                      <div>QUEUE</div> ({playlistTracks?.length || 0} tracks)
+                      <div>QUEUE</div> ({playlistTracks?.length || 0} tracks) duration: {getTotalDurationString(playlistTracks)}
                     </div>
                     <div className='toolbar-icons'>
                       {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}

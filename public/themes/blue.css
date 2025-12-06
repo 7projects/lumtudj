@@ -627,8 +627,13 @@ td {
 .context-menu {
   position: absolute;
   background: #ffffff;
-  z-index: 1000;
+  z-index: 99999;
   border-radius: 4px;
+}
+.context-menu span {
+  border-top: 1px solid #e6e6e6;
+  width: 100%;
+  display: inline-block;
 }
 .context-menu div {
   padding: 10px;
@@ -2036,7 +2041,7 @@ button:active {
   font-weight: bold;
 }
 .react-tabs__tab--selected {
-  text-decoration: underline ;
+  text-decoration: underline;
 }
 .reconnecting-container {
   position: fixed;
@@ -2196,9 +2201,11 @@ button:active {
   color: #000000;
   border-radius: 0.5rem;
   cursor: pointer;
+  fill: #0a2540;
 }
 .toolbar-button:hover {
   color: #202020;
+  fill: #202020;
 }
 .trash-container {
   position: fixed;

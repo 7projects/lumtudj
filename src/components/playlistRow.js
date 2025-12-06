@@ -96,11 +96,13 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
                       <td colSpan={2}>
                         {playlist.type == "album" ?
                           <div className="playlists-count" style={{ fontStyle: "italic", fontSize: 12 }}>
-                            {playlist.artists[0].name} {playlist.release_date?.substring(0, 4)}
+                            {playlist.artists[0].name} {playlist.release_date?.substring(0, 4)} ({playlist.count || playlist.total_tracks} tracks)
                           </div> :
                           <div className="playlists-count">
-                            {(playlist.count ? playlist.count : playlist.tracks?.total || playlist.total_tracks)} songs {playlist.tracks && ("(" + playlist.tracks.filter(x => x.datePlayed).length + " played)")}
-                          </div>}
+                            {/* {(playlist.count ? playlist.count : playlist.tracks?.total || playlist.total_tracks)} tracks {playlist.tracks && ("(" + playlist.tracks.filter(x => x.datePlayed).length + " played)")} */}
+                            ({(playlist.count ? playlist.count : playlist.tracks?.total || playlist.total_tracks)} tracks)
+                         
+                         </div>}
                       </td> : null}
                   </tr>
                 </tbody>

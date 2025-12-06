@@ -94,7 +94,7 @@ export default function SpotifyPlayer({
             "background: #222; color: #bada55; font-size: 14px"
           );
           console.log(state);
-          
+
           trackEndedFor.current = trackIdRef.current;
 
           stateChanged?.(state);
@@ -366,7 +366,8 @@ export default function SpotifyPlayer({
 
                     />}
                 </td>
-                <td style={{ textAlign: "left", paddingLeft: 10, height: 100 }}>
+
+                <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",alignSelf:"center", width:"fit-content"  }}>
                   {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
                   {track && track.name}<br></br>
                   {playlists && playlists.map((p) =>

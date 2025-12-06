@@ -630,6 +630,11 @@ td {
   z-index: 99999;
   border-radius: 4px;
 }
+.context-menu span {
+  border-top: 1px solid #929292;
+  width: 100%;
+  display: inline-block;
+}
 .context-menu div {
   padding: 10px;
   color: #f1f1f1;
@@ -1195,7 +1200,7 @@ button {
   border: 1px solid #030303;
   display: inline-block;
   cursor: pointer;
-  color: #e2e2e2;
+  color: #181313;
   font-family: Arial;
   font-size: 11px;
   padding: 6px;
@@ -1210,7 +1215,7 @@ button:active {
   top: 1px;
 }
 .input::placeholder {
-  color: #bcbcbc;
+  color: #000000;
   box-shadow: none;
 }
 .input:focus::placeholder {
@@ -1457,7 +1462,7 @@ button:active {
   font-size: 20px;
 }
 .selected-track-label {
-  color: #e2e2e2;
+  color: #181313;
 }
 .selected-track-container {
   height: 45px;
@@ -1480,7 +1485,7 @@ button:active {
   display: inline-block;
   background-color: #1d1d1d;
   border: 1px solid #030303;
-  color: #e2e2e2;
+  color: #181313;
   margin: 2px;
   border-radius: 5px;
   font-size: 10px;
@@ -1491,7 +1496,7 @@ button:active {
   background-color: #373737;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root {
-  color: #e2e2e2;
+  color: #181313;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root.Mui-selected {
   color: #f1f1f1;
@@ -1682,11 +1687,11 @@ button:active {
   outline: none;
 }
 .icon-color {
-  color: #e2e2e2;
-  fill: #e2e2e2;
+  color: #181313;
+  fill: #181313;
 }
 .tab {
-  color: #e2e2e2;
+  color: #181313;
   background-color: #1d1d1d;
   text-align: center;
   height: 40px;
@@ -1695,7 +1700,7 @@ button:active {
   border-radius: 10px;
 }
 .tab-selected {
-  color: #e2e2e2;
+  color: #181313;
   background-color: #1d1d1d;
   text-align: center;
   height: 40px;
@@ -1716,7 +1721,7 @@ button:active {
   background-color: #1e1e1e;
   outline: none;
   border: 1px solid #292929;
-  color: #e2e2e2;
+  color: #181313;
   background-color: #1d1d1d;
   height: 40px;
   font-size: 20px;
@@ -1883,16 +1888,16 @@ button:active {
   color: black;
 }
 .playlist-divider {
-  color: #e2e2e2;
+  color: #181313;
   background-color: #1d1d1d;
 }
 .playlist-divider-playlists {
-  color: #e2e2e2;
+  color: #181313;
   background-color: #1d1d1d;
   background-color: #893e22;
 }
 .playlist-divider-albums {
-  color: #e2e2e2;
+  color: #181313;
   background-color: #1d1d1d;
   background-color: #225589;
 }
@@ -2024,7 +2029,7 @@ button:active {
   cursor: pointer;
   font-weight: 500;
   list-style: none;
-  color: #e2e2e2;
+  color: #181313;
   /* remove default list styles */
   border-bottom: 2px solid transparent;
   /* default underline */
@@ -2035,7 +2040,7 @@ button:active {
   font-weight: bold;
 }
 .react-tabs__tab--selected {
-  text-decoration: underline ;
+  text-decoration: underline;
 }
 .reconnecting-container {
   position: fixed;
@@ -2155,7 +2160,7 @@ button:active {
   gap: 10px;
   gap: 0.5rem;
   padding-left: 32px;
-  color: #e2e2e2;
+  color: #181313;
 }
 .toolbar-search {
   display: flex;
@@ -2163,7 +2168,7 @@ button:active {
   flex: 1;
   /* takes remaining space */
   gap: 8px;
-  color: #e2e2e2;
+  color: #181313;
 }
 .toolbar-input-search {
   flex: 1;
@@ -2173,13 +2178,13 @@ button:active {
   font-weight: bold;
   font-family: Doto, Monospace, Sans-serif;
   box-sizing: border-box;
-  color: #e2e2e2;
+  color: #181313;
   background-color: transparent;
   outline: none;
   border: none;
 }
 .toolbar-input-search::placeholder {
-  color: rgba(226, 226, 226, 0.4) !important;
+  color: rgba(24, 19, 19, 0.4) !important;
 }
 .toolbar-icons {
   display: flex;
@@ -2195,9 +2200,11 @@ button:active {
   color: #a4a4a4;
   border-radius: 0.5rem;
   cursor: pointer;
+  fill: #181313;
 }
 .toolbar-button:hover {
   color: #f1f1f1;
+  fill: #f1f1f1;
 }
 .trash-container {
   position: fixed;
@@ -2267,7 +2274,7 @@ button:active {
 }
 .dialog-header {
   background: #353535;
-  color: #e2e2e2;
+  color: #181313;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2291,7 +2298,7 @@ button:active {
 }
 .dialog-body {
   font-size: 14px;
-  color: #e2e2e2;
+  color: #181313;
   background-color: #353535;
 }
 .dialog-footer {
@@ -2314,7 +2321,7 @@ button:active {
 .dialog-footer .dialog-btn.primary {
   border: none;
   background: #1d1d1d;
-  color: #e2e2e2;
+  color: #181313;
 }
 .dialog-footer .dialog-btn.primary:hover {
   background: #1d1d1d;
