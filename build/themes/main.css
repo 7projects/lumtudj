@@ -1475,7 +1475,7 @@ button:active {
   color: #078ec2;
   margin: 2px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px;
   cursor: pointer;
   box-shadow: 0 0 5px 1px #50fbb4;
@@ -1488,7 +1488,7 @@ button:active {
   color: #181313;
   margin: 2px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px;
   cursor: pointer;
 }

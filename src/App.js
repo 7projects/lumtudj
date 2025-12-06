@@ -96,6 +96,7 @@ function App() {
   const { menuAnchor, playedFrom, setSelectedArtistTrackIndex, selectedArtistTrackIndex, setSelectedArtistAlbumIndex, setPlayedFrom, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
   const [contextMenu, setContextMenu] = useState(null);
 
+  const [pickerPosition, setPickerPosition] = useState(JSON.parse(localStorage.getItem("pickerPosition")) || { x: 100, y: 100 });
   const Activity = React.Activity ?? React.unstable_Activity ?? (() => null);
 
   const [shufflePlaylist, setShufflePlaylist] = useState(false);
@@ -2304,22 +2305,43 @@ function App() {
                 </div>
               </div>
 
-              {mode == "normal" && showPickers ?
-                <table style={{ width: "100%", display: "inline-block" }}>
-                  <tbody>
-                    <tr>
-                      <td style={{ width: 30, padding: 5 }}>
-                        <img
-                          src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
-                          style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: "50%" }}
-                        />
-                      </td>
-                      <td className='selected-track-container'>
-                        {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
-                      </td>
-                    </tr>
-                  </tbody>
-                </table> : null}
+
+              <Dialog
+                onMouseDown={() => setMenuPosition(null)}
+                position={pickerPosition}
+                onDragEnd={(pos) => { setPickerPosition(pos); localStorage.setItem("pickerPosition", JSON.stringify(pos)); }}
+                open={mode == "normal" && showPickers }
+                onClose={() => {setShowPickers(false);}}
+                title={selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
+                header={<div onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center"}}>
+
+
+                </div>}
+                style={{ textAlign: "center" }}
+                blockBackground={false}
+                buttons={[]}
+                onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }}
+              >
+              
+                  <table style={{ width: "100%", display: "inline-block" }}>
+                    <tbody>
+                      <tr>
+                        {/* <td style={{ width: 30, padding: 5 }}>
+                          <img
+                            src={selectedTrack && selectedTrack.album && selectedTrack.album.images[2].url}
+                            style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: "50%" }}
+                          />
+                        </td> */}
+                        <td className='selected-track-container'>
+                          {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table> 
+
+              </Dialog>
+
+
 
 
 
