@@ -1,5 +1,6 @@
 import React from "react";
-
+import 'shepherd.js/dist/css/shepherd.css';
+import Shepherd from 'shepherd.js';
 
 export const myShazamTracksPl = {
   id: "MyShazamedTracks",
@@ -19,6 +20,66 @@ export const lastListenedPl = {
   type: "featured",
   tracks: [],
   shuffle: 2
+}
+
+export const getTour = () => {
+  const tour = new Shepherd.Tour({
+    useModalOverlay: true,
+    defaultStepOptions: {
+      classes: 'shadow-md bg-purple-dark',
+      scrollTo: true
+    }
+  });
+
+  tour.addStep({
+    id: 'example-step',
+    text: 'Library. Here you can filter your local playlists, albums. Press ENTER to search on the server.',
+    attachTo: {
+      element: '#tour1',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Next',
+        action: tour.next
+      }
+    ]
+  });
+
+  tour.addStep({
+    id: 'example-step2',
+    text: 'Here you can search for local saved tracks. When you press ENTER in the search box, it will search the server as well.',
+    attachTo: {
+      element: '#tour2',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Next',
+        action: tour.next
+      }
+    ]
+  });
+
+    tour.addStep({
+    id: 'example-step3',
+    text: 'This is the playback queue. You can add and reorder tracks by dragging and dropping them.',
+    attachTo: {
+      element: '#tour3',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Next',
+        action: tour.next
+      }
+    ]
+  });
+
+  return tour;
 }
 
 

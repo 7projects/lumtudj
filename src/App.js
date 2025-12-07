@@ -6,7 +6,7 @@ import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
-import { loadThemeCSS, isMobile, fullscreen, startUniverse, getTotalDurationString, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
+import { getTour, loadThemeCSS, isMobile, fullscreen, startUniverse, getTotalDurationString, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
 import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { loadLibray, deleteFromLibrary, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 import Menu from '@mui/material/Menu';
@@ -68,6 +68,7 @@ import ArtistInfo from './components/artistInfo';
 
 import UserAgreement from './components/userAgreement';
 
+import Joyride from 'react-joyride';
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -158,6 +159,7 @@ function App() {
 
   let timer = null;
 
+  const tour = getTour();
 
   const open = Boolean(menuAnchor);
   const handleClick = (event) => {
@@ -220,6 +222,8 @@ function App() {
       }
 
       if (!intervalRef.current) startTimer();
+
+      // tour.start();
     };
 
     init();
@@ -1680,7 +1684,6 @@ function App() {
   let subItems = ["Option 1", "Option 2", "Option 3"];
   const MENU_ID = "my-context-menu";
 
-
   const getSelectedTrack = () => {
     return selectedTrack;
   }
@@ -1688,6 +1691,13 @@ function App() {
   const [showArtistInfo, setShowArtistInfo] = useState(false);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+
+
+  const steps = [{
+    target: '#tour1',
+    content: 'This is my awesome feature!',
+  }];
+
 
   return (
 
@@ -2146,6 +2156,7 @@ function App() {
                 </div>
               </div >
               :
+
               <div className='layout' onContextMenu={(e) => e.preventDefault()} onMouseDown={closeContextMenu} >
                 <div className="header">
                   <table style={{ width: "100%", tableLayout: "fixed" }}>
@@ -2235,11 +2246,11 @@ function App() {
                 </div>
                 <div className="main">
                   {mode == "normal" ?
-                    <div className="panel">
+                    <div className="panel" id="tour1">
                       <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                     </div>
                     : null}
-                  <div id="panel-main" className="panel-main">
+                  <div id="panel-main" className="panel-main" id="tour2">
                     {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
 
                     {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
@@ -2279,7 +2290,7 @@ function App() {
                       // getTracksPanel()
                     }
                   </div>
-                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
+                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }} id="tour3">
 
                     <div className="toolbar-wrapper">
                       <div className='toolbar-search'>
@@ -2375,6 +2386,7 @@ function App() {
                   <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
                 </div>
               </div>
+
           )
         }
       </>
