@@ -65,6 +65,10 @@ import useAppStore from './AppStore';
 import ChecklistIcon from '@mui/icons-material/Checklist';
 import LiquorIcon from '@mui/icons-material/Liquor';
 import ArtistInfo from './components/artistInfo';
+
+import UserAgreement from './components/userAgreement';
+
+
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
   DndContext,
@@ -393,7 +397,7 @@ function App() {
     setShowPickers(!showPickers);
   }
 
-  const [showPickers, setShowPickers] = useState(true);
+  const [showPickers, setShowPickers] = useState(localStorage.getItem("showPickers") == "true");
 
   useEffect(() => {
     if (inputRef && inputRef.current) {
@@ -1681,20 +1685,17 @@ function App() {
     return selectedTrack;
   }
 
-
-
   const [showArtistInfo, setShowArtistInfo] = useState(false);
 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   return (
 
+    localStorage.getItem("userAgreementAccepted") != "true" ? <UserAgreement></UserAgreement>
+      :
+      <>
 
-
-
-    <>
-
-      {/* <CtxMenu id={MENU_ID}>
+        {/* <CtxMenu id={MENU_ID}>
         <CtxItem >Refresh</CtxItem>
 
         <CtxSubmenu label="More Options">
@@ -1708,7 +1709,7 @@ function App() {
         <CtxItem>Settings</CtxItem>
       </CtxMenu > */}
 
-      {/* <CtxMenu id={MENU_ID}>
+        {/* <CtxMenu id={MENU_ID}>
         {contextMenuItems.map((item, index) => (
           item.items ?
             <CtxSubmenu key={index} label={item.label}>
@@ -1787,83 +1788,83 @@ function App() {
         ))}
       </CtxMenu > */}
 
-      {menuPosition && (
-        <div className="context-menu"
-          style={{
-            top: menuPosition.y,
-            left: menuPosition.x,
-          }}
-        >
-          {contextMenuItems.map((item, index) => (
+        {menuPosition && (
+          <div className="context-menu"
+            style={{
+              top: menuPosition.y,
+              left: menuPosition.x,
+            }}
+          >
+            {contextMenuItems.map((item, index) => (
 
-            item.label == "-" ?
-              <span key={index}></span> :
-              <div style={{ display: "flex", alignItems: "center", gap: 6 }} key={index} onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >
-                {item.icon ? item.icon : null} {item.label}
-              </div>
-          ))}
-        </div>
-      )
-      }
+              item.label == "-" ?
+                <span key={index}></span> :
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }} key={index} onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >
+                  {item.icon ? item.icon : null} {item.label}
+                </div>
+            ))}
+          </div>
+        )
+        }
 
-      {
-        menuAnchor &&
-        <Menu
-          anchorEl={menuAnchor}
-          id="account-menu"
-          open={open}
-          onClose={handleClose}
-          onClick={handleClose}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        >
+        {
+          menuAnchor &&
+          <Menu
+            anchorEl={menuAnchor}
+            id="account-menu"
+            open={open}
+            onClose={handleClose}
+            onClick={handleClose}
+            transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+            anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+          >
 
-          {menuAnchor.getAttribute("menu-target") == "library" ?
-            <MenuItem onClick={() => setShowNewPlaylistInfo(true)}>
-              New playlist
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "library" ?
+              <MenuItem onClick={() => setShowNewPlaylistInfo(true)}>
+                New playlist
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "library" ?
-            <MenuItem onClick={checkForUpdates}>
-              Update library
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "library" ?
+              <MenuItem onClick={checkForUpdates}>
+                Update library
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "settings" ?
-            <MenuItem onClick={toggleMode}>
-              {mode == "normal" ? "Party mode" : "Standard mode"}
+            {menuAnchor.getAttribute("menu-target") == "settings" ?
+              <MenuItem onClick={toggleMode}>
+                {mode == "normal" ? "Party mode" : "Standard mode"}
 
-            </MenuItem> : null}
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "settings" ?
-            <MenuItem onClick={logout}>
-              Log out
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "settings" ?
+              <MenuItem onClick={logout}>
+                Log out
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "library-item" ?
-            <MenuItem onClick={() => setShowPlaylistInfo(true)}>
-              Edit playlist
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "library-item" ?
+              <MenuItem onClick={() => setShowPlaylistInfo(true)}>
+                Edit playlist
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "tracks" ?
-            <MenuItem onClick={() => setPlaylistTracks([])}>
-              Something
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "tracks" ?
+              <MenuItem onClick={() => setPlaylistTracks([])}>
+                Something
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "playlist" ?
-            <MenuItem onClick={() => setPlaylistTracks([])}>
-              Clear playlist
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "playlist" ?
+              <MenuItem onClick={() => setPlaylistTracks([])}>
+                Clear playlist
+              </MenuItem> : null}
 
-          {menuAnchor.getAttribute("menu-target") == "playlist" ?
-            <MenuItem onClick={() => setShowPlaylistSaveAs(true)}>
-              Save as
-            </MenuItem> : null}
+            {menuAnchor.getAttribute("menu-target") == "playlist" ?
+              <MenuItem onClick={() => setShowPlaylistSaveAs(true)}>
+                Save as
+              </MenuItem> : null}
 
 
-        </Menu>
-      }
+          </Menu>
+        }
 
-      {/* <Moveable
+        {/* <Moveable
         target={document.querySelector("#artist-info")}
         draggable={true}
         edge={false}
@@ -1878,197 +1879,197 @@ function App() {
         }}
       /> */}
 
-      {
-        showPlaylistInfo ?
-          <PlaylistInfo onSave={onPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))} playlist={selectedLibraryItem}></PlaylistInfo> : null
-      }
+        {
+          showPlaylistInfo ?
+            <PlaylistInfo onSave={onPlaylistInfoSave} onClose={(() => setShowPlaylistInfo(false))} playlist={selectedLibraryItem}></PlaylistInfo> : null
+        }
 
-      {
-        showNewPlaylistInfo ?
-          <PlaylistInfo title="New playlist" onSave={onNewPlaylistInfoSave} onClose={(() => setShowNewPlaylistInfo(false))}></PlaylistInfo> : null
-      }
+        {
+          showNewPlaylistInfo ?
+            <PlaylistInfo title="New playlist" onSave={onNewPlaylistInfoSave} onClose={(() => setShowNewPlaylistInfo(false))}></PlaylistInfo> : null
+        }
 
-      {
-        showPlaylistSaveAs ?
-          <PlaylistInfo title="New playlist" onSave={savePlaylistAs} onClose={(() => setShowPlaylistSaveAs(false))}></PlaylistInfo> : null
-      }
+        {
+          showPlaylistSaveAs ?
+            <PlaylistInfo title="New playlist" onSave={savePlaylistAs} onClose={(() => setShowPlaylistSaveAs(false))}></PlaylistInfo> : null
+        }
 
-      {
-        dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem.type != "album" && selectedLibraryItem.type != "featured" ?
-          <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
-            <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
-          </div> : null
-      }
-
-
-      {showArtistInfo ?
-        <ArtistInfo onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={onAlbumClick} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
-      }
-
-      {
-        // selectedArtist || loadingArtistInfo ?
-        //   <div className='panel-dialog target' id="artist-info">
-        //     <div className="close-btn" onClick={() => { setSelectedArtist(null); setLoadingArtistInfo(false) }}>x</div>
-
-        //     {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
-        //       <>
-        //         <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
-        //         <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
-        //         <Tabs style={{ width: "100%" }}>
-        //           <TabList className="custom-tablist">
-        //             <Tab className="custom-tab">
-        //               Top Tracks
-        //             </Tab>
-        //             <Tab className="custom-tab">
-        //               Albums
-        //             </Tab>
-        //           </TabList>
-
-        //           <TabPanel>
-        //             {selectedArtist && selectedArtist.tracks.map((tr, index) => {
-        //               return <TrackRow id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-        //             })}
-        //           </TabPanel>
-        //           <TabPanel>
-        //             {selectedArtist && selectedArtist.albums.map((a, index) => {
-        //               return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
-        //                 <img
-
-        //                   className="artist-info-album-img"
-        //                   src={a.images && a.images[2] && a.images[2].url}
-        //                   alt={a.name}
-        //                 />
-        //                 <div className="artist-info-album-details">
-        //                   <div className="artist-info-album-name">{a.name}</div>
-        //                   <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
-        //                   <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
-        //                 </div>
-        //               </div>
-        //             })}
-        //           </TabPanel>
-        //         </Tabs></>}
-
-        //   </div> : null
-      }
-
-      <Snackbar
-        message={snackbarMessage}
-        show={snackbarMessage}
-        onClose={() => setSnackbarMessage("")}
-      />
+        {
+          dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem.type != "album" && selectedLibraryItem.type != "featured" ?
+            <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
+              <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
+            </div> : null
+        }
 
 
-      <div
-        className="reconnecting-container"
-        style={{ zIndex: 99999, display: reconnecting ? "flex" : "none" }}
-      >
+        {showArtistInfo ?
+          <ArtistInfo onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={onAlbumClick} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
+        }
 
-        <div className="reconnecting-dots">
-          <img
-            src={process.env.PUBLIC_URL + '/logo.png'}
-            style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
-          />
-          connecting to Spotify<span>.</span><span>.</span><span>.</span>
+        {
+          // selectedArtist || loadingArtistInfo ?
+          //   <div className='panel-dialog target' id="artist-info">
+          //     <div className="close-btn" onClick={() => { setSelectedArtist(null); setLoadingArtistInfo(false) }}>x</div>
+
+          //     {loadingArtistInfo ? <div className='loader' style={{ position: "absolute" }}></div> :
+          //       <>
+          //         <img className='artist-info-img' src={selectedArtist && selectedArtist.images && selectedArtist.images.length > 0 && selectedArtist.images[0].url} />
+          //         <div className='artist-info-name'>{selectedArtist && selectedArtist.name}</div>
+          //         <Tabs style={{ width: "100%" }}>
+          //           <TabList className="custom-tablist">
+          //             <Tab className="custom-tab">
+          //               Top Tracks
+          //             </Tab>
+          //             <Tab className="custom-tab">
+          //               Albums
+          //             </Tab>
+          //           </TabList>
+
+          //           <TabPanel>
+          //             {selectedArtist && selectedArtist.tracks.map((tr, index) => {
+          //               return <TrackRow id={"atr" + tr.id} onAddToPlaylistButton={() => { addToPlaylist(tr) }} onContextMenu={handleMenu} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
+          //             })}
+          //           </TabPanel>
+          //           <TabPanel>
+          //             {selectedArtist && selectedArtist.albums.map((a, index) => {
+          //               return <div className="artist-info-album-row" key={"a" + a.id} onClick={() => { onAlbumClick(a) }}>
+          //                 <img
+
+          //                   className="artist-info-album-img"
+          //                   src={a.images && a.images[2] && a.images[2].url}
+          //                   alt={a.name}
+          //                 />
+          //                 <div className="artist-info-album-details">
+          //                   <div className="artist-info-album-name">{a.name}</div>
+          //                   <div className="artist-info-album-tracks">{a.total_tracks} tracks</div>
+          //                   <div className="artist-info-album-year">{a.release_date}</div> {/* assuming a.year exists */}
+          //                 </div>
+          //               </div>
+          //             })}
+          //           </TabPanel>
+          //         </Tabs></>}
+
+          //   </div> : null
+        }
+
+        <Snackbar
+          message={snackbarMessage}
+          show={snackbarMessage}
+          onClose={() => setSnackbarMessage("")}
+        />
+
+
+        <div
+          className="reconnecting-container"
+          style={{ zIndex: 99999, display: reconnecting ? "flex" : "none" }}
+        >
+
+          <div className="reconnecting-dots">
+            <img
+              src={process.env.PUBLIC_URL + '/logo.png'}
+              style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
+            />
+            connecting to Spotify<span>.</span><span>.</span><span>.</span>
+          </div>
         </div>
-      </div>
 
-      <canvas id="field" className="universe"></canvas>
+        <canvas id="field" className="universe"></canvas>
 
-      {
-        !token ? (
+        {
+          !token ? (
 
-          loadingToken ?
-            <div className='menu-container' style={{ height: "100vh", width: "100vw", top: "0", left: "0", position: "absolute" }}>
-              <div className='loader' style={{ position: "absolute" }}></div>
-            </div>
-            :
-            <div className='menu-container' style={{ height: "100vh" }}>
-              <img
-                src={process.env.PUBLIC_URL + '/logo.png'}
-                style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
-              />
-              <button style={{ fontSize: 20 }} onClick={handleLogin}>Login with Spotify</button>
-            </div>
+            loadingToken ?
+              <div className='menu-container' style={{ height: "100vh", width: "100vw", top: "0", left: "0", position: "absolute" }}>
+                <div className='loader' style={{ position: "absolute" }}></div>
+              </div>
+              :
+              <div className='menu-container' style={{ height: "100vh" }}>
+                <img
+                  src={process.env.PUBLIC_URL + '/logo.png'}
+                  style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
+                />
+                <button style={{ fontSize: 20 }} onClick={handleLogin}>Login with Spotify</button>
+              </div>
 
-        ) : (
+          ) : (
 
-          isMobile() ?
-            <div className='layout'>
+            isMobile() ?
+              <div className='layout'>
 
-              <AnimatePresence>
-                {showplaylistPicker ?
+                <AnimatePresence>
+                  {showplaylistPicker ?
 
-                  <motion.div
-                    key="playlistPicker"
-                    initial={{ x: "-100%" }}
-                    animate={{ x: 0 }}
-                    exit={{ x: "-100%" }}
-                    style={{ zIndex: 9999 }}
-                    transition={{ duration: 0.2, ease: "easeInOut" }}
-                    className="fixed top-0 left-0 w-72 h-full bg-gray-900 text-white shadow-lg"
-                  >
-                    <PlaylistPicker onClick={addToSpotifyPlaylist} track={selectedTrack} onSwipedLeft={() => setShowPlaylistPicker(false)} onClose={() => setShowPlaylistPicker(false)} playlists={library} />
+                    <motion.div
+                      key="playlistPicker"
+                      initial={{ x: "-100%" }}
+                      animate={{ x: 0 }}
+                      exit={{ x: "-100%" }}
+                      style={{ zIndex: 9999 }}
+                      transition={{ duration: 0.2, ease: "easeInOut" }}
+                      className="fixed top-0 left-0 w-72 h-full bg-gray-900 text-white shadow-lg"
+                    >
+                      <PlaylistPicker onClick={addToSpotifyPlaylist} track={selectedTrack} onSwipedLeft={() => setShowPlaylistPicker(false)} onClose={() => setShowPlaylistPicker(false)} playlists={library} />
 
 
-                  </motion.div>
+                    </motion.div>
 
-                  : null}
-              </AnimatePresence>
-              <table style={{ width: "100%", tableLayout: "fixed", borderSpacing: 3 }}>
-                <tbody>
-                  <tr>
-                    <td className={tab == 1 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1) }}>
-                      <PlaylistAddCheckIcon></PlaylistAddCheckIcon>
-                    </td>
-                    {/* <td className={tab == 1.5 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1.5) }}>
+                    : null}
+                </AnimatePresence>
+                <table style={{ width: "100%", tableLayout: "fixed", borderSpacing: 3 }}>
+                  <tbody>
+                    <tr>
+                      <td className={tab == 1 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1) }}>
+                        <PlaylistAddCheckIcon></PlaylistAddCheckIcon>
+                      </td>
+                      {/* <td className={tab == 1.5 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(1.5) }}>
                     <AlbumIcon></AlbumIcon>
                   </td> */}
-                    <td className={tab == 2 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(2) }}>
-                      <SearchIcon></SearchIcon>
-                    </td>
-                    {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
+                      <td className={tab == 2 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(2) }}>
+                        <SearchIcon></SearchIcon>
+                      </td>
+                      {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
                     <HistoryIcon></HistoryIcon>
                   </td>
                   <td className='tab' onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     SHZM
                   </td> */}
-                    {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
+                      {/* <td className='tab' onClick={() => { getLastListened(); setCurrentTab(2); setSearchText("Last listened tracks") }}>
                     <HistoryIcon></HistoryIcon>
                   </td>
                   <td className='tab' {...longPressHandler()} onClick={() => { getMyShazamTracks(); setCurrentTab(2); setSearchText("My Shazam Tracks") }}>
                     {myShazamTracksPlIconMobile}
                   </td> */}
-                    <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
-                      <PlaylistPlayIcon></PlaylistPlayIcon>
-                    </td>
-                    <td className={tab == 4 ? 'tab-selected' : 'tab'} style={{ width: 40 }} onClick={() => { setCurrentTab(4) }}>
-                      <Settings></Settings>
-                    </td>
-                  </tr>
-                  <tr>
-                    {tab != 4 ? <td colSpan={4} className='tab-panel'>
-                      <Activity mode={tab == "1" ? "visible" : "hidden"}>
-                        <PanelLibrary onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
-                      </Activity>
-                      <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
-                        <div className="toolbar-wrapper">
-                          <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedLibraryItem && selectedLibraryItem.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
-                        </div>
-                        <div className='panel-playlist-mobile'>
-                          {false ?
-                            <>
-                              <div className="loader-text">{loadingLibrary}</div>
-                              <div className='loader'>
+                      <td className={tab == 3 ? 'tab-selected' : 'tab'} onClick={() => { setCurrentTab(3) }} id="playlistButton">
+                        <PlaylistPlayIcon></PlaylistPlayIcon>
+                      </td>
+                      <td className={tab == 4 ? 'tab-selected' : 'tab'} style={{ width: 40 }} onClick={() => { setCurrentTab(4) }}>
+                        <Settings></Settings>
+                      </td>
+                    </tr>
+                    <tr>
+                      {tab != 4 ? <td colSpan={4} className='tab-panel'>
+                        <Activity mode={tab == "1" ? "visible" : "hidden"}>
+                          <PanelLibrary onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                        </Activity>
+                        <Activity mode={tab == "plprev" ? "visible" : "hidden"}>
+                          <div className="toolbar-wrapper">
+                            <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={selectedLibraryItem && selectedLibraryItem.name} onChange={(e) => onPlaylistFilterChange(e.target.value)} />
+                          </div>
+                          <div className='panel-playlist-mobile'>
+                            {false ?
+                              <>
+                                <div className="loader-text">{loadingLibrary}</div>
+                                <div className='loader'>
 
-                              </div>
-                            </>
-                            :
-                            <>
-                              <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-                            </>}
-                        </div>
-                      </Activity>
-                      {/* <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
+                                </div>
+                              </>
+                              :
+                              <>
+                                <ReordableTrackList enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} key={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                              </>}
+                          </div>
+                        </Activity>
+                        {/* <Activity mode={tab == "1.5" ? "visible" : "hidden"}>
                       <div className='panel-playlists-mobile'>
                         {loadingLibrary ?
                           <>
@@ -2084,245 +2085,245 @@ function App() {
                       </div>
                     </Activity> */}
 
-                      <Activity mode={tab == "2" ? "visible" : "hidden"}>
-                        <div className="toolbar-wrapper">
-                          {/* <SearchIcon className="search-icon" /> */}
-                          <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                        </div>
-                        <div className="panel-search-mobile">
-                          <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-
-
-                        </div>
-                      </Activity>
-
-                      <Activity mode={tab == "3" ? "visible" : "hidden"}>
-
-                        {
-                          playlistTracks.length > 0 ?
-                            <div className='panel-playlist-mobile'>
-                              <ReordableTrackList enableDrag={true} onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
-                            </div>
-                            :
-                            <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
-                              <SwipeRightIcon style={{ fontSize: 50 }}></SwipeRightIcon>
-
-                              <div style={{ fontSize: 20 }}>swipe right song<br></br> to add to queue</div>
-                            </div>
-                        }
-
-                      </Activity>
-                    </td> : null}
-                    {tab == 4 ? <td colSpan={4} className='tab-panel'>
-                      <button style={{ float: "right" }}>{time}</button>
-                      <button style={{ float: "right" }} onClick={logout}>Logout</button>
-                      <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
-                      <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
-
-                        {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
-                          <FullscreenIcon></FullscreenIcon>}
-
-                      </button>
-
-
-                      <button onClick={checkForUpdates}>Check for updates</button>
-                      {/* <button onClick={refreshAccessToken}>refresh at</button> */}
-                      <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
-                      <button onClick={() => { setToken(crypto.randomUUID()) }}>change token</button>
-                    </td> : null}
-                  </tr>
-
-                </tbody>
-              </table >
-
-              <div className='footer-mobile player'>
-
-                {token ?
-                  // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
-                  <SpotifyPlayer onNext={nextTrack} onClick={() => { showArtistInfo(true); loadArtistInfo(track) }} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
-
-                  : null}
-              </div>
-            </div >
-            :
-            <div className='layout' onContextMenu={(e) => e.preventDefault()} onMouseDown={closeContextMenu} >
-              <div className="header">
-                <table style={{ width: "100%", tableLayout: "fixed" }}>
-                  <tbody>
-                    <tr>
-                      <td >
-                        <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
-
-
-                          <div onContextMenu={handleMenu} className='app-title'>
-                            <span>LUMTU</span>
-                            <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
-                            {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                        <Activity mode={tab == "2" ? "visible" : "hidden"}>
+                          <div className="toolbar-wrapper">
+                            {/* <SearchIcon className="search-icon" /> */}
+                            <input ref={inputRef} className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                           </div>
+                          <div className="panel-search-mobile">
+                            <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
 
-                          {mode == "compact" ?
-                            <div className="toolbar-wrapper">
-                              {/* <SearchIcon className="search-icon" /> */}
-                              <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                            </div> : null}
+                          </div>
+                        </Activity>
 
-                          {/* <button onClick={checkForUpdates}>Check for updates</button> */}
-                          {/* <button onClick={checkForUpdates}>Check for updates</button> */}
-                          {/* <button onClick={refreshAccessToken}>refresh at</button> */}
-                          {/* <button onClick={startUniverse}>start</button> */}
+                        <Activity mode={tab == "3" ? "visible" : "hidden"}>
 
-                          {/* <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button> */}
+                          {
+                            playlistTracks.length > 0 ?
+                              <div className='panel-playlist-mobile'>
+                                <ReordableTrackList enableDrag={true} onClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} key={"pl"} onSwipedRight={onPlaylistSwipedRight} onDrop={addToPlaylist} ></ReordableTrackList>
+                              </div>
+                              :
+                              <div className='QueueMusicIcon' style={{ marginTop: "50%" }}>
+                                <SwipeRightIcon style={{ fontSize: 50 }}></SwipeRightIcon>
+
+                                <div style={{ fontSize: 20 }}>swipe right song<br></br> to add to queue</div>
+                              </div>
+                          }
+
+                        </Activity>
+                      </td> : null}
+                      {tab == 4 ? <td colSpan={4} className='tab-panel'>
+                        <button style={{ float: "right" }}>{time}</button>
+                        <button style={{ float: "right" }} onClick={logout}>Logout</button>
+                        <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
+                        <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
+
+                          {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
+                            <FullscreenIcon></FullscreenIcon>}
+
+                        </button>
 
 
-                          {/* <button className='header-button-small' onClick={toggleMode}><LiquorIcon></LiquorIcon></button> */}
+                        <button onClick={checkForUpdates}>Check for updates</button>
+                        {/* <button onClick={refreshAccessToken}>refresh at</button> */}
+                        <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
+                        <button onClick={() => { setToken(crypto.randomUUID()) }}>change token</button>
+                      </td> : null}
+                    </tr>
 
-                          {/* <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button> */}
-                          {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
-                        </div>
-                      </td>
-                      {mode == "normal" ?
-                        <td style={{ display: "flex", textAlign: "center", justifyContent: "center", padding: 5 }}>
-                          {/* <button onClick={getTopTracks}>Top tracks</button>*/}
-                          {/* <button onClick={getRecommendations}>Recommendations</button> */}
+                  </tbody>
+                </table >
 
-                          {/* <div className="toolbar-wrapper">
+                <div className='footer-mobile player'>
+
+                  {token ?
+                    // <Player onNext={() => nextTrack()} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={(e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
+                    <SpotifyPlayer onNext={nextTrack} onClick={() => { showArtistInfo(true); loadArtistInfo(track) }} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onLongPress={(track, e) => { e.stopPropagation(); setSelectedTrack(track); setShowPlaylistPicker(true) }} playlists={library.length > 0 && library.length > 0 && library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+
+                    : null}
+                </div>
+              </div >
+              :
+              <div className='layout' onContextMenu={(e) => e.preventDefault()} onMouseDown={closeContextMenu} >
+                <div className="header">
+                  <table style={{ width: "100%", tableLayout: "fixed" }}>
+                    <tbody>
+                      <tr>
+                        <td >
+                          <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
+
+
+                            <div onContextMenu={handleMenu} className='app-title'>
+                              <span>LUMTU</span>
+                              <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
+                              {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                            </div>
+
+
+                            {mode == "compact" ?
+                              <div className="toolbar-wrapper">
+                                {/* <SearchIcon className="search-icon" /> */}
+                                <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                              </div> : null}
+
+                            {/* <button onClick={checkForUpdates}>Check for updates</button> */}
+                            {/* <button onClick={checkForUpdates}>Check for updates</button> */}
+                            {/* <button onClick={refreshAccessToken}>refresh at</button> */}
+                            {/* <button onClick={startUniverse}>start</button> */}
+
+                            {/* <button className='header-button-small' onClick={() => loadPlaylistPrev(lastListenedPl)}><HistoryIcon></HistoryIcon></button> */}
+
+
+                            {/* <button className='header-button-small' onClick={toggleMode}><LiquorIcon></LiquorIcon></button> */}
+
+                            {/* <button className='header-button-small' style={{ width: 100, padding: 5 }} onClick={() => loadPlaylistPrev(myShazamTracksPl)}>{myShazamTracksPlIcon}</button> */}
+                            {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
+                          </div>
+                        </td>
+                        {mode == "normal" ?
+                          <td style={{ display: "flex", textAlign: "center", justifyContent: "center", padding: 5 }}>
+                            {/* <button onClick={getTopTracks}>Top tracks</button>*/}
+                            {/* <button onClick={getRecommendations}>Recommendations</button> */}
+
+                            {/* <div className="toolbar-wrapper">
                           <SearchIcon className="search-icon" />
                           <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={(e) => setSearchText(e.target.value)} />
                         </div> */}
-                          {/* <button onClick={getRecentTracks}>Recently played</button> */}
-                        </td> : null}
-                      <td>
-                        <div onContextMenu={handleMenu} className='app-title2'>
-                          {/* {mode == "compact" ? <span>QUEUE</span> : null} */}
-                          {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
-                          {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
-                        </div>
+                            {/* <button onClick={getRecentTracks}>Recently played</button> */}
+                          </td> : null}
+                        <td>
+                          <div onContextMenu={handleMenu} className='app-title2'>
+                            {/* {mode == "compact" ? <span>QUEUE</span> : null} */}
+                            {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
+                            {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                          </div>
 
-                        <button style={{ float: "right" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
+                          <button style={{ float: "right" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
 
-                        <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
-                          {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
-                            <FullscreenIcon></FullscreenIcon>}
-                        </button>
+                          <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
+                            {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
+                              <FullscreenIcon></FullscreenIcon>}
+                          </button>
 
-                        {locked ?
-                          <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                          : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                          {locked ?
+                            <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                            : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
 
-                        <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                          <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
 
-                        {mode == "normal" ?
-                          <button className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button> : null}
+                          {mode == "normal" ?
+                            <button className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button> : null}
 
 
-                        <button
-                          style={{ height: 40, float: "right" }}
-                          onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
-                          🍺 Buy me a beer
-                        </button>
+                          <button
+                            style={{ height: 40, float: "right" }}
+                            onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
+                            🍺 Buy me a beer
+                          </button>
 
-                        {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
-                        {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
-                        {/* <button style={{ float: "right" }}>{time}</button> */}
+                          {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
+                          {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
+                          {/* <button style={{ float: "right" }}>{time}</button> */}
 
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
 
-              </div>
-              <div className="main">
-                {mode == "normal" ?
-                  <div className="panel">
-                    <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
-                  </div>
-                  : null}
-                <div id="panel-main" className="panel-main">
-                  {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
-
-                  {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
-                  {true ? <div className="toolbar-wrapper">
-
-                    {mode == "normal" ?
-                      <>
-                        <div className='toolbar-search'>
-                          <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
-                          {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem?.images?.[2]?.url || selectedLibraryItem?.images?.[0]?.url} />
-
-                            : null}
-
-                          <input ref={inputRef} className="toolbar-input-search" placeholder="Search" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
-                        </div>
-
-                        {/* {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null} */}
-
-                        <div className='toolbar-icons'>
-                          {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
-                          <HistoryIcon className='toolbar-button' onClick={() => loadPlaylistPrev(lastListenedPl)}></HistoryIcon>
-
-                          <svg onClick={() => loadPlaylistPrev(myShazamTracksPl)} class='toolbar-button' width="22" height="22" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                            <g transform="translate(1, 1)" class='toolbar-button' >
-                              <path class='toolbar-button' d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
-                            </g>
-                          </svg>
-
-                          <MoreVertIcon onClick={handleMenu} menu-target="tracks" className='toolbar-button'></MoreVertIcon>
-                        </div>
-                      </> : null}
-                  </div> : null}
-                  {
-                    loadingTracks ? <div className='loader'></div> :
-                      <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-
-                    // getTracksPanel()
-                  }
                 </div>
-                <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
+                <div className="main">
+                  {mode == "normal" ?
+                    <div className="panel">
+                      <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
+                    </div>
+                    : null}
+                  <div id="panel-main" className="panel-main">
+                    {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
 
-                  <div className="toolbar-wrapper">
-                    <div className='toolbar-search'>
-                      <div>QUEUE</div> ({playlistTracks?.length || 0} tracks) duration: {getTotalDurationString(playlistTracks)}
-                    </div>
-                    <div className='toolbar-icons'>
-                      {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
-                      <svg onClick={() => setShufflePlaylist(!shufflePlaylist)} className={shufflePlaylist ? "bulbOnColor" : "bulbOffColor"} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path d="M237.66 178.34a8 8 0 0 1 0 11.32l-24 24a8 8 0 0 1-11.32-11.32L212.69 192h-11.75a72.12 72.12 0 0 1-58.59-30.15l-41.72-58.4A56.1 56.1 0 0 0 55.06 80H32a8 8 0 0 1 0-16h23.06a72.12 72.12 0 0 1 58.59 30.15l41.72 58.4A56.1 56.1 0 0 0 200.94 176h11.75l-10.35-10.34a8 8 0 0 1 11.32-11.32ZM143 107a8 8 0 0 0 11.16-1.86l1.2-1.67A56.1 56.1 0 0 1 200.94 80h11.75l-10.35 10.34a8 8 0 0 0 11.32 11.32l24-24a8 8 0 0 0 0-11.32l-24-24a8 8 0 0 0-11.32 11.32L212.69 64h-11.75a72.12 72.12 0 0 0-58.59 30.15l-1.2 1.67A8 8 0 0 0 143 107Zm-30 42a8 8 0 0 0-11.16 1.86l-1.2 1.67A56.1 56.1 0 0 1 55.06 176H32a8 8 0 0 0 0 16h23.06a72.12 72.12 0 0 0 58.59-30.15l1.2-1.67A8 8 0 0 0 113 149Z" />
-                      </svg>
-                      <MoreVertIcon onClick={handleMenu} menu-target="playlist" className='toolbar-button'></MoreVertIcon>
-                    </div>
+                    {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
+                    {true ? <div className="toolbar-wrapper">
+
+                      {mode == "normal" ?
+                        <>
+                          <div className='toolbar-search'>
+                            <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setSearchText(""); setSelectedLibraryItem(null); setSelectedLibraryIndex(-1); inputRef.current.focus(); }}></SearchIcon>
+                            {selectedLibraryItem ? <img className="" style={{ width: 20 }} src={selectedLibraryItem?.images?.[2]?.url || selectedLibraryItem?.images?.[0]?.url} />
+
+                              : null}
+
+                            <input ref={inputRef} className="toolbar-input-search" placeholder="Search" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                          </div>
+
+                          {/* {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null} */}
+
+                          <div className='toolbar-icons'>
+                            {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
+                            <HistoryIcon className='toolbar-button' onClick={() => loadPlaylistPrev(lastListenedPl)}></HistoryIcon>
+
+                            <svg onClick={() => loadPlaylistPrev(myShazamTracksPl)} class='toolbar-button' width="22" height="22" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                              <g transform="translate(1, 1)" class='toolbar-button' >
+                                <path class='toolbar-button' d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
+                              </g>
+                            </svg>
+
+                            <MoreVertIcon onClick={handleMenu} menu-target="tracks" className='toolbar-button'></MoreVertIcon>
+                          </div>
+                        </> : null}
+                    </div> : null}
+                    {
+                      loadingTracks ? <div className='loader'></div> :
+                        <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={onPlaylistTrackDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
+                      // getTracksPanel()
+                    }
                   </div>
+                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }}>
 
-                  {
-                    playlistTracks.length > 0 ?
-                      <ReordableTrackList enableDrag onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
-
-                      :
-                      <div className='QueueMusicIcon'>
-                        <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
-                        <div style={{ fontSize: 20 }}>drag to queue</div>
+                    <div className="toolbar-wrapper">
+                      <div className='toolbar-search'>
+                        <div>QUEUE</div> ({playlistTracks?.length || 0} tracks) duration: {getTotalDurationString(playlistTracks)}
                       </div>
-                  }
+                      <div className='toolbar-icons'>
+                        {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
+                        <svg onClick={() => setShufflePlaylist(!shufflePlaylist)} className={shufflePlaylist ? "bulbOnColor" : "bulbOffColor"} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 256 256"><path d="M237.66 178.34a8 8 0 0 1 0 11.32l-24 24a8 8 0 0 1-11.32-11.32L212.69 192h-11.75a72.12 72.12 0 0 1-58.59-30.15l-41.72-58.4A56.1 56.1 0 0 0 55.06 80H32a8 8 0 0 1 0-16h23.06a72.12 72.12 0 0 1 58.59 30.15l41.72 58.4A56.1 56.1 0 0 0 200.94 176h11.75l-10.35-10.34a8 8 0 0 1 11.32-11.32ZM143 107a8 8 0 0 0 11.16-1.86l1.2-1.67A56.1 56.1 0 0 1 200.94 80h11.75l-10.35 10.34a8 8 0 0 0 11.32 11.32l24-24a8 8 0 0 0 0-11.32l-24-24a8 8 0 0 0-11.32 11.32L212.69 64h-11.75a72.12 72.12 0 0 0-58.59 30.15l-1.2 1.67A8 8 0 0 0 143 107Zm-30 42a8 8 0 0 0-11.16 1.86l-1.2 1.67A56.1 56.1 0 0 1 55.06 176H32a8 8 0 0 0 0 16h23.06a72.12 72.12 0 0 0 58.59-30.15l1.2-1.67A8 8 0 0 0 113 149Z" />
+                        </svg>
+                        <MoreVertIcon onClick={handleMenu} menu-target="playlist" className='toolbar-button'></MoreVertIcon>
+                      </div>
+                    </div>
+
+                    {
+                      playlistTracks.length > 0 ?
+                        <ReordableTrackList enableDrag onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+
+                        :
+                        <div className='QueueMusicIcon'>
+                          <QueueMusicIcon style={{ fontSize: 50 }}></QueueMusicIcon>
+                          <div style={{ fontSize: 20 }}>drag to queue</div>
+                        </div>
+                    }
+                  </div>
                 </div>
-              </div>
 
 
-              <Dialog
-                onMouseDown={() => setMenuPosition(null)}
-                position={pickerPosition}
-                onDragEnd={(pos) => { setPickerPosition(pos); localStorage.setItem("pickerPosition", JSON.stringify(pos)); }}
-                open={mode == "normal" && showPickers }
-                onClose={() => {setShowPickers(false);}}
-                title={selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
-                header={<div onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center"}}>
+                <Dialog
+                  onMouseDown={() => setMenuPosition(null)}
+                  position={pickerPosition}
+                  onDragEnd={(pos) => { setPickerPosition(pos); localStorage.setItem("pickerPosition", JSON.stringify(pos)); }}
+                  open={mode == "normal" && showPickers}
+                  onClose={() => { setShowPickers(false); localStorage.setItem("showPickers", "false"); }}
+                  title={selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
+                  header={<div onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center" }}>
 
 
-                </div>}
-                style={{ textAlign: "center" }}
-                blockBackground={false}
-                buttons={[]}
-                onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }}
-              >
-              
+                  </div>}
+                  style={{ textAlign: "center" }}
+                  blockBackground={false}
+                  buttons={[]}
+                  onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }}
+                >
+
                   <table style={{ width: "100%", display: "inline-block" }}>
                     <tbody>
                       <tr>
@@ -2337,11 +2338,9 @@ function App() {
                         </td>
                       </tr>
                     </tbody>
-                  </table> 
+                  </table>
 
-              </Dialog>
-
-
+                </Dialog>
 
 
 
@@ -2365,18 +2364,20 @@ function App() {
 
 
 
-              <div className="footer player">
-                {/* {playbackSDKReady && token ?
+
+
+                <div className="footer player">
+                  {/* {playbackSDKReady && token ?
                 <Player locked={locked} onNext={() => { if (isLocked()) { return; } nextTrack() }} onError={playerError} stateChanged={playerStateChanged} token={token} trackid={track} onClick={() => setSelectedTrack(track)} playlists={library.filter((pl) => pl.tracks.some((t) => t.id == track.id))} />
 
 
                 : null} */}
-                <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                  <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                </div>
               </div>
-            </div>
-        )
-      }
-    </>
+          )
+        }
+      </>
 
   );
 }
