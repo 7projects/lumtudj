@@ -15,6 +15,8 @@ import BlockIcon from '@mui/icons-material/Block';
 import PersonIcon from '@mui/icons-material/Person';
 import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
+import Tooltip from '@mui/material/Tooltip';
+import Marquee from "react-fast-marquee";
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -117,6 +119,9 @@ function App() {
   const [selectedPlaylistTrack, setSelectedPlaylistTrack] = useState([]);
 
   const [selectedPlaylistTracks, setSelectedPlaylistTracks] = useState([]);
+
+  const [plcMode, setPLCMode] = useState("tagger"); // or "edit"
+  const [plcSelected, setPLCSelected] = useState([]);
 
   const [trackCounts, setTrackCounts] = useState({});
   const [track, setTrack] = useState({});
@@ -889,6 +894,58 @@ function App() {
     let pls = [...playlistTracks, ...pl.tracks];
     setPlaylistTracks(pls);
   };
+
+
+  const addToPLCSelected = (pl, selected) => {
+    let sel = [...plcSelected];
+    if (selected) {
+      sel.push(pl);
+    } else {
+      sel = sel.filter(x => x != pl);    
+    }
+
+    setPLCSelected(sel);
+    //need all tracks from library that are in every playlist in plcSelected
+    const result = getCommonTracks(sel);
+    debugger;
+
+    setSelectedPlaylistTracks(result);
+
+  }
+
+  function getCommonTracks(selectedPlaylists = []) {
+    // normalize to IDs
+    const selIds = selectedPlaylists.map(p => (typeof p === 'string' ? p : p.id));
+
+    // find matching playlists in library
+    const selected = library.filter(p => selIds.includes(p.id));
+    if (selected.length === 0) return [];
+    if (selected.length === 1) return Array.from(selected[0].tracks);
+
+    // make sets of track IDs (handle tracks that may be objects or primitives)
+    const trackIdSets = selected.map(p =>
+      new Set(p.tracks.map(t => (t && typeof t === 'object') ? t.id ?? t : t))
+    );
+
+    // intersection of track ids
+    const commonIds = [...trackIdSets[0]].filter(id =>
+      trackIdSets.every(s => s.has(id))
+    );
+
+    // try to return full track objects where available (search first playlist that contains the object)
+    const idToTrackObj = new Map();
+    for (const p of selected) {
+      for (const t of p.tracks) {
+        const tid = (t && typeof t === 'object') ? t.id ?? t : t;
+        if (!idToTrackObj.has(tid)) idToTrackObj.set(tid, t);
+      }
+    }
+
+    // build result array preferring full objects when we discovered them
+    return commonIds.map(id => idToTrackObj.get(id) ?? id);
+  }
+
+
 
   const addToSpotifyPlaylist = async (pl, bulbOn) => {
 
@@ -1842,7 +1899,11 @@ function App() {
             {menuAnchor.getAttribute("menu-target") == "settings" ?
               <MenuItem onClick={toggleMode}>
                 {mode == "normal" ? "Party mode" : "Standard mode"}
+              </MenuItem> : null}
 
+            {menuAnchor.getAttribute("menu-target") == "settings" ?
+              <MenuItem onClick={() => tour.start()}>
+                Take a tour
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "settings" ?
@@ -1905,7 +1966,7 @@ function App() {
         }
 
         {
-          dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem.type != "album" && selectedLibraryItem.type != "featured" ?
+          dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem?.type != "album" && selectedLibraryItem?.type != "featured" ?
             <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
               <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
             </div> : null
@@ -2213,20 +2274,27 @@ function App() {
 
                           <button style={{ float: "right" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
 
-                          <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
-                            {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
-                              <FullscreenIcon></FullscreenIcon>}
-                          </button>
+                          <Tooltip enterDelay={500} title="Toggle fullscreen mode">
+                            <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
+                              {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
+                                <FullscreenIcon></FullscreenIcon>}
+                            </button>
+                          </Tooltip>
 
-                          {locked ?
-                            <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                            : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                          <Tooltip enterDelay={500} title="Toggle lock mode">
+                            {locked ?
+                              <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                              : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                          </Tooltip>
 
-                          <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                          <Tooltip enterDelay={500} title="Change theme">
+                            <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                          </Tooltip>
 
-                          {mode == "normal" ?
-                            <button className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button> : null}
 
+                          <Tooltip enterDelay={500} title="Toggle playlist controller">
+                            <button className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button>
+                          </Tooltip>
 
                           <button
                             style={{ height: 40, float: "right" }}
@@ -2246,11 +2314,11 @@ function App() {
                 </div>
                 <div className="main">
                   {mode == "normal" ?
-                    <div className="panel" id="tour1">
+                    <div className="panel" id="library">
                       <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                     </div>
                     : null}
-                  <div id="panel-main" className="panel-main" id="tour2">
+                  <div id="panel-main" className="panel-main">
                     {/* <img src="https://mosaic.scdn.co/640/ab67616d00001e0204508fa56b3746ca1f90f73cab67616d00001e024206814685e7f97a78670cc9ab67616d00001e027b2ed55c469487b2be37cac0ab67616d00001e028e7da55a612d5dda4e2d6663" alt="Search" className="panel-image" /> */}
 
                     {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
@@ -2290,7 +2358,7 @@ function App() {
                       // getTracksPanel()
                     }
                   </div>
-                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }} id="tour3">
+                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }} id="playlist">
 
                     <div className="toolbar-wrapper">
                       <div className='toolbar-search'>
@@ -2322,20 +2390,30 @@ function App() {
                   onMouseDown={() => setMenuPosition(null)}
                   position={pickerPosition}
                   onDragEnd={(pos) => { setPickerPosition(pos); localStorage.setItem("pickerPosition", JSON.stringify(pos)); }}
-                  open={mode == "normal" && showPickers}
+                  open={showPickers}
                   onClose={() => { setShowPickers(false); localStorage.setItem("showPickers", "false"); }}
-                  title={selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
-                  header={<div onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center" }}>
-
-
-                  </div>}
+                  title={<table onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center" }}>
+                    <tbody style={{ width: "100%" }}>
+                      <tr>
+                        <td style={{ width: "80%", padding: 5 }}>
+                          <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
+                            {selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
+                          </Marquee>
+                        </td>
+                        <td style={{ width: "20%", padding: 5 }}>
+                          <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}>AND</span>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>}
+                  header={null}
                   style={{ textAlign: "center" }}
                   blockBackground={false}
                   buttons={[]}
                   onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }}
                 >
 
-                  <table style={{ width: "100%", display: "inline-block" }}>
+                  <table style={{ width: "100%", display: "inline-block", maxHeight: "50vh" }}>
                     <tbody>
                       <tr>
                         {/* <td style={{ width: 30, padding: 5 }}>
@@ -2344,9 +2422,16 @@ function App() {
                             style={{ display: "block", width: isMobile() ? 30 : 35, objectFit: 'cover', borderRadius: "50%" }}
                           />
                         </td> */}
-                        <td className='selected-track-container'>
-                          {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
-                        </td>
+                        {plcMode == "tagger" ?
+                          <td className='selected-track-container'>
+                            {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                          </td> : null}
+
+                        {plcMode == "and" ?
+                          <td className='selected-track-container'>
+                            {library.filter(l => l.type == "playlist").map(p => plcSelected.some(s => s == p.id) ? <span onClick={() => { addToPLCSelected(p.id, false) }} className='plc-button-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToPLCSelected(p.id, true) }} className='plc-button-off' key={p.id}>{p.name}</span>)}
+                          </td> : null}
+
                       </tr>
                     </tbody>
                   </table>

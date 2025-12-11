@@ -1476,7 +1476,7 @@ button:active {
   color: #2e2e2e;
   margin: 2px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px;
   cursor: pointer;
   box-shadow: 0 0 5px 1px #80ceff;
@@ -1489,7 +1489,7 @@ button:active {
   color: #0d3b66;
   margin: 2px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px;
   cursor: pointer;
 }
@@ -2301,6 +2301,7 @@ button:active {
   font-size: 14px;
   color: #0d3b66;
   background-color: #f3f8ff;
+  overflow-y: scroll;
 }
 .dialog-footer {
   padding: 12px 16px;
@@ -2326,4 +2327,31 @@ button:active {
 }
 .dialog-footer .dialog-btn.primary:hover {
   background: #e7f2ff;
+}
+.plc-button-off {
+  display: inline-block;
+  background-color: #e7f2ff;
+  border: 1px solid #b4d6ff;
+  color: #0d3b66;
+  margin: 2px;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 3px;
+  cursor: pointer;
+}
+.plc-button-off:hover {
+  background-color: #ffffff;
+}
+.plc-button-on {
+  display: inline-block;
+  background-color: #eb2019;
+  border: 1px solid #aa3818;
+  color: #1e1e1e;
+  margin: 2px;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 5px 1px #d94125;
+  text-shadow: 2 2 #838383;
 }

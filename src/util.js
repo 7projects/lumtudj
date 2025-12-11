@@ -32,11 +32,12 @@ export const getTour = () => {
   });
 
   tour.addStep({
+    title: "LIBRARY",
     id: 'example-step',
-    text: 'Library. Here you can filter your local playlists, albums. Press ENTER to search on the server.',
+    text: 'Explore your saved albums and playlists with ease. Start typing in the search bar to instantly see results from your local library.\nLooking for something new on the server? Just hit Enter to expand your search.',
     attachTo: {
-      element: '#tour1',
-      on: 'top'
+      element: '#library',
+      on: 'right'
     },
     classes: 'example-step-extra-class',
     buttons: [
@@ -48,10 +49,11 @@ export const getTour = () => {
   });
 
   tour.addStep({
+    title: "TRACK PREVIEW PANEL",
     id: 'example-step2',
-    text: 'Here you can search for local saved tracks. When you press ENTER in the search box, it will search the server as well.',
+    text: 'This panel shows all songs from your selected album or playlist. Make changes to the playlist on the spot.Start typing in the search bar to instantly see results from your local library.Press Enter to look for more on the server.',
     attachTo: {
-      element: '#tour2',
+      element: '#panel-main',
       on: 'top'
     },
     classes: 'example-step-extra-class',
@@ -64,10 +66,11 @@ export const getTour = () => {
   });
 
     tour.addStep({
+    title: "QUEUE",
     id: 'example-step3',
-    text: 'This is the playback queue. You can add and reorder tracks by dragging and dropping them.',
+    text: 'This panel shows the songs you’ve queued up — they’ll play in order, or shuffled if you choose. You can also create new playlists right here. \nOnce a song starts playing, it’s removed from the queue.', 
     attachTo: {
-      element: '#tour3',
+      element: '#playlist',
       on: 'top'
     },
     classes: 'example-step-extra-class',

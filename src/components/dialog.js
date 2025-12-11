@@ -143,14 +143,10 @@ export default function Dialog({
             <div className="dialog-header" onMouseDown={onMouseDown}>
               <table style={{ width: "100%" }}>
                 <tr>
-                  <td style={{ display: "inline-block" }}>
-                    <Marquee speed={0} style={{ fontSize: 14 }}>
-                      {title}
-                    </Marquee>
-
-
+                  <td style={{ display: "inline-block", width: "90%" }}>         
+                      {title}    
                   </td>
-                  <td>
+                  <td style={{ display: "inline-block", width: "40px" }}>
                     <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}>×</button>
                   </td>
                 </tr>

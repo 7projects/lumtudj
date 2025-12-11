@@ -629,6 +629,11 @@ td {
   z-index: 99999;
   border-radius: 4px;
 }
+.context-menu span {
+  border-top: 1px solid #161616;
+  width: 100%;
+  display: inline-block;
+}
 .context-menu div {
   padding: 10px;
   color: #f1f1f1;
@@ -1469,7 +1474,7 @@ button:active {
   color: #505050;
   margin: 2px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px;
   cursor: pointer;
   box-shadow: 0 0 5px 1px #43e57d;
@@ -1482,7 +1487,7 @@ button:active {
   color: #ffffff;
   margin: 2px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: 12px;
   padding: 3px;
   cursor: pointer;
 }
@@ -2293,6 +2298,7 @@ button:active {
   font-size: 14px;
   color: #ffffff;
   background-color: #000000;
+  overflow-y: scroll;
 }
 .dialog-footer {
   padding: 12px 16px;
@@ -2318,4 +2324,31 @@ button:active {
 }
 .dialog-footer .dialog-btn.primary:hover {
   background: #070707;
+}
+.plc-button-off {
+  display: inline-block;
+  background-color: #070707;
+  border: 1px solid #000000;
+  color: #ffffff;
+  margin: 2px;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 3px;
+  cursor: pointer;
+}
+.plc-button-off:hover {
+  background-color: #212121;
+}
+.plc-button-on {
+  display: inline-block;
+  background-color: #eb2019;
+  border: 1px solid #aa3818;
+  color: #1e1e1e;
+  margin: 2px;
+  border-radius: 5px;
+  font-size: 12px;
+  padding: 3px;
+  cursor: pointer;
+  box-shadow: 0 0 5px 1px #d94125;
+  text-shadow: 2 2 #838383;
 }
