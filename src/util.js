@@ -65,10 +65,10 @@ export const getTour = () => {
     ]
   });
 
-    tour.addStep({
+  tour.addStep({
     title: "QUEUE",
     id: 'example-step3',
-    text: 'This panel shows the songs you’ve queued up — they’ll play in order, or shuffled if you choose. You can also create new playlists right here. \nOnce a song starts playing, it’s removed from the queue.', 
+    text: 'This panel shows the songs you’ve queued up — they’ll play in order, or shuffled if you choose. You can also create new playlists right here. \nOnce a song starts playing, it’s removed from the queue.',
     attachTo: {
       element: '#playlist',
       on: 'top'
@@ -85,6 +85,9 @@ export const getTour = () => {
   return tour;
 }
 
+export const isDesktop = () => {
+  return !!window.chrome?.webview;
+}
 
 export const formatTime = (ms) => {
   if (ms === null) return '0:00';
@@ -94,55 +97,68 @@ export const formatTime = (ms) => {
 };
 
 export const loadThemeCSS = (themeName) => {
-  const id = 'theme-css-link'
-  const href = "./themes/" + themeName + ".css";
-  let link = document.getElementById(id)
+  return new Promise((resolve, reject) => {
+    const id = 'theme-css-link'
+    const href = `./themes/${themeName}.css`
+    let link = document.getElementById(id)
 
-  if (link) {
+    if (!link) {
+      link = document.createElement('link')
+      link.id = id
+      link.rel = 'stylesheet'
+      document.head.appendChild(link)
+    }
+
+    // IMPORTANT: attach handlers BEFORE setting href
+    link.onload = () => {
+      const bodyBgColor = window.getComputedStyle(document.body).backgroundColor;
+      sendMsgToDesktop(bodyBgColor);
+      resolve();
+    }
+    link.onerror = () => reject(new Error(`Failed to load theme: ${themeName}`))
     link.href = href
-  } else {
-    link = document.createElement('link')
-    link.id = id
-    link.rel = 'stylesheet'
-    link.href = href
-    document.head.appendChild(link)
-  }
+  })
 }
 
-export const changeTheme = () => {
-  if (localStorage.getItem("theme") == "blue") {
-    localStorage.setItem("theme", "light");
-    loadThemeCSS("light");
-    return;
-  }
+export const changeTheme = async () => {
+  const currentTheme = localStorage.getItem("theme");
 
-  if (localStorage.getItem("theme") == "light") {
-    localStorage.setItem("theme", "spotify");
-    loadThemeCSS("spotify");
-    return;
-  }
+  switch (currentTheme) {
+    case "blue":
+      localStorage.setItem("theme", "light");
+      await loadThemeCSS("light");
+      break;
 
-  if (localStorage.getItem("theme") == "spotify") {
-    localStorage.setItem("theme", "mono");
-    loadThemeCSS("mono");
-    return;
-  }
+    case "light":
+      localStorage.setItem("theme", "spotify");
+      await loadThemeCSS("spotify");
+      break;
 
-  if (localStorage.getItem("theme") == "mono") {
-    localStorage.setItem("theme", "slate");
-    loadThemeCSS("slate");
-    return;
-  }
+    case "spotify":
+      localStorage.setItem("theme", "mono");
+      await loadThemeCSS("mono");
+      break;
 
-  if (localStorage.getItem("theme") == "slate") {
-    localStorage.setItem("theme", "blue");
-    loadThemeCSS("blue");
-    return;
-  }
+    case "mono":
+      localStorage.setItem("theme", "slate");
+      await loadThemeCSS("slate");
+      break;
 
-  loadThemeCSS("spotify");
-  localStorage.setItem("theme", "spotify");
-}
+    case "slate":
+      localStorage.setItem("theme", "blue");
+      await loadThemeCSS("blue");
+      break;
+
+    default:
+      localStorage.setItem("theme", "spotify");
+      await loadThemeCSS("spotify");
+      break;
+  }
+};
+
+export const sendMsgToDesktop = (msg) => {
+  window.chrome?.webview?.postMessage(msg);
+};
 
 export const isMobile = () => {
   return /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(

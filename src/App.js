@@ -6,7 +6,7 @@ import Player from './components/player';
 import TrackRow from './components/trackRow';
 import api from './Api';
 import PlaylistRow from './components/playlistRow';
-import { getTour, loadThemeCSS, isMobile, fullscreen, startUniverse, getTotalDurationString, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
+import { getTour, sendMsgToDesktop, isDesktop, loadThemeCSS, isMobile, fullscreen, startUniverse, getTotalDurationString, flyToPlayer, flyToPlaylist, changeTheme, myShazamTracksPl, lastListenedPl } from './util';
 import { faL, faLeaf, faPersonMilitaryToPerson } from '@fortawesome/free-solid-svg-icons';
 import { loadLibray, deleteFromLibrary, saveLibrary, savePlaylists, loadPlaylists, saveBackgroundPlaylists, loadBackgroundPlaylists, addToHistory, getHistory, saveAlbums, loadAlbums, clearDatabase } from './database';
 import Menu from '@mui/material/Menu';
@@ -17,6 +17,10 @@ import PlaylistRemoveIcon from '@mui/icons-material/PlaylistRemove';
 import PlayCircleIcon from '@mui/icons-material/PlayCircle';
 import Tooltip from '@mui/material/Tooltip';
 import Marquee from "react-fast-marquee";
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
+import MinimizeIcon from '@mui/icons-material/Minimize';
+import MaximizeIcon from '@mui/icons-material/Maximize';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -459,10 +463,10 @@ function App() {
       const theme = localStorage.getItem("theme");
       if (theme) {
 
-        loadThemeCSS(theme);
+        await loadThemeCSS(theme);
       } else {
 
-        loadThemeCSS("mono");
+        await loadThemeCSS("mono");
       }
 
       const oldCode = localStorage.getItem('code');
@@ -901,7 +905,7 @@ function App() {
     if (selected) {
       sel.push(pl);
     } else {
-      sel = sel.filter(x => x != pl);    
+      sel = sel.filter(x => x != pl);
     }
 
     setPLCSelected(sel);
@@ -1755,7 +1759,6 @@ function App() {
     content: 'This is my awesome feature!',
   }];
 
-
   return (
 
     localStorage.getItem("userAgreementAccepted") != "true" ? <UserAgreement></UserAgreement>
@@ -2065,7 +2068,7 @@ function App() {
           ) : (
 
             isMobile() ?
-              <div className='layout'>
+              <div className='layout' id="layout">
 
                 <AnimatePresence>
                   {showplaylistPicker ?
@@ -2196,7 +2199,6 @@ function App() {
 
                         </button>
 
-
                         <button onClick={checkForUpdates}>Check for updates</button>
                         {/* <button onClick={refreshAccessToken}>refresh at</button> */}
                         <button onClick={() => { api.getFullAlbums(); }}>get albums</button>
@@ -2218,8 +2220,8 @@ function App() {
               </div >
               :
 
-              <div className='layout' onContextMenu={(e) => e.preventDefault()} onMouseDown={closeContextMenu} >
-                <div className="header">
+              <div className='layout' id="layout" onContextMenu={(e) => e.preventDefault()} onMouseDown={closeContextMenu} >
+                <div className="header" onMouseDown={(e) => sendMsgToDesktop("ondragwindow")}>
                   <table style={{ width: "100%", tableLayout: "fixed" }}>
                     <tbody>
                       <tr>
@@ -2272,31 +2274,53 @@ function App() {
                             {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                           </div>
 
-                          <button style={{ float: "right" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
+
+
+                          {isDesktop() && <>
+                            <Tooltip enterDelay={500} title="Exit">
+                              <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onclose") }}>
+                                <DisabledByDefaultIcon></DisabledByDefaultIcon>
+                              </button>
+                            </Tooltip>
+
+                            <Tooltip enterDelay={500} title="Maximize window">
+                              <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onmaximize") }}>
+                                <MaximizeIcon></MaximizeIcon>
+                              </button>
+                            </Tooltip>
+
+                            <Tooltip enterDelay={500} title="Minimize window">
+                              <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onminimize") }}>
+                                <MinimizeIcon></MinimizeIcon>
+                              </button>
+                            </Tooltip>
+                          </>}
 
                           <Tooltip enterDelay={500} title="Toggle fullscreen mode">
-                            <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
+                            <button style={{ float: "right"}} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
                               {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
                                 <FullscreenIcon></FullscreenIcon>}
                             </button>
                           </Tooltip>
 
+                          <button onMouseDown={e => e.stopPropagation()} style={{ float: "right", marginRight: "30px" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
+
                           <Tooltip enterDelay={500} title="Toggle lock mode">
                             {locked ?
-                              <button id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                              : <button id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                              <button onMouseDown={e => e.stopPropagation()} id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                              : <button onMouseDown={e => e.stopPropagation()} id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Change theme">
-                            <button style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                            <button onMouseDown={e => e.stopPropagation()} style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
                           </Tooltip>
 
-
                           <Tooltip enterDelay={500} title="Toggle playlist controller">
-                            <button className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button>
+                            <button onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button>
                           </Tooltip>
 
                           <button
+                            onMouseDown={e => e.stopPropagation()}
                             style={{ height: 40, float: "right" }}
                             onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
                             🍺 Buy me a beer
@@ -2401,7 +2425,7 @@ function App() {
                           </Marquee>
                         </td>
                         <td style={{ width: "20%", padding: 5 }}>
-                          <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}>AND</span>
+                          <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
                         </td>
                       </tr>
                     </tbody>
