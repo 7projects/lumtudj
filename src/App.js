@@ -1767,6 +1767,15 @@ function App() {
     content: 'This is my awesome feature!',
   }];
 
+  const handleDownloadDesktopApp = () => {
+    const link = document.createElement("a");
+    link.href = "https://lumtudj.net/setupX64.zip"; // file URL
+    link.setAttribute("download", "setupX64.zip");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
   return (
 
     localStorage.getItem("userAgreementAccepted") != "true" ? <UserAgreement></UserAgreement>
@@ -1913,7 +1922,7 @@ function App() {
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "settings" && !isDesktop() ?
-              <MenuItem onClick={toggleMode}>
+              <MenuItem onClick={handleDownloadDesktopApp}>
                 Download desktop app
               </MenuItem> : null}
 
