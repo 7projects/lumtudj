@@ -47,6 +47,9 @@
 @panel-background-color: lighten(@background-color, 10%);
 @panel-color: @track-row-color;
 
+@panel-main-background-color: @panel-background-color;
+@panel-main-color: @track-row-color;
+
 :root {
     color-scheme: dark;
 }
@@ -201,7 +204,7 @@ code {
     width: 50%;
     padding: 1px;
 
-    background-color: @panel-background-color;
+    background-color: @panel-main-background-color;
     text-wrap: auto;
     border-radius: 10px;
     /* border: 4px solid white; */
@@ -2078,7 +2081,7 @@ button:active {
 .dialog-backdrop {
     position: fixed;
     inset: 0;
-    z-index: 9999;
+    z-index: 9990;
     display: flex;
     align-items: center;
     justify-content: center;

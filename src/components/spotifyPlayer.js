@@ -21,7 +21,8 @@ export default function SpotifyPlayer({
   playlists,
   onNext,
   stateChanged,
-  onLongPress
+  onLongPress,
+  isLocked,
 }) {
 
   const playerRef = useRef(null);
@@ -194,6 +195,9 @@ export default function SpotifyPlayer({
   }
 
   const pauseTrack = async (e) => {
+    if(isLocked)
+      if(isLocked()) return;
+
     e.stopPropagation();
     if (!deviceId || !tokenRef.current || locked) return;
     try {
@@ -220,6 +224,9 @@ export default function SpotifyPlayer({
   };
 
   const seek = async (e) => {
+    if(isLocked)
+      if(isLocked()) return;
+
     e.stopPropagation();
     if (!playerRef.current || !deviceId || !tokenRef.current) return;
 
@@ -242,11 +249,18 @@ export default function SpotifyPlayer({
   };
 
   const next = async (e) => {
+    if(!paused)
+      if(isLocked)
+        if(isLocked()) return;
+
     e.stopPropagation();
     if (onNext) onNext();
   };
 
   const prev = async () => {
+    if(isLocked)
+      if(isLocked()) return;
+
     if (locked || !deviceId || !tokenRef.current) return;
     setPosition(0);
     try {

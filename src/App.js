@@ -823,6 +823,9 @@ function App() {
 
   const addToPlaylist = async (track, position, id) => {
 
+
+    debugger;
+
     // if(dragSource == "playlist") 
     //   return;
     setDragSource(null);
@@ -836,14 +839,14 @@ function App() {
     let pl = [...playlistTracks];
 
     if (dragSource == "playlist") {
-      if (locked) {
-        return
+      if (isLocked()) {
+        return;
       } else {
         pl.splice(dragSourceIndex, 1);
       }
     }
 
-    if (dragSource == "library" && !locked) {
+    if (dragSource == "library") {
       const selPl = filteredLibrary[dragSourceIndex];
 
       if (selPl.tracks?.length == 0) {
@@ -1100,14 +1103,14 @@ function App() {
   }
 
   const onPlaylistTrackDoubleClick = (tr, index) => {
-
+    if (isLocked()) { return; }
     //remove this tr from playlistTracks and flyto player
     let pl = [...playlistTracks];
     pl.splice(index, 1);
     setPlaylistTracks(pl);
     flyToPlayer("pl" + index + "-" + tr.id);
 
-    if (isLocked()) { return; }
+
     play(tr);
     setPlayPosition("playlist");
     setPlayIndex(index);
@@ -1450,10 +1453,15 @@ function App() {
     setLoadingTracks(true);
 
     if (pl.id == "MyShazamedTracks") {
+      setSelectedLibraryItem(null);
+      setSelectedLibraryIndex(-1);
+
       pl.tracks = await getMyShazamTracks();
     }
 
     if (pl.id == "LastListened") {
+      setSelectedLibraryItem(null);
+      setSelectedLibraryIndex(-1);
       pl.tracks = await getLastListened();
     }
 
@@ -1622,7 +1630,7 @@ function App() {
       items.push({ label: "Follow album", onClick: () => followAlbum(album), icon: <FavoriteIcon /> });
 
     if (album.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => { nextTrack(null, album) }, icon: <PlayCircleIcon /> });
+      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, album) }, icon: <PlayCircleIcon /> });
 
     setSelectedArtistAlbumIndex(index);
     setContextMenuItems(items);
@@ -1668,7 +1676,7 @@ function App() {
       items.push({ label: "Follow album", onClick: () => followAlbum(playlist), icon: <FavoriteIcon /> });
 
     if (playlist.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => { nextTrack(null, playlist) }, icon: <PlayCircleIcon /> });
+      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist) }, icon: <PlayCircleIcon /> });
     // selectedLibraryItem.type == "artist" &&
     //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
     items.push({ label: "-" });
@@ -1904,6 +1912,11 @@ function App() {
                 {mode == "normal" ? "Party mode" : "Standard mode"}
               </MenuItem> : null}
 
+            {menuAnchor.getAttribute("menu-target") == "settings" && !isDesktop() ?
+              <MenuItem onClick={toggleMode}>
+                Download desktop app
+              </MenuItem> : null}
+
             {menuAnchor.getAttribute("menu-target") == "settings" ?
               <MenuItem onClick={() => tour.start()}>
                 Take a tour
@@ -1919,10 +1932,10 @@ function App() {
                 Edit playlist
               </MenuItem> : null}
 
-            {menuAnchor.getAttribute("menu-target") == "tracks" ?
+            {/* {menuAnchor.getAttribute("menu-target") == "tracks" ?
               <MenuItem onClick={() => setPlaylistTracks([])}>
                 Something
-              </MenuItem> : null}
+              </MenuItem> : null} */}
 
             {menuAnchor.getAttribute("menu-target") == "playlist" ?
               <MenuItem onClick={() => setPlaylistTracks([])}>
@@ -2297,7 +2310,7 @@ function App() {
                           </>}
 
                           <Tooltip enterDelay={500} title="Toggle fullscreen mode">
-                            <button style={{ float: "right"}} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
+                            <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
                               {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
                                 <FullscreenIcon></FullscreenIcon>}
                             </button>
@@ -2377,7 +2390,7 @@ function App() {
                     </div> : null}
                     {
                       loadingTracks ? <div className='loader'></div> :
-                        <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={(tr) => { play(tr); }} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                        <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                       // getTracksPanel()
                     }
@@ -2398,7 +2411,7 @@ function App() {
 
                     {
                       playlistTracks.length > 0 ?
-                        <ReordableTrackList enableDrag onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                        <ReordableTrackList enableDrag={!locked} onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                         :
                         <div className='QueueMusicIcon'>
@@ -2420,12 +2433,19 @@ function App() {
                     <tbody style={{ width: "100%" }}>
                       <tr>
                         <td style={{ width: "80%", padding: 5 }}>
-                          <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
-                            {selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
-                          </Marquee>
+                          {plcMode == "tagger" ?
+                            <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
+                              {selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
+                            </Marquee> :
+                            <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
+                              Combine playlists
+                            </Marquee>
+                          }
                         </td>
                         <td style={{ width: "20%", padding: 5 }}>
-                          <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
+                          <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
+                            <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
+                          </Tooltip>
                         </td>
                       </tr>
                     </tbody>
@@ -2492,7 +2512,7 @@ function App() {
 
 
                 : null} */}
-                  <SpotifyPlayer onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                  <SpotifyPlayer isLocked={isLocked} onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
                 </div>
               </div>
 
