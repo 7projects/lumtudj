@@ -5,7 +5,7 @@ import { generateRandomString, generateCodeChallenge } from './pkceUtils';
 const BASE_URL = 'https://api.spotify.com/v1';
 const FIREBASE_FUNCTIONS_URL = 'https://us-central1-lumtudj-dfd38.cloudfunctions.net/api'; //samo produkcija
 
-const REDIRECT_URI = process.env.NODE_ENV === 'development' ? 'https://localhost:3000' : 'https://lumtudj.net';
+const REDIRECT_URI = process.env.NODE_ENV === 'development' ? 'https://localhost:3000' : 'https://lumtu.net';
 const CLIENT_ID = '6b690613cc6d481d97a3b75c2c0cf947';
 
 const getToken = async () => {

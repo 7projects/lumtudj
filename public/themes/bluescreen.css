@@ -2353,3 +2353,20 @@ button:active {
   box-shadow: 0 0 5px 1px #d94125;
   text-shadow: 2 2 #838383;
 }
+.fade-img {
+  opacity: 0;
+  transition: opacity 4s ease-in-out;
+}
+.fade-img.loaded {
+  opacity: 1;
+}
+.input-search {
+  border: 2px solid white;
+  color: #333333;
+  background-color: #a9a9a9;
+}
+::-webkit-scrollbar-thumb {
+  background: #3685ff;
+  cursor: pointer;
+  border-radius: 5px;
+}

@@ -10,7 +10,7 @@ import { useLongPress } from 'use-long-press';
 import useAppStore from '../AppStore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../Api';
-
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 export default function SpotifyPlayer({
   locked,
@@ -38,6 +38,8 @@ export default function SpotifyPlayer({
   const [paused, setPaused] = useState(true);
   const [loadingTrack, setLoadingTrack] = useState(false);
   const [playerReady, setPlayerReady] = useState(false);
+
+  const [artistLoaded, setArtistLoaded] = useState(false);
 
   const trackIdRef = useRef(null);      // currently playing track
   const trackEndedFor = useRef(null);   // track for which onNext() was called
@@ -171,6 +173,7 @@ export default function SpotifyPlayer({
   const playTrack = async (trackId) => {
     if (!trackId || !deviceId || !tokenRef.current) return;
     setArtist(null);
+    setArtistLoaded(false);
     trackIdRef.current = trackId;
     trackEndedFor.current = null; // reset for new track
     setLoadingTrack(true);
@@ -195,8 +198,8 @@ export default function SpotifyPlayer({
   }
 
   const pauseTrack = async (e) => {
-    if(isLocked)
-      if(isLocked()) return;
+    if (isLocked)
+      if (isLocked()) return;
 
     e.stopPropagation();
     if (!deviceId || !tokenRef.current || locked) return;
@@ -224,8 +227,8 @@ export default function SpotifyPlayer({
   };
 
   const seek = async (e) => {
-    if(isLocked)
-      if(isLocked()) return;
+    if (isLocked)
+      if (isLocked()) return;
 
     e.stopPropagation();
     if (!playerRef.current || !deviceId || !tokenRef.current) return;
@@ -249,17 +252,17 @@ export default function SpotifyPlayer({
   };
 
   const next = async (e) => {
-    if(!paused)
-      if(isLocked)
-        if(isLocked()) return;
+    if (!paused)
+      if (isLocked)
+        if (isLocked()) return;
 
     e.stopPropagation();
     if (onNext) onNext();
   };
 
   const prev = async () => {
-    if(isLocked)
-      if(isLocked()) return;
+    if (isLocked)
+      if (isLocked()) return;
 
     if (locked || !deviceId || !tokenRef.current) return;
     setPosition(0);
@@ -364,7 +367,7 @@ export default function SpotifyPlayer({
           <div className="div1" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
             <table>
               <tr>
-                <td>
+                <td style={{width: 100}}>
 
                   {!artist ?
                     <img
@@ -372,16 +375,21 @@ export default function SpotifyPlayer({
                       style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent" }}
 
                     />
-
+                    // <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent", opacity: 0.1 }}>
+                    //   {/* <AccountCircleIcon style={{ width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70 }} /> */}
+                    // </div>
                     :
                     <img
+                      className={`fade-img ${artistLoaded ? 'loaded' : ''}`}
+                      key={artist?.images?.[0]?.url}
+                      onLoad={() => setArtistLoaded(true)}
                       src={artist?.images?.[0]?.url}
-                      style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
+                      style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
 
                     />}
                 </td>
 
-                <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis",alignSelf:"center", width:"fit-content"  }}>
+                <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", alignSelf: "center", width: "fit-content" }}>
                   {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
                   {track && track.name}<br></br>
                   {playlists && playlists.map((p) =>

@@ -82,6 +82,75 @@ export const getTour = () => {
     ]
   });
 
+  tour.addStep({
+    title: "Hide/Show Library",
+    id: 'example-step3',
+    text: 'Click this button to toggle the library panel visibility. \nThis allows you to focus on your current playlist or track preview panel.',
+    attachTo: {
+      element: '#button-library',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Next',
+        action: tour.next
+      }
+    ]
+  });
+
+  tour.addStep({
+    title: "Hide/Show Playlist Controller",
+    id: 'example-step4',
+    text: 'The Playlist Controller provides an overview of all your playlists. When you select a song, any playlist containing that track becomes highlighted, making it easy to see where it belongs. To manage the song, simply click a playlist’s button to add it or remove it instantly.',
+    attachTo: {
+      element: '#button-plc',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Next',
+        action: tour.next
+      }
+    ]
+  });
+
+  tour.addStep({
+    title: "Change Theme",
+    id: 'example-step5',
+    text: 'Click this button to cycle through different themes for the application. Customize the look and feel to suit your preferences!',
+    attachTo: {
+      element: '#button-theme',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Next',
+        action: tour.next
+      }
+    ]
+  });
+
+  tour.addStep({
+    title: "Toggle Lock Mode",
+    id: 'example-step6',
+    text: 'Press the lock icon to activate Lock Mode. Playback controls, deletion, and playlist reordering are disabled. \nThe only action allowed is adding new tracks to the queue.\nType your password (dinamo) at any time to unlock.',
+    attachTo: {
+      element: '#button-lock',
+      on: 'top'
+    },
+    classes: 'example-step-extra-class',
+    buttons: [
+      {
+        text: 'Finish',
+        action: tour.next
+      }
+    ]
+  });
+
+
   return tour;
 }
 

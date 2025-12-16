@@ -33,19 +33,19 @@ export default function UserAgreement({ onAgree }) {
                 </p>
 
                 <p style={{ fontSize: "14px", color: "#6b7280" }}>
-                    Welcome to <strong>LumtuDJ</strong>. By accessing
-                    or using this LumtuDJ, you agree to the terms below. If you do not agree,
-                    please do not use the LumtuDJ.
+                    Welcome to <strong>Lumtu Manager</strong>. By accessing
+                    or using this Lumtu Manager, you agree to the terms below. If you do not agree,
+                    please do not use the Lumtu Manager.
                 </p>
 
                 {/* ============================ */}
                 {/* 1. Description */}
                 {/* ============================ */}
                 <h2 style={{ fontSize: "18px", marginTop: "20px" }}>
-                    1. Description of the LumtuDJ
+                    1. Description of the Lumtu Manager
                 </h2>
                 <p>
-                    The LumtuDJ is a free web-based Spotify player designed to offer a simple,
+                    The Lumtu Manager is a free web-based Spotify player designed to offer a simple,
                     intuitive interface for browsing, playing, and managing your Spotify
                     music.
                 </p>
@@ -57,7 +57,7 @@ export default function UserAgreement({ onAgree }) {
                     <li>Additional user-friendly tools and enhancements</li>
                 </ul>
                 <p>
-                    The LumtuDJ uses <strong>LocalStorage</strong> and{" "}
+                    The Lumtu Manager uses <strong>LocalStorage</strong> and{" "}
                     <strong>IndexedDB</strong> within your browser to store certain
                     preferences and data.
                 </p>
@@ -69,17 +69,17 @@ export default function UserAgreement({ onAgree }) {
                     2. Spotify Integration
                 </h2>
                 <p>
-                    This LumtuDJ uses Spotify’s official APIs and requires you to log in with
+                    This Lumtu Manager uses Spotify’s official APIs and requires you to log in with
                     your Spotify account.
                 </p>
                 <p>You understand and agree that:</p>
                 <ul style={{ marginLeft: "20px" }}>
                     <li>Spotify controls your playback and music library.</li>
-                    <li>This LumtuDJ does <strong>not</strong> store your Spotify login information.</li>
+                    <li>This Lumtu Manager does <strong>not</strong> store your Spotify login information.</li>
                     <li>All Spotify content, marks, and trademarks belong to Spotify.</li>
                 </ul>
                 <p style={{ fontSize: "13px", color: "#6b7280" }}>
-                    Use of the LumtuDJ is subject to Spotify’s terms and developer policies.
+                    Use of the Lumtu Manager is subject to Spotify’s terms and developer policies.
                 </p>
 
                 {/* ============================ */}
@@ -90,7 +90,7 @@ export default function UserAgreement({ onAgree }) {
                 </h2>
                 <ul style={{ marginLeft: "20px" }}>
                     <li>
-                        The LumtuDJ does <strong>not</strong> collect or store your personal
+                        The Lumtu Manager does <strong>not</strong> collect or store your personal
                         data on external servers by default.
                     </li>
                     <li>
@@ -108,7 +108,7 @@ export default function UserAgreement({ onAgree }) {
                 <h2 style={{ fontSize: "18px", marginTop: "20px" }}>
                     4. “Buy Me a Beer” Donations
                 </h2>
-                <p>The LumtuDJ may include an optional donation link.</p>
+                <p>The Lumtu Manager may include an optional donation link.</p>
                 <ul style={{ marginLeft: "20px" }}>
                     <li>Donations are voluntary and non-refundable.</li>
                     <li>
@@ -125,8 +125,8 @@ export default function UserAgreement({ onAgree }) {
                 </h2>
                 <p>You agree NOT to:</p>
                 <ul style={{ marginLeft: "20px" }}>
-                    <li>Use the LumtuDJ for illegal or unauthorized purposes.</li>
-                    <li>Reverse-engineer, modify, or misuse the LumtuDJ.</li>
+                    <li>Use the Lumtu Manager for illegal or unauthorized purposes.</li>
+                    <li>Reverse-engineer, modify, or misuse the Lumtu Manager.</li>
                     <li>Interfere with the App’s functionality.</li>
                     <li>Violate Spotify’s Terms via your usage.</li>
                 </ul>
@@ -138,7 +138,7 @@ export default function UserAgreement({ onAgree }) {
                     6. Disclaimer of Warranty
                 </h2>
                 <p>
-                    The LumtuDJ is provided <strong>“as is”</strong> without warranties of any
+                    The Lumtu Manager is provided <strong>“as is”</strong> without warranties of any
                     kind. Spotify may change APIs or permissions at any time, which may
                     impact functionality.
                 </p>
@@ -154,7 +154,7 @@ export default function UserAgreement({ onAgree }) {
                     <li>Loss of data</li>
                     <li>Service interruptions</li>
                     <li>Spotify API changes</li>
-                    <li>Any damages from using or not using the LumtuDJ</li>
+                    <li>Any damages from using or not using the Lumtu Manager</li>
                 </ul>
 
                 {/* ============================ */}
@@ -164,7 +164,7 @@ export default function UserAgreement({ onAgree }) {
                     8. Changes to This Agreement
                 </h2>
                 <p>
-                    This Agreement may be updated occasionally. Continued use of the LumtuDJ
+                    This Agreement may be updated occasionally. Continued use of the Lumtu Manager
                     means you accept the updated terms.
                 </p>
 

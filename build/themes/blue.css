@@ -2247,7 +2247,7 @@ button:active {
 .dialog-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 9999;
+  z-index: 9990;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2354,4 +2354,11 @@ button:active {
   cursor: pointer;
   box-shadow: 0 0 5px 1px #d94125;
   text-shadow: 2 2 #838383;
+}
+.fade-img {
+  opacity: 0;
+  transition: opacity 4s ease-in-out;
+}
+.fade-img.loaded {
+  opacity: 1;
 }

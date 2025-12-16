@@ -21,6 +21,7 @@ import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import MaximizeIcon from '@mui/icons-material/Maximize';
+import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -466,7 +467,7 @@ function App() {
         await loadThemeCSS(theme);
       } else {
 
-        await loadThemeCSS("mono");
+        await loadThemeCSS("bluescreen");
       }
 
       const oldCode = localStorage.getItem('code');
@@ -1065,7 +1066,7 @@ function App() {
 
   const isLocked = () => {
     let l = localStorage.getItem("locked") == "true";
-    const btn = document.getElementById("lockButton");
+    const btn = document.getElementById("button-lock");
 
     if (l) {
       // Add class only if not already blinking
@@ -1769,7 +1770,7 @@ function App() {
 
   const handleDownloadDesktopApp = () => {
     const link = document.createElement("a");
-    link.href = "https://lumtudj.net/setupX64.zip"; // file URL
+    link.href = "https://lumtu.net/setupX64.zip"; // file URL
     link.setAttribute("download", "setupX64.zip");
     document.body.appendChild(link);
     link.click();
@@ -1916,10 +1917,10 @@ function App() {
                 Update library
               </MenuItem> : null}
 
-            {menuAnchor.getAttribute("menu-target") == "settings" ?
+            {/* {menuAnchor.getAttribute("menu-target") == "settings" ?
               <MenuItem onClick={toggleMode}>
                 {mode == "normal" ? "Party mode" : "Standard mode"}
-              </MenuItem> : null}
+              </MenuItem> : null} */}
 
             {menuAnchor.getAttribute("menu-target") == "settings" && !isDesktop() ?
               <MenuItem onClick={handleDownloadDesktopApp}>
@@ -1947,7 +1948,7 @@ function App() {
               </MenuItem> : null} */}
 
             {menuAnchor.getAttribute("menu-target") == "playlist" ?
-              <MenuItem onClick={() => setPlaylistTracks([])}>
+              <MenuItem onClick={() => { if (!isLocked()) setPlaylistTracks([]) }}>
                 Clear playlist
               </MenuItem> : null}
 
@@ -2084,7 +2085,12 @@ function App() {
                   src={process.env.PUBLIC_URL + '/logo.png'}
                   style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
                 />
-                <button style={{ fontSize: 20 }} onClick={handleLogin}>Login with Spotify</button>
+                {/* <div className='app-title' style={{fontSize:40}}>
+                  <span>LUMTU</span>
+                  <span style={{ opacity: 0.5 }} className='app-title-dj'>MANAGER</span><br></br>
+                  
+                </div> */}
+                <button style={{ fontSize: 20, padding: 10, border: "2px solid white", padding: 20 }} onClick={handleLogin}>Login with Spotify</button>
               </div>
 
           ) : (
@@ -2251,15 +2257,16 @@ function App() {
                           <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
 
 
-                            <div onContextMenu={handleMenu} className='app-title'>
-                              <span>LUMTU</span>
-                              <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br>
-                              {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
-                            </div>
+                            {mode != "compact" ?
+                              <div onContextMenu={handleMenu} className='app-title'>
+                                <span>LUMTU</span>
+                                <span style={{ opacity: 0.5 }} className='app-title-dj'>MANAGER</span><br></br>
+                                {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
+                              </div> : null}
 
 
                             {mode == "compact" ?
-                              <div className="toolbar-wrapper">
+                              <div className="toolbar-wrapper" style={{ paddingLeft: 0 }}>
                                 {/* <SearchIcon className="search-icon" /> */}
                                 <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
                               </div> : null}
@@ -2278,7 +2285,7 @@ function App() {
                             {/* <button className='header-button-small' style={{ width: 100 }} onClick={playerError}>Token</button> */}
                           </div>
                         </td>
-                        {mode == "normal" ?
+                        {mode == "ne prikazuj trenutno" ?
                           <td style={{ display: "flex", textAlign: "center", justifyContent: "center", padding: 5 }}>
                             {/* <button onClick={getTopTracks}>Top tracks</button>*/}
                             {/* <button onClick={getRecommendations}>Recommendations</button> */}
@@ -2329,16 +2336,20 @@ function App() {
 
                           <Tooltip enterDelay={500} title="Toggle lock mode">
                             {locked ?
-                              <button onMouseDown={e => e.stopPropagation()} id="lockButton" style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                              : <button onMouseDown={e => e.stopPropagation()} id="lockButton" style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                              <button id="button-lock" onMouseDown={e => e.stopPropagation()} style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                              : <button id="button-lock" onMouseDown={e => e.stopPropagation()} style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Change theme">
-                            <button onMouseDown={e => e.stopPropagation()} style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                            <button id="button-theme" onMouseDown={e => e.stopPropagation()} style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Toggle playlist controller">
-                            <button onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button>
+                            <button id="button-plc" onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={togglePickers}><ChecklistIcon></ChecklistIcon></button>
+                          </Tooltip>
+
+                          <Tooltip enterDelay={500} title="Toggle library">
+                            <button id="button-library" onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={toggleMode}><LibraryMusicIcon></LibraryMusicIcon></button>
                           </Tooltip>
 
                           <button
@@ -2408,7 +2419,7 @@ function App() {
 
                     <div className="toolbar-wrapper">
                       <div className='toolbar-search'>
-                        <div>QUEUE</div> ({playlistTracks?.length || 0} tracks) duration: {getTotalDurationString(playlistTracks)}
+                        <div>QUEUE</div> {playlistTracks?.length || 0}/{getTotalDurationString(playlistTracks)}
                       </div>
                       <div className='toolbar-icons'>
                         {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
