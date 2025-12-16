@@ -2362,4 +2362,11 @@ button:active {
 }
 .input-search {
   border: 2px solid white;
+  color: #333333;
+  background-color: #a9a9a9;
+}
+::-webkit-scrollbar-thumb {
+  background: #3685ff;
+  cursor: pointer;
+  border-radius: 5px;
 }

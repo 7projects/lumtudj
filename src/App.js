@@ -26,6 +26,7 @@ import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
+import PlaylistAddCircleIcon from '@mui/icons-material/PlaylistAddCircle';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
@@ -1662,7 +1663,10 @@ function App() {
 
 
   const onLibraryItemContextMenu = (e, playlist, index) => {
-    loadPlaylistPrev(playlist);
+
+    if(index) //ako je index nedefiniran onda je iz PLC
+      loadPlaylistPrev(playlist);
+
     let items = [];
 
     let userID = localStorage.getItem("userId");
@@ -1677,7 +1681,10 @@ function App() {
       items.push({ label: "Follow album", onClick: () => followAlbum(playlist), icon: <FavoriteIcon /> });
 
     if (playlist.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist) }, icon: <PlayCircleIcon /> });
+      items.push({ label: "Add to queue", onClick: () => { if (!isLocked()) addPlaylistToToPlaylist(playlist) }, icon: <PlaylistAddIcon /> });
+
+    if (playlist.type != "featured")
+      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist)  }, icon: <PlayCircleIcon /> });
     // selectedLibraryItem.type == "artist" &&
     //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
     items.push({ label: "-" });
@@ -1687,8 +1694,12 @@ function App() {
 
 
     setContextMenuItems(items);
-    setSelectedLibraryIndex(index);
-    setSelectedLibraryItem(playlist);
+
+    if (index)
+      setSelectedLibraryIndex(index);
+
+    if (index)
+      setSelectedLibraryItem(playlist);
 
     handleContextMenu(e);
   }
@@ -2352,12 +2363,12 @@ function App() {
                             <button id="button-library" onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={toggleMode}><LibraryMusicIcon></LibraryMusicIcon></button>
                           </Tooltip>
 
-                          <button
+                          {/* <button
                             onMouseDown={e => e.stopPropagation()}
                             style={{ height: 40, float: "right" }}
                             onClick={() => window.open('https://buymeacoffee.com/vsprojects5', '_blank')}>
                             🍺 Buy me a beer
-                          </button>
+                          </button> */}
 
                           {/* <button style={{ float: "right" }} onClick={checkForUpdates}>update</button> */}
                           {/* <button style={{ float: "right" }} onClick={logout}>Logout</button> */}
@@ -2488,7 +2499,9 @@ function App() {
                         </td> */}
                         {plcMode == "tagger" ?
                           <td className='selected-track-container'>
-                            {library.filter(l => l.type == "playlist").map(p => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ? <span onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
+                            {library.filter(l => l.type == "playlist").map((p, index) => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ?
+                              <span onContextMenu={(e) => onLibraryItemContextMenu(e, p)} onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> :
+                              <span onContextMenu={(e) => onLibraryItemContextMenu(e, p)} onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                           </td> : null}
 
                         {plcMode == "and" ?
