@@ -2428,7 +2428,7 @@ function App() {
                     </div> : null}
                     {
                       loadingTracks ? <div className='loader'></div> :
-                        <ReordableTrackList onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                        <ReordableTrackList view={"details"} onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onTrackContextMenu} enableDrag={selectedLibraryItem && selectedLibraryItem.type == "playlist"} source="plprev" onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} keys={"spl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                       // getTracksPanel()
                     }

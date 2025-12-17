@@ -9,7 +9,7 @@ import Marquee from 'react-fast-marquee';
 import useAppStore from '../AppStore';
 
 
-const TrackRow = ({source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({view, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const { library, dragTrack, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
@@ -140,49 +140,74 @@ const TrackRow = ({source, track, forPlaylist, forInfo, onClick, onArtistClick, 
 
                                 :
                                 <table style={{ width: "100%", padding: 5 }}>
-                                    <tbody>
-
-                                        <tr>
-                                            <td>
-
-                                                <span className="song-artist" onClick={(e) => { onArtistClick && onArtistClick(track) }}>
-
-
-                                                    {forInfo ? track && track.name :
-                                                        track && track.artists && track.artists.map(a => a.name).join(", ")
-                                                    }
-                                                </span>
-                                            </td>
-                                            {onAddToPlaylistButton ?
-                                                <td className='song-add-to-playlist' onClick={(e) => { e.stopPropagation(); onAddToPlaylistButton(track); }}>
-
-
-                                                    <PlaylistAddIcon ></PlaylistAddIcon>
-
-                                                </td> : null}
-                                        </tr>
-                                        {!forInfo ?
+                                    {view == "details" && !forInfo ?
+                                        <tbody>
                                             <tr>
-                                                <td colSpan={2}>
-                                                    <span className="song-name">
-                                                        {/* {forPlayer ?
+                                                <td style={{ fontSize: 12 }}>
+                                                    {track && track.artists && track.artists.map(a => a.name).join(", ")} - {track && track.name}
+                                                </td>
+                                                <td style={{ fontSize: 12, textAlign: "left", width: 100 }}>
+                                                    {playlists && playlists.map((p) =>
+                                                        <div key={p.id} className='littleBulbOn'>
+
+                                                        </div>
+                                                    )
+                                                    }
+                                                </td>
+                                                <td style={{ fontSize: 12, textAlign: "left", width: 40 }}>
+                                                    {/* {track?.album?.name} &nbsp; */}
+                                                    {track?.album?.release_date?.substring(0, 4)}
+                                                </td>
+                                                <td style={{ fontSize: 12, textAlign: "left", width: 40 }}>
+                                                    {!forPlayer && formatTime(track.duration_ms)}
+                                                </td>
+                                            </tr>
+
+                                        </tbody>
+                                        :
+                                        <tbody>
+
+                                            <tr>
+                                                <td>
+
+                                                    <span className="song-artist" onClick={(e) => { onArtistClick && onArtistClick(track) }}>
+
+
+                                                        {forInfo ? track && track.name :
+                                                            track && track.artists && track.artists.map(a => a.name).join(", ")
+                                                        }
+                                                    </span>
+                                                </td>
+                                                {onAddToPlaylistButton ?
+                                                    <td className='song-add-to-playlist' onClick={(e) => { e.stopPropagation(); onAddToPlaylistButton(track); }}>
+
+
+                                                        <PlaylistAddIcon ></PlaylistAddIcon>
+
+                                                    </td> : null}
+                                            </tr>
+                                            {!forInfo ?
+                                                <tr>
+                                                    <td colSpan={2}>
+                                                        <span className="song-name">
+                                                            {/* {forPlayer ?
                                                             <Marquee>{track.name}</Marquee>
                                                             :
                                                             track.name} */}
-                                                        {track.name}&nbsp;
-                                                        <br></br>
-                                                        {!forInfo && track?.album ?
-                                                            <div className="song-release-date">
+                                                            {track.name}&nbsp;
+                                                            <br></br>
+                                                            {!forInfo && track?.album ?
+                                                                <div className="song-release-date">
 
-                                                                {track?.album?.name} &nbsp;
-                                                                {track?.album?.release_date?.substring(0, 4)}
+                                                                    {track?.album?.name} &nbsp;
+                                                                    {track?.album?.release_date?.substring(0, 4)}
 
-                                                            </div> : null}
-                                                    </span>
-                                                </td>
-                                            </tr> : null}
+                                                                </div> : null}
+                                                        </span>
+                                                    </td>
+                                                </tr> : null}
 
-                                        {/* {!forInfo ?
+                                            {/* {!forInfo ?
                                             <tr>
                                                 <td colSpan={2}>
                                                     <div className="song-release-date">
@@ -192,22 +217,22 @@ const TrackRow = ({source, track, forPlaylist, forInfo, onClick, onArtistClick, 
                                                 </td>
                                             </tr> : null} */}
 
-                                        <tr>
-                                            <td colSpan={2} style={{ float: "left" }} >
-                                                <div className="song-duration">
-                                                    {!forPlayer && formatTime(track.duration_ms)}
+                                            <tr>
+                                                <td colSpan={2} style={{ float: "left" }} >
+                                                    <div className="song-duration">
+                                                        {!forPlayer && formatTime(track.duration_ms)}
 
-                                                    {!forPlayer && <>&nbsp;</>}
-                                                    {playlists && playlists.map((p) =>
-                                                        <div key={p.id} className='littleBulbOn'>
+                                                        {!forPlayer && <>&nbsp;</>}
+                                                        {playlists && playlists.map((p) =>
+                                                            <div key={p.id} className='littleBulbOn'>
 
-                                                        </div>
-                                                    )
-                                                    }
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
+                                                            </div>
+                                                        )
+                                                        }
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>}
                                 </table>
                             }
                         </td>
