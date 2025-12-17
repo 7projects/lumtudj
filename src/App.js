@@ -27,6 +27,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import PlaylistAddCircleIcon from '@mui/icons-material/PlaylistAddCircle';
+import PreviewIcon from '@mui/icons-material/Preview';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
@@ -76,7 +77,6 @@ import ArtistInfo from './components/artistInfo';
 
 import UserAgreement from './components/userAgreement';
 
-import Joyride from 'react-joyride';
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -161,6 +161,9 @@ function App() {
   const [showPlaylistSaveAs, setShowPlaylistSaveAs] = useState(false);
 
   const [showNewPlaylistInfo, setShowNewPlaylistInfo] = useState(false);
+
+  const [plcFilter, setPlcFilter] = useState("");
+
 
   const inputBuffer = useRef();
 
@@ -1664,12 +1667,16 @@ function App() {
 
   const onLibraryItemContextMenu = (e, playlist, index) => {
 
-    if(index) //ako je index nedefiniran onda je iz PLC
+    if (index) //ako je index nedefiniran onda je iz PLC
       loadPlaylistPrev(playlist);
 
     let items = [];
 
     let userID = localStorage.getItem("userId");
+
+
+    if (playlist.type != "featured" && !index)
+      items.push({ label: "Preview", onClick: () => { loadPlaylistPrev(playlist) }, icon: <PreviewIcon /> });
 
     if (playlist.owner_id == userID)
       items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true), icon: <EditIcon /> });
@@ -1684,7 +1691,7 @@ function App() {
       items.push({ label: "Add to queue", onClick: () => { if (!isLocked()) addPlaylistToToPlaylist(playlist) }, icon: <PlaylistAddIcon /> });
 
     if (playlist.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist)  }, icon: <PlayCircleIcon /> });
+      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist) }, icon: <PlayCircleIcon /> });
     // selectedLibraryItem.type == "artist" &&
     //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
     items.push({ label: "-" });
@@ -1729,8 +1736,8 @@ function App() {
 
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
-    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
+    items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
 
     // items[1].items = [
     //   { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
@@ -2453,7 +2460,6 @@ function App() {
                   </div>
                 </div>
 
-
                 <Dialog
                   onMouseDown={() => setMenuPosition(null)}
                   position={pickerPosition}
@@ -2463,20 +2469,23 @@ function App() {
                   title={<table onMouseDown={() => setMenuPosition(null)} style={{ width: "100%", textAlign: "center" }}>
                     <tbody style={{ width: "100%" }}>
                       <tr>
-                        <td style={{ width: "80%", padding: 5 }}>
-                          {plcMode == "tagger" ?
+                        <td style={{ width: "80%", padding: 5, textAlign: "left" }}>
+                          {plcMode == "tagger" ? <>
                             <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
                               {selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
-                            </Marquee> :
+                            </Marquee>
+
+                          </> :
                             <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
                               Combine playlists
                             </Marquee>
                           }
                         </td>
                         <td style={{ width: "20%", padding: 5 }}>
-                          <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
+                          <input value={plcFilter} placeholder='filter...' onChange={(e) => setPlcFilter(e.target.value)} type='text'></input>
+                          {/* <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
                             <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
-                          </Tooltip>
+                          </Tooltip> */}
                         </td>
                       </tr>
                     </tbody>
@@ -2499,7 +2508,7 @@ function App() {
                         </td> */}
                         {plcMode == "tagger" ?
                           <td className='selected-track-container'>
-                            {library.filter(l => l.type == "playlist").map((p, index) => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ?
+                            {library.filter(l => l.type == "playlist" && l.name?.toLowerCase().includes(plcFilter.toLowerCase())).map((p, index) => selectedTrack && p.tracks && p.tracks.some(t => t.id == selectedTrack.id) ?
                               <span onContextMenu={(e) => onLibraryItemContextMenu(e, p)} onClick={() => { addToSpotifyPlaylist(p, true) }} className='selected-track-bulb-on' key={p.id}>{p.name}</span> :
                               <span onContextMenu={(e) => onLibraryItemContextMenu(e, p)} onClick={() => { addToSpotifyPlaylist(p, false) }} className='selected-track-bulb-off' key={p.id}>{p.name}</span>)}
                           </td> : null}

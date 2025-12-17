@@ -75,3 +75,36 @@
 // .panel-main {
 //     background-color: #1616cf;
 // }
+
+.context-menu {
+    position: absolute;
+    background: whitesmoke!important;
+    // border: 1px solid @track-row-border-bottom-color;
+
+    z-index: 99999;
+    border-radius: 4px;
+
+    span {
+        border-top: 1px solid @track-row-border-bottom-color;
+        width: 100%;
+        display: inline-block;
+        background: whitesmoke!important;
+    }
+
+    div {
+        background: whitesmoke!important;
+        padding: 10px;
+        color: @track-row-background-color;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 16px;
+    }
+
+    div:hover {
+        background-color: lighten(@track-row-background-color, 10%);
+    }
+}
+
+.selected-track-bulb-off {
+    background-color: #5555ff !important;
+}
