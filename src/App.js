@@ -1492,11 +1492,6 @@ function App() {
 
   const loadPlaylistPrev = async (pl) => {
 
-    let newActs = [...mainActivities];
-    newActs.push(pl);
-    setMainActivities(newActs);
-    setMainActivityIndex(newActs.length - 1);
-
     setCurrentTab("plprev");
     // pl.tracks.map((tr) => tr.uid = newGuid());
 
@@ -1523,7 +1518,7 @@ function App() {
       pl.tracks = await getLastListened();
     }
 
-    if (pl.tracks?.length == 0 && pl.type == "album") {
+    if ((!pl.tracks || pl.tracks?.length == 0) && pl.type == "album") {
       pl.tracks = await api.getAlbumTracks(pl.id);
     }
 
@@ -1537,6 +1532,21 @@ function App() {
     setSelectedPlaylistTrack(null);
 
     setLoadingTracks(false);
+
+    let newActs = [...mainActivities];
+    
+    if (lastMainActivity) {
+      newActs[newActs.length - 1] = lastMainActivity;
+    }
+    
+    //if newActs lenght > 10 remove first
+    if (newActs.length > 10) {
+      newActs.shift();
+    }
+
+    newActs.push(pl);
+    setMainActivities(newActs);
+    setMainActivityIndex(newActs.length - 1);
   }
 
   const [playlistChanged, setPlaylistChanged] = useState();
@@ -1844,6 +1854,12 @@ function App() {
     }
   }
 
+  const [lastMainActivity, setLastMainActivity] = useState(null);
+
+  const onMainActivitiesChange = (Item) => {
+    setLastMainActivity(Item);
+  }
+
   const steps = [{
     target: '#tour1',
     content: 'This is my awesome feature!',
@@ -2081,7 +2097,7 @@ function App() {
 
 
         {showArtistInfo ?
-          <ArtistInfo onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={onAlbumClick} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
+          <ArtistInfo onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={loadPlaylistPrev} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
         }
 
         {
@@ -2465,7 +2481,7 @@ function App() {
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onBack={onPanelMainActivitiesBack} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onChange={onMainActivitiesChange} onBack={onPanelMainActivitiesBack} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}
