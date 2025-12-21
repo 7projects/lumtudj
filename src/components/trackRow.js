@@ -9,7 +9,7 @@ import Marquee from 'react-fast-marquee';
 import useAppStore from '../AppStore';
 
 
-const TrackRow = ({view, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({view, draggable, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const { library, dragTrack, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
@@ -64,7 +64,7 @@ const TrackRow = ({view, source, track, forPlaylist, forInfo, onClick, onArtistC
 
     return (
         track &&
-        <div id={id} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : true} onContextMenu={(e) => { e.preventDefault(); onContextMenu?.(e, track, index) }} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
+        <div id={id} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  {...swipeHandler} {...longPressHandler()} draggable={isMobile() ? false : draggable} onContextMenu={(e) => { e.preventDefault(); onContextMenu?.(e, track, index) }} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(index) }} className={getTrackRowClass()} key={track.id} onClick={(e) => { onClick && onClick(track) }} onDoubleClick={() => { onDoubleClick && onDoubleClick(track) }} onMouseDown={(e) => { onMouseDown && onMouseDown(track) }}>
 
             <table style={{ width: "100%" }}>
                 <tbody>

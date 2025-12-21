@@ -1215,11 +1215,14 @@ button:active {
   top: 1px;
 }
 .input::placeholder {
-  color: #d9d9d9;
+  color: rgba(255, 255, 255, 0.4) !important;
   box-shadow: none;
 }
+.placeholder-color {
+  color: rgba(255, 255, 255, 0.4) !important;
+}
 .input:focus::placeholder {
-  color: #66666600;
+  color: rgba(255, 255, 255, 0.4) !important;
   box-shadow: none;
 }
 .bi-search {
@@ -2158,7 +2161,6 @@ button:active {
   box-sizing: border-box;
   gap: 10px;
   gap: 0.5rem;
-  padding-left: 32px;
   color: #ffffff;
 }
 .toolbar-search {
@@ -2336,6 +2338,7 @@ button:active {
   font-size: 12px;
   padding: 3px;
   cursor: pointer;
+  background-color: #5555ff !important;
 }
 .plc-button-off:hover {
   background-color: #0000dd;
@@ -2369,4 +2372,30 @@ button:active {
   background: #3685ff;
   cursor: pointer;
   border-radius: 5px;
+}
+.context-menu {
+  position: absolute;
+  background: whitesmoke!important;
+  z-index: 99999;
+  border-radius: 4px;
+}
+.context-menu span {
+  border-top: 1px solid #1e2cf7;
+  width: 100%;
+  display: inline-block;
+  background: whitesmoke!important;
+}
+.context-menu div {
+  background: whitesmoke!important;
+  padding: 10px;
+  color: #0000aa;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 16px;
+}
+.context-menu div:hover {
+  background-color: #0000dd;
+}
+.selected-track-bulb-off {
+  background-color: #5555ff !important;
 }

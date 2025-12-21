@@ -31,7 +31,7 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
 const SortableItem = ({ view, enableDrag, source, track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
-    const { selectedLibraryItem } = useAppStore();
+    const { selectedLibraryItem, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
     const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
@@ -54,31 +54,28 @@ const SortableItem = ({ view, enableDrag, source, track, forInfo, onClick, onArt
         if (forPlayer)
             clss = clss + " for-player";
 
-
-
         return clss;
     }
 
     return (
         <li ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`} onClick={() => onClick?.(track)} onContextMenu={onContextMenu} onMouseDown={onMouseDown} onDoubleClick={onDoubleClick}>
-            <table style={{ width: "100%" }} className={getTrackRowClass()}>
+            <table style={{ width: "100%" }}>
                 <tbody>
                     <tr>
                         {/* Main content cell */}
-                        <td style={{ width: "auto" }} >
+                        <td className={getTrackRowClass()} style={{ width: "auto"}} draggable={isMobile() ? false : true} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  >
                             <TrackRow
                                 view={view}
                                 source={source}
                                 track={track}
                                 forInfo={forInfo}
-
+                                draggable={false}
                                 onArtistClick={onArtistClick}
-                               
 
                                 index={index}
                                 onDrop={onDrop}
                                 selected={selected}
-                                
+
 
                                 forPlayer={forPlayer}
                                 hideImage={hideImage}

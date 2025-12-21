@@ -1215,11 +1215,14 @@ button:active {
   top: 1px;
 }
 .input::placeholder {
-  color: #000000;
+  color: rgba(24, 19, 19, 0.4) !important;
   box-shadow: none;
 }
+.placeholder-color {
+  color: rgba(24, 19, 19, 0.4) !important;
+}
 .input:focus::placeholder {
-  color: #66666600;
+  color: rgba(24, 19, 19, 0.4) !important;
   box-shadow: none;
 }
 .bi-search {
@@ -2159,7 +2162,6 @@ button:active {
   box-sizing: border-box;
   gap: 10px;
   gap: 0.5rem;
-  padding-left: 32px;
   color: #181313;
 }
 .toolbar-search {

@@ -367,7 +367,7 @@ export default function SpotifyPlayer({
           <div className="div1" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
             <table>
               <tr>
-                <td style={{width: 100}}>
+                <td style={{ width: 100 }}>
 
                   {!artist ?
                     <img
@@ -390,8 +390,10 @@ export default function SpotifyPlayer({
                 </td>
 
                 <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", alignSelf: "center", width: "fit-content" }}>
-                  {track && track.artists && track.artists.map(a => a.name).join(", ")}<br></br>
-                  {track && track.name}<br></br>
+                  <Marquee speed={0} style={{ fontSize: 16, fontWeight: "bold", width: "25vw" }}>{track && track.artists && track.artists.map(a => a.name).join(", ")}</Marquee>
+                  <Marquee speed={0} style={{ fontSize: 14, width: "25vw" }}>
+                    {track && track.name}
+                  </Marquee>
                   {playlists && playlists.map((p) =>
                     <div key={p.id} className='littleBulbOn'>
 
