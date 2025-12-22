@@ -1216,11 +1216,14 @@ button:active {
   top: 1px;
 }
 .input::placeholder {
-  color: #041422;
+  color: rgba(13, 59, 102, 0.4) !important;
   box-shadow: none;
 }
+.placeholder-color {
+  color: rgba(13, 59, 102, 0.4) !important;
+}
 .input:focus::placeholder {
-  color: #66666600;
+  color: rgba(13, 59, 102, 0.4) !important;
   box-shadow: none;
 }
 .bi-search {
@@ -2160,7 +2163,6 @@ button:active {
   box-sizing: border-box;
   gap: 10px;
   gap: 0.5rem;
-  padding-left: 32px;
   color: #0d3b66;
 }
 .toolbar-search {
@@ -2362,4 +2364,3 @@ button:active {
 .fade-img.loaded {
   opacity: 1;
 }
-/*# sourceMappingURL=./light.css.map */

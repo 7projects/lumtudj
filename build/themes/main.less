@@ -50,6 +50,8 @@
 @panel-main-background-color: @panel-background-color;
 @panel-main-color: @track-row-color;
 
+@placeholder-color: fade(@button-color, 40%) !important;
+
 :root {
     color-scheme: dark;
 }
@@ -730,14 +732,17 @@ button:active {
 }
 
 
-
 .input::placeholder {
-    color: darken(@button-color, 15%);
+    color: @placeholder-color;
     box-shadow: none;
 }
 
+.placeholder-color {
+    color: @placeholder-color;
+}
+
 .input:focus::placeholder {
-    color: #66666600;
+    color: @placeholder-color;
     box-shadow: none;
 }
 
@@ -1972,7 +1977,7 @@ button:active {
     box-sizing: border-box;
     gap: 10px;
     gap: 0.5rem;
-    padding-left: 32px;
+    // padding-left: 32px;
     color: @button-color;
     // margin: 2px;
 }
@@ -2003,7 +2008,7 @@ button:active {
 }
 
 .toolbar-input-search::placeholder {
-    color: fade(@button-color, 40%) !important;
+    color: @placeholder-color!important;
 }
 
 .toolbar-icons {

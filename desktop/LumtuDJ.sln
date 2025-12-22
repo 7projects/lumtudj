@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36705.20
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LumtuDJ", "LumtuDJ\LumtuDJ.csproj", "{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "LumtuDJSetup", "LumtuDJSetup\LumtuDJSetup.vdproj", "{FB62C7DE-AF66-609A-4FAF-5F62BD8B182A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Debug|x64.ActiveCfg = Debug|x64
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Debug|x64.Build.0 = Debug|x64
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Release|x64.ActiveCfg = Release|x64
+		{3B177A12-DBBA-4772-8ED1-ED7C2A1C9EAE}.Release|x64.Build.0 = Release|x64
+		{FB62C7DE-AF66-609A-4FAF-5F62BD8B182A}.Debug|Any CPU.ActiveCfg = Debug
+		{FB62C7DE-AF66-609A-4FAF-5F62BD8B182A}.Debug|x64.ActiveCfg = Debug
+		{FB62C7DE-AF66-609A-4FAF-5F62BD8B182A}.Release|Any CPU.ActiveCfg = Release
+		{FB62C7DE-AF66-609A-4FAF-5F62BD8B182A}.Release|x64.ActiveCfg = Release
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {687600D8-5128-4359-8A44-5301CABCD176}
+	EndGlobalSection
+EndGlobal

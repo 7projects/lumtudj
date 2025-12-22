@@ -1,0 +1,5 @@
+﻿Rebuild started at 20:53...
+1>------ Rebuild All started: Project: LumtuDJ, Configuration: Debug Any CPU ------
+1>  LumtuDJ -> C:\Users\Vedran\Documents\dev\FD\LumtuDJ\bin\Debug\LumtuDJ.exe
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========
+========== Rebuild completed at 20:53 and took 00,918 seconds ==========
