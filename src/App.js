@@ -1490,6 +1490,55 @@ function App() {
 
   const tracksRef = useRef(null);
 
+  function getTracksSortedByPlaylistCount() {
+    const trackMap = new Map();
+
+    for (const playlist of library.filter(p => p.type == "playlist")) {
+      const seen = new Set();
+
+      for (const track of playlist.tracks) {
+        if (seen.has(track.id)) continue;
+        seen.add(track.id);
+
+        if (!trackMap.has(track.id)) {
+          trackMap.set(track.id, {
+            ...track,
+            playlistCount: 1
+          });
+        } else {
+          trackMap.get(track.id).playlistCount++;
+        }
+      }
+    }
+
+    return [...trackMap.values()]
+      .map(t => ({
+        ...t,
+        playlistCount: Number(t.playlistCount) // 🔥 FORCE NUMBER
+      }))
+      .sort((a, b) => b.playlistCount - a.playlistCount);
+  }
+
+
+  const onPanelMainToolbarButtonClick = (action) => {
+    switch(action){
+      case "MyShazamedTracks":
+        loadPlaylistPrev(myShazamTracksPl);
+        break;
+      case "LastListened":
+        loadPlaylistPrev(lastListenedPl);
+        break;
+      case "TopTracks":
+        loadPlaylistPrev({id: "TopTracks", name: "Top Tracks", type: "toptracks"});
+        break;
+      case "search":
+        debugger;
+        loadPlaylistPrev({id: "search", name: "", type: "search"});
+        break;
+    }
+  }
+
+
   const loadPlaylistPrev = async (pl) => {
 
     setCurrentTab("plprev");
@@ -1505,6 +1554,15 @@ function App() {
 
     setLoadingTracks(true);
 
+    if(pl.id == "search"){
+      pl.tracks = [];
+      setSelectedLibraryItem(null);
+      setSelectedLibraryIndex(-1);
+      setLoadingTracks(false);
+      setSelectedPlaylistTracks([]);
+      setSearchText("");
+    }
+
     if (pl.id == "MyShazamedTracks") {
       setSelectedLibraryItem(null);
       setSelectedLibraryIndex(-1);
@@ -1516,6 +1574,12 @@ function App() {
       setSelectedLibraryItem(null);
       setSelectedLibraryIndex(-1);
       pl.tracks = await getLastListened();
+    }
+
+    if (pl.id == "TopTracks") {
+      setSelectedLibraryItem(null);
+      setSelectedLibraryIndex(-1);
+      pl.tracks = getTracksSortedByPlaylistCount();
     }
 
     if ((!pl.tracks || pl.tracks?.length == 0) && pl.type == "album") {
@@ -1534,11 +1598,11 @@ function App() {
     setLoadingTracks(false);
 
     let newActs = [...mainActivities];
-    
+
     if (lastMainActivity) {
       newActs[newActs.length - 1] = lastMainActivity;
     }
-    
+
     //if newActs lenght > 10 remove first
     if (newActs.length > 10) {
       newActs.shift();
@@ -2089,7 +2153,7 @@ function App() {
         }
 
         {
-          dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem?.type != "album" && selectedLibraryItem?.type != "featured" ?
+          (dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem?.type != "album" && selectedLibraryItem?.type != "featured") || dragTrack && dragSource == "playlist" ?
             <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
               <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
             </div> : null
@@ -2481,7 +2545,7 @@ function App() {
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onChange={onMainActivitiesChange} onBack={onPanelMainActivitiesBack} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={onPanelMainActivitiesBack} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}

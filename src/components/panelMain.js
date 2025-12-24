@@ -76,7 +76,7 @@ const myShazamTracksPlIconMobile = <svg className='icon-color' width="24px" heig
     <path d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
 </svg>;
 
-const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMenu, mode, handleMenu, onDoubleClick, isLocked, onClick, onMenuClick, onSwipedRight, onBulbClick, onBulbCheckClick, onLongPress, onShuffleClick, onDrop }) => {
+const PanelMain = ({ onBack, onToolBarClick, onChange, selectedLibraryItem, tracks, onContextMenu, mode, handleMenu, onDoubleClick, isLocked, onClick, onMenuClick, onSwipedRight, onBulbClick, onBulbCheckClick, onLongPress, onShuffleClick, onDrop }) => {
 
     const { setMenuAnchor, library, setLoadingLibrary, filteredLibrary, setFilteredLibrary, setLibrary, loadingLibrary, selectedLibraryIndex, setSelectedLibraryIndex, backgroundPlaylists, setBackgroundPlaylists, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex } = useAppStore();
 
@@ -119,6 +119,11 @@ const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMen
         setLibraryItem(selectedLibraryItem);
         setSearchText(selectedLibraryItem.name);
 
+        debugger;
+        if (selectedLibraryItem.type == "search" && selectedLibraryItem.name.trim() == "") {
+            inputRef && inputRef.current.focus();
+        }
+
     }, [selectedLibraryItem]);
 
     const tracksRef = useRef(null);
@@ -129,6 +134,15 @@ const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMen
 
     const onSearchTextChanged = (e) => {
         setSearchText(e.target.value);
+
+        let changedPL = {
+            id: libraryItem ? libraryItem.id : "searchResults",
+            type: libraryItem ? libraryItem.type : "search",
+            tracks: selectedPlaylistTracks,
+            name: e.target.value,
+        };
+
+        onChange && onChange(changedPL);
 
         if (e.target.value.trim() == "") {
             setSelectedPlaylistTracks([]);
@@ -167,80 +181,6 @@ const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMen
         return tracks;
     }
 
-    const loadPlaylistPrev = async (pl) => {
-        // setCurrentTab("plprev");
-        // pl.tracks.map((tr) => tr.uid = newGuid());
-
-        if (tracksRef.current) {
-            tracksRef.current.scrollToIndex({
-                index: 0,
-                align: 'start',
-                behavior: 'auto', // or 'smooth'
-            });
-        }
-
-        setLoadingTracks(true);
-
-        setLibraryItem(pl);
-
-        if (pl.id == "MyShazamedTracks") {
-            setLibraryItem(null);
-            //   setSelectedLibraryIndex(-1);
-
-            pl.tracks = await getMyShazamTracks();
-        }
-
-        if (pl.id == "LastListened") {
-            setLibraryItem(null);
-            //   setSelectedLibraryIndex(-1);
-            pl.tracks = await getLastListened();
-        }
-
-        if (pl.tracks?.length == 0 && pl.type == "album") {
-            pl.tracks = await api.getAlbumTracks(pl.id);
-        }
-
-        setSearchText(pl.name);
-
-        setPlaylistChanged(false);
-        setSelectedPlaylistTracks(pl.tracks || []);
-
-        // setSelectedPlaylistTrackIndex(-1);
-        // setSelectedTrackIndex(-1);
-        // setSelectedPlaylistTrack(null);
-
-        setLoadingTracks(false);
-    }
-
-    function getTracksSortedByPlaylistCount() {
-        const trackMap = new Map();
-
-        for (const playlist of library.filter(p => p.type == "playlist")) {
-            const seen = new Set();
-
-            for (const track of playlist.tracks) {
-                if (seen.has(track.id)) continue;
-                seen.add(track.id);
-
-                if (!trackMap.has(track.id)) {
-                    trackMap.set(track.id, {
-                        ...track,
-                        playlistCount: 1
-                    });
-                } else {
-                    trackMap.get(track.id).playlistCount++;
-                }
-            }
-        }
-
-        return [...trackMap.values()]
-            .map(t => ({
-                ...t,
-                playlistCount: Number(t.playlistCount) // 🔥 FORCE NUMBER
-            }))
-            .sort((a, b) => b.playlistCount - a.playlistCount);
-    }
-
     const search = async (query) => {
 
         setPlaylistChanged(false);
@@ -266,19 +206,33 @@ const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMen
         }
     }
 
+
+    const initNewSearchActivity = () => {
+        onToolBarClick("search");
+        if (inputRef && inputRef.current) inputRef.current.focus();
+    }
+
+
     const handleKeyDown = async (e) => {
 
         //check if e.key is alphanumeric or space
         let st = searchText;
 
+        // if(libraryItem && libraryItem.type != "search"){
+        //     onToolBarClick("search");
+        //     if (inputRef && inputRef.current) inputRef.current.focus();
+        // }
+
         if (e.key === 'Backspace') {
             st = st.slice(0, -1);
+
         }
 
         if (st != undefined && st.trim() == "") {
             setSearchText("");
             setSelectedPlaylistTracks([]);
             setLibraryItem(null);
+
             return;
         }
 
@@ -340,12 +294,13 @@ const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMen
                         <div className='toolbar-search'>
                             <ArrowBackIosIcon className='toolbar-button' onClick={onBack}></ArrowBackIosIcon>
                             {/* <KeyboardArrowRightIcon></KeyboardArrowRightIcon> */}
-                            <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { setLibraryItem(null); setSearchText(""); setSelectedPlaylistTracks([]); if (inputRef && inputRef.current) inputRef.current.focus(); }}></SearchIcon>
-                            {libraryItem?.images ? <img className="" style={{ width: 20 }} src={libraryItem?.images?.[2]?.url || libraryItem?.images?.[0]?.url} />
+                            <SearchIcon className='toolbar-button' style={{ cursor: "pointer" }} onClick={() => { onToolBarClick("search"); if (inputRef && inputRef.current) inputRef.current.focus(); }}></SearchIcon>
+                            {libraryItem?.images ? <img className="" style={{ width: 20, borderRadius: "50%" }} src={libraryItem?.images?.[2]?.url || libraryItem?.images?.[0]?.url} />
 
                                 : null}
 
-                            <input ref={inputRef} className="toolbar-input-search" placeholder="Search" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
+                            {libraryItem?.images ? <div>{searchText}</div> :
+                                <input ref={inputRef} className="toolbar-input-search" placeholder="Search" onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />}
                         </div>
 
                         {/* {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null} */}
@@ -354,13 +309,13 @@ const PanelMain = ({ onBack, onChange, selectedLibraryItem, tracks, onContextMen
                             {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}
 
                             <Tooltip style={{}} enterDelay={500} title={"Aggregate tracks across playlists, count how many playlists each song appears in"} >
-                                <StarsIcon className='toolbar-button' onClick={() => setSelectedPlaylistTracks(getTracksSortedByPlaylistCount())}></StarsIcon>
+                                <StarsIcon className='toolbar-button' onClick={() => onToolBarClick("TopTracks")}></StarsIcon>
                             </Tooltip>
                             <Tooltip style={{}} enterDelay={500} title={"Show last listened tracks"} >
-                                <HistoryIcon className='toolbar-button' onClick={() => loadPlaylistPrev(lastListenedPl)}></HistoryIcon>
+                                <HistoryIcon className='toolbar-button' onClick={() => onToolBarClick("LastListened")}></HistoryIcon>
                             </Tooltip>
                             <Tooltip style={{}} enterDelay={500} title={"Show last shazamed tracks"} >
-                                <svg onClick={() => loadPlaylistPrev(myShazamTracksPl)} class='toolbar-button' width="22" height="22" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                                <svg onClick={() => onToolBarClick("MyShazamedTracks")} class='toolbar-button' width="22" height="22" viewBox="0 0 35 35" version="1.1" xmlns="http://www.w3.org/2000/svg">
                                     <g transform="translate(1, 1)" class='toolbar-button' >
                                         <path class='toolbar-button' d="M23.85 21.795c-1.428 1.577-3.985 4.030-4.094 4.135-0.312 0.298-0.735 0.481-1.201 0.481-0.961 0-1.74-0.779-1.74-1.74 0-0.495 0.207-0.942 0.539-1.259l0.001-0.001c0.026-0.025 2.578-2.471 3.92-3.956 0.561-0.611 0.905-1.43 0.905-2.328 0-0.072-0.002-0.144-0.007-0.214l0 0.010c-0.079-1.050-0.58-1.97-1.331-2.599l-0.006-0.005c-0.596-0.47-1.357-0.754-2.185-0.754-0.859 0-1.646 0.306-2.259 0.814l0.006-0.005c-0.776 0.695-1.716 1.72-1.724 1.73-0.319 0.35-0.777 0.569-1.287 0.569-0.961 0-1.74-0.779-1.74-1.74 0-0.459 0.178-0.877 0.468-1.188l-0.001 0.001c0.042-0.046 1.062-1.157 1.963-1.966 1.22-1.054 2.822-1.695 4.573-1.695 1.699 0 3.256 0.604 4.47 1.608l-0.012-0.009c1.448 1.231 2.399 3.007 2.533 5.008l0.001 0.022c0.008 0.128 0.013 0.277 0.013 0.428 0 1.796-0.686 3.433-1.81 4.661l0.005-0.005zM13.341 21.918c-0.020 0-0.044 0-0.067 0-1.675 0-3.208-0.605-4.393-1.609l0.010 0.008c-1.447-1.23-2.399-3.007-2.534-5.006l-0.001-0.022c-0.008-0.127-0.013-0.275-0.013-0.424 0-1.798 0.687-3.435 1.812-4.664l-0.005 0.005c1.427-1.578 3.985-4.030 4.093-4.135 0.312-0.298 0.735-0.481 1.201-0.481 0.961 0 1.74 0.779 1.74 1.74 0 0.495-0.207 0.942-0.539 1.259l-0.001 0.001c-0.026 0.025-2.576 2.469-3.92 3.954-0.561 0.611-0.905 1.43-0.905 2.329 0 0.072 0.002 0.143 0.007 0.214l-0-0.010c0.080 1.050 0.58 1.97 1.331 2.602l0.006 0.005c0.596 0.47 1.358 0.753 2.186 0.753 0.858 0 1.646-0.305 2.26-0.812l-0.006 0.005c0.774-0.699 1.715-1.721 1.724-1.732 0.319-0.344 0.773-0.558 1.277-0.558 0.961 0 1.74 0.779 1.74 1.74 0 0.455-0.174 0.868-0.46 1.178l0.001-0.001c-0.044 0.044-1.065 1.155-1.964 1.964-1.2 1.053-2.784 1.696-4.517 1.696-0.022 0-0.045-0-0.067-0l0.003 0zM16 1.004c0 0 0 0-0 0-8.282 0-14.996 6.714-14.996 14.996s6.714 14.996 14.996 14.996c8.282 0 14.996-6.714 14.996-14.996v0c-0-8.282-6.714-14.996-14.996-14.996v0z"></path>
                                     </g>

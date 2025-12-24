@@ -390,8 +390,8 @@ export default function SpotifyPlayer({
                 </td>
 
                 <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", alignSelf: "center", width: "fit-content" }}>
-                  <Marquee speed={0} style={{ fontSize: 16, fontWeight: "bold", width: "25vw" }}>{track && track.artists && track.artists.map(a => a.name).join(", ")}</Marquee>
-                  <Marquee speed={0} style={{ fontSize: 14, width: "25vw" }}>
+                  <Marquee speed={0} style={{ fontSize: 16, fontWeight: "bold", maxWidth: "20vw" }}>{track && track.artists && track.artists.map(a => a.name).join(", ")}</Marquee>
+                  <Marquee speed={0} style={{ fontSize: 14, maxWidth: "20vw" }}>
                     {track && track.name}
                   </Marquee>
                   {playlists && playlists.map((p) =>
