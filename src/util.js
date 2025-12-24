@@ -193,7 +193,7 @@ export const changeTheme = async () => {
   const currentTheme = localStorage.getItem("theme");
 
   switch (currentTheme) {
-    case "bluescreen":
+    case "retro":
       localStorage.setItem("theme", "light");
       await loadThemeCSS("light");
       break;
@@ -221,6 +221,11 @@ export const changeTheme = async () => {
     case "blue":
       localStorage.setItem("theme", "bluescreen");
       await loadThemeCSS("bluescreen");
+      break;
+
+    case "bluescreen":
+      localStorage.setItem("theme", "retro");
+      await loadThemeCSS("retro");
       break;
 
     default:

@@ -2163,6 +2163,7 @@ button:active {
   gap: 10px;
   gap: 0.5rem;
   color: #181313;
+  height: 30px;
 }
 .toolbar-search {
   display: flex;
@@ -2181,9 +2182,11 @@ button:active {
   font-family: Doto, Monospace, Sans-serif;
   box-sizing: border-box;
   color: #181313;
+  background-color: #1d1d1d;
   background-color: transparent;
   outline: none;
   border: none;
+  padding: 6px;
 }
 .toolbar-input-search::placeholder {
   color: rgba(24, 19, 19, 0.4) !important;
@@ -2203,6 +2206,18 @@ button:active {
   border-radius: 0.5rem;
   cursor: pointer;
   fill: #181313;
+}
+.toolbar-button-disabled {
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a4a4a4;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  fill: #181313;
+  opacity: 0.3;
 }
 .toolbar-button:hover {
   color: #f1f1f1;

@@ -1521,7 +1521,7 @@ function App() {
 
 
   const onPanelMainToolbarButtonClick = (action) => {
-    switch(action){
+    switch (action) {
       case "MyShazamedTracks":
         loadPlaylistPrev(myShazamTracksPl);
         break;
@@ -1529,11 +1529,11 @@ function App() {
         loadPlaylistPrev(lastListenedPl);
         break;
       case "TopTracks":
-        loadPlaylistPrev({id: "TopTracks", name: "Top Tracks", type: "toptracks"});
+        loadPlaylistPrev({ id: "TopTracks", name: "Top Tracks", type: "toptracks" });
         break;
       case "search":
         debugger;
-        loadPlaylistPrev({id: "search", name: "", type: "search"});
+        loadPlaylistPrev({ id: "search", name: "", type: "search" });
         break;
     }
   }
@@ -1554,7 +1554,7 @@ function App() {
 
     setLoadingTracks(true);
 
-    if(pl.id == "search"){
+    if (pl.id == "search") {
       pl.tracks = [];
       setSelectedLibraryItem(null);
       setSelectedLibraryIndex(-1);
@@ -1908,13 +1908,29 @@ function App() {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
 
+  // const onPanelMainActivitiesBack = () => {
+  //   if (mainActivityIndex > 0) {
+  //     let newActs = [...mainActivities];
+  //     newActs.pop();
+  //     setMainActivities(newActs);
+  //     setMainActivityIndex(newActs.length - 1);
+  //     setCurrentTab("library");
+  //   }
+  // }
+
   const onPanelMainActivitiesBack = () => {
     if (mainActivityIndex > 0) {
       let newActs = [...mainActivities];
-      newActs.pop();
-      setMainActivities(newActs);
-      setMainActivityIndex(newActs.length - 1);
-      setCurrentTab("library");
+      let newIndex = mainActivityIndex - 1;
+      if (newIndex < 0) newIndex = 0;
+      setMainActivityIndex(newIndex);
+    }
+  }
+
+  const onPanelMainActivitiesForward = () => {
+    if (mainActivityIndex < mainActivities.length - 1) {
+      let newIndex = mainActivityIndex + 1;
+      setMainActivityIndex(newIndex);
     }
   }
 
@@ -2539,13 +2555,14 @@ function App() {
                   <div id="panel-main" className="panel-main">
 
                     {mainActivities.map((pl, index) => {
-                      const isTop = index === mainActivities.length - 1;
+                      // const isTop = index === mainActivities.length - 1;
+                      const isTop = index === mainActivityIndex;
 
                       return (
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={onPanelMainActivitiesBack} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}
