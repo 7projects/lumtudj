@@ -31,7 +31,7 @@ const PlaylistPicker = ({ track, playlists, onClose, onLongPress, onSwipedLeft, 
         <div className='playlistPickerContainer' {...swipeHandler} onClick={onClose}>
             <div className={"playlistPicker"}>
                 {playlists && playlists.map((pl, index) => {
-                    const bulbOn = pl.tracks.some(x => x.id == track.id);
+                    const bulbOn = pl?.tracks?.some(x => x.id == track.id);
                     return <div key={"plp" + index} onClick={(e) => onClickHandler(e, pl, bulbOn)} className={bulbOn ? 'playlistPickerRowBulbOn' : 'playlistPickerRow'}>{pl.name}</div>
                 })}
             </div>

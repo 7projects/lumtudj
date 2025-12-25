@@ -11,9 +11,11 @@ import useAppStore from '../AppStore';
 import DeleteIcon from '@mui/icons-material/Delete';
 import api from '../Api';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import BulbContainer from "./bulbContainer";
 
 export default function SpotifyPlayer({
   locked,
+  onBulbsClick,
   token,
   track,
   onClick,
@@ -300,7 +302,7 @@ export default function SpotifyPlayer({
             <tr>
               <td style={{ paddingRight: 5 }}>
                 <div>
-                  {playlists && playlists.map((p) =>
+                  {playlists && playlists.filter(x => x.type == "playlist").map((p) =>
                     <span key={p.id} className='littleBulbOn'>
 
                     </span>
@@ -394,13 +396,9 @@ export default function SpotifyPlayer({
                   <Marquee speed={0} style={{ fontSize: 14, maxWidth: "20vw" }}>
                     {track && track.name}
                   </Marquee>
-                  {playlists && playlists.map((p) =>
-                    <div key={p.id} className='littleBulbOn'>
-
-                    </div>
-                  )
-                  }
-
+                  {track && track.name ?
+                    <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
+                    : null}
                   <div style={{ fontSize: 10, height: 16 }}>
                     {playedFrom ?
                       <>playing from {playedFrom}</> : null}
@@ -416,7 +414,6 @@ export default function SpotifyPlayer({
                   <td style={{ textAlign: "right", padding: 10, width: "40px" }}>{formatTime(position)}</td>
                   <td>
                     <div className="player-progress-bar" id="progressBar" onClick={seek}>
-
                       <div className="player-progress-bar-fill" style={{ width: `${(position / duration) * 100}%` }}></div>
                     </div>
                   </td>

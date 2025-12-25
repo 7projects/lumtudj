@@ -41,7 +41,6 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
 
   const onLikedClick = async (e) => {
 
-    debugger
     if (liked) {
       let res = await api.unfollowAlbum(playlist);
       if (res.ok) {
@@ -82,7 +81,7 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
                 <tbody>
                   <tr>
                     <td>
-                      <div className={isMobile() ? "playlists-name-mobile" : "playlist-name"}>
+                      <div className={isMobile() ? "playlists-name-mobile" : "playlist-name"} style={{ fontWeight:  "bold"  }}>
                         {playlist.name}
                       </div>
                     </td>

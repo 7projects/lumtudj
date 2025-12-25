@@ -24,6 +24,7 @@
 @bulb-on-color: rgb(30, 250, 158);
 
 @player-background-color: #3d6a90;
+@player-slider-color: @bulb-on-color;
 @player-slider-background-color: rgb(29, 29, 29);
 @player-color: rgb(226, 226, 226);
 @player-gradient1: #1b2735;
@@ -51,6 +52,7 @@
 @panel-main-color: @track-row-color;
 
 @placeholder-color: fade(@button-color, 40%) !important;
+
 
 :root {
     color-scheme: dark;
@@ -320,6 +322,27 @@ code {
     object-fit: cover;
 }
 
+.bulb-container {
+    background-color: lighten(@track-row-background-color, 8%);
+    display: flex;
+    align-items: center;
+    /* padding: 4px; */
+    border-radius: 6px;
+    height: 16px;
+    padding-left: 5px;
+    width: 100px;
+}
+
+.bulb-container-text {
+    font-size: 10px;
+    color: darken(@track-row-color, 20%);
+    margin: auto;
+}
+
+
+.bulb-container:hover {
+    background-color: lighten(@track-row-background-color, 15%);
+}
 
 .littleBulbOn {
     width: 4px;
@@ -2011,7 +2034,7 @@ button:active {
 }
 
 .toolbar-input-search::placeholder {
-    color: @placeholder-color!important;
+    color: @placeholder-color !important;
 }
 
 .toolbar-icons {
@@ -2214,10 +2237,10 @@ button:active {
 }
 
 .fade-img {
-  opacity: 0;
-  transition: opacity 4s ease-in-out;
+    opacity: 0;
+    transition: opacity 4s ease-in-out;
 }
 
 .fade-img.loaded {
-  opacity: 1;
+    opacity: 1;
 }

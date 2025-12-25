@@ -577,10 +577,11 @@
 }
 body {
   margin: 0;
-  font-family: "Doto", "Courier New", Monospace;
+  font-family: monospace, Sans-serif;
   font-size: 10px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: #3ecaf5;
   user-select: none;
   /* Standard */
   -webkit-user-select: none;
@@ -588,7 +589,7 @@ body {
   -moz-user-select: none;
   /* Firefox */
   -ms-user-select: none;
-  background-color: #000000;
+  background-color: #f5f5f7;
 }
 ::-webkit-scrollbar-corner {
   background: #1e1e1e;
@@ -604,7 +605,7 @@ body {
   background-size: cover;
   background-position: center;
   z-index: -1;
-  fill: #030303;
+  fill: #43cbf5;
 }
 table,
 th,
@@ -618,31 +619,31 @@ td {
 .app-title {
   font-family: "Anton", monospace;
   font-size: 20px;
-  color: #78ff78;
+  color: #000000;
   padding: 5px;
   letter-spacing: 8px;
   margin-left: 8px;
 }
 .context-menu {
   position: absolute;
-  background: #000000;
+  background: #ffffff;
   z-index: 99999;
   border-radius: 4px;
 }
 .context-menu span {
-  border-top: 1px solid rgba(120, 255, 120, 0.25);
+  border-top: 1px solid #e5e5ea;
   width: 100%;
   display: inline-block;
 }
 .context-menu div {
   padding: 10px;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
   border-radius: 4px;
   font-size: 16px;
 }
 .context-menu div:hover {
-  background-color: #1a1a1a;
+  background-color: #ffffff;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -669,7 +670,7 @@ code {
 }
 .footer {
   height: 100px;
-  background-color: #000000;
+  background-color: #3ecaf5;
   color: white;
   display: flex;
   align-items: center;
@@ -679,7 +680,7 @@ code {
 .panel {
   flex: 1 1 0;
   padding: 1px;
-  background-color: #000000;
+  background-color: #f3f3f3;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
@@ -690,7 +691,7 @@ code {
 .panel-main {
   width: 50%;
   padding: 1px;
-  background-color: #000000;
+  background-color: #e6e6e6;
   text-wrap: auto;
   border-radius: 10px;
   /* border: 4px solid white; */
@@ -734,9 +735,9 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
 }
 .playlists-row-selected {
@@ -749,12 +750,12 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
-  background-color: rgba(120, 255, 120, 0.15);
-  color: #96ff96;
+  background-color: #ffe4ea;
+  color: #b00020;
 }
 .playlists-row-mobile {
   background-color: transparent;
@@ -787,8 +788,8 @@ code {
   border: 1px solid #141414;
   border-radius: 10px;
   margin: 3px;
-  background-color: rgba(120, 255, 120, 0.15);
-  color: #96ff96;
+  background-color: #ffe4ea;
+  color: #b00020;
 }
 .playlists-name {
   font-weight: bold;
@@ -829,19 +830,19 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  background-color: #78ff78;
-  box-shadow: 0 0 5px 1px #abffab;
+  background-color: #ff2d55;
+  box-shadow: 0 0 5px 1px #ff607e;
   display: inline-block;
   margin: 1px;
 }
 .bulbOnColor {
-  fill: #78ff78 !important;
+  fill: #ff2d55 !important;
 }
 .bulbOffColor {
-  fill: rgba(120, 255, 120, 0.3);
+  fill: #d1d1d6;
 }
 .bulbOffColor:hover {
-  fill: rgba(255, 255, 255, 0.3);
+  fill: #ffffff;
 }
 .bulbOn {
   width: 20px;
@@ -856,15 +857,15 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  color: #78ff78;
+  color: #ff2d55;
   cursor: pointer;
 }
 .bulbOn::before {
   content: '';
   width: 10px;
   height: 10px;
-  background-color: #78ff78;
-  box-shadow: 0 0 5px 1px #abffab;
+  background-color: #ff2d55;
+  box-shadow: 0 0 5px 1px #ff607e;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -883,18 +884,18 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  color: rgba(120, 255, 120, 0.3);
+  color: #d1d1d6;
   cursor: pointer;
 }
 .bulbOff:hover {
-  color: #78ff78;
+  color: #ff2d55;
 }
 .bulbOff::before {
   content: '';
   width: 10px;
   height: 10px;
-  background-color: rgba(120, 255, 120, 0.3);
-  box-shadow: 0 0 5px 1px rgba(171, 255, 171, 0.3);
+  background-color: #d1d1d6;
+  box-shadow: 0 0 5px 1px #ececee;
   position: absolute;
   top: 50%;
   left: 50%;
@@ -911,7 +912,7 @@ code {
   left: 50%;
   border-radius: 50%;
   transform: translate(-50%, -50%);
-  color: #78ff78;
+  color: #ff2d55;
 }
 .item-row {
   align-items: center;
@@ -923,9 +924,9 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
   font-size: 18px;
 }
@@ -939,9 +940,9 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
   font-size: 18px;
 }
@@ -955,13 +956,13 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
   font-size: 18px;
-  background-color: rgba(120, 255, 120, 0.15);
-  color: #96ff96;
+  background-color: #ffe4ea;
+  color: #b00020;
 }
 .item-row-selected-mobile {
   align-items: center;
@@ -973,13 +974,13 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
   font-size: 18px;
-  background-color: rgba(120, 255, 120, 0.15);
-  color: #96ff96;
+  background-color: #ffe4ea;
+  color: #b00020;
 }
 .track-row {
   align-items: center;
@@ -991,9 +992,9 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
 }
 .track-row-selected {
@@ -1006,12 +1007,12 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
-  background-color: rgba(120, 255, 120, 0.15);
-  color: #96ff96;
+  background-color: #ffe4ea;
+  color: #b00020;
 }
 .track-row-playing {
   align-items: center;
@@ -1023,15 +1024,15 @@ code {
   /* IE 10 and IE 11 */
   user-select: none;
   /* Standard syntax */
-  border-bottom: 1px solid rgba(120, 255, 120, 0.25);
+  border-bottom: 1px solid #e5e5ea;
   background-color: transparent;
-  color: #78ff78;
+  color: #000000;
   cursor: pointer;
-  background-color: #78ff78;
-  border: 1px solid #45ff45;
-  box-shadow: 0 0 5px 1px #abffab;
-  text-shadow: 2 2 rgba(222, 255, 222, 0.3);
-  color: rgba(120, 255, 120, 0.3);
+  background-color: #ff2d55;
+  border: 1px solid #f9002f;
+  box-shadow: 0 0 5px 1px #ff607e;
+  text-shadow: 2 2 #ffffff;
+  color: #d1d1d6;
 }
 .song-name {
   word-wrap: normal;
@@ -1072,7 +1073,7 @@ input[type="range"] {
   width: 100%;
   height: 5px;
   border-radius: 5px;
-  background: #366836;
+  background: #e5e5ea;
   outline: none;
   margin: 0;
   cursor: pointer;
@@ -1083,7 +1084,7 @@ input[type="range"]::-webkit-slider-thumb {
   appearance: none;
   width: 20px;
   height: 20px;
-  background: #366836;
+  background: #e5e5ea;
   /* Spotify green */
   cursor: pointer;
   border-radius: 50%;
@@ -1092,24 +1093,24 @@ input[type="range"]::-webkit-slider-thumb {
   transition: background 0.3s ease;
 }
 input[type="range"]:hover::-webkit-slider-thumb {
-  background: #366836;
+  background: #e5e5ea;
 }
 /* Firefox */
 input[type="range"]::-moz-range-thumb {
   width: 20px;
   height: 20px;
-  background: #366836;
+  background: #e5e5ea;
   cursor: pointer;
   border-radius: 50%;
-  border: 2px solid #366836;
+  border: 2px solid #e5e5ea;
   transition: background 0.3s ease;
 }
 input[type="range"]:hover::-moz-range-thumb {
-  background: #366836;
+  background: #e5e5ea;
 }
 /* Track styling Firefox */
 input[type="range"]::-moz-range-track {
-  background: #366836;
+  background: #e5e5ea;
   height: 5px;
   border-radius: 5px;
 }
@@ -1117,7 +1118,7 @@ input[type="range"]::-moz-range-track {
 input[type="range"]::-webkit-slider-runnable-track {
   height: 5px;
   border-radius: 5px;
-  background: #366836;
+  background: #e5e5ea;
 }
 @media only screen and (max-width: 768px) {
   body {
@@ -1136,7 +1137,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     width: 100%;
     height: 3px;
     border-radius: 5px;
-    background: #366836;
+    background: #e5e5ea;
     outline: none;
     margin: 0;
     cursor: pointer;
@@ -1147,7 +1148,7 @@ input[type="range"]::-webkit-slider-runnable-track {
     appearance: none;
     width: 10px;
     height: 10px;
-    background: #366836;
+    background: #e5e5ea;
     /* Spotify green */
     cursor: pointer;
     border-radius: 50%;
@@ -1156,24 +1157,24 @@ input[type="range"]::-webkit-slider-runnable-track {
     transition: background 0.3s ease;
   }
   input[type="range"]:hover::-webkit-slider-thumb {
-    background: #366836;
+    background: #e5e5ea;
   }
   /* Firefox */
   input[type="range"]::-moz-range-thumb {
     width: 10px;
     height: 10px;
-    background: #366836;
+    background: #e5e5ea;
     cursor: pointer;
     border-radius: 50%;
-    border: 2px solid #366836;
+    border: 2px solid #e5e5ea;
     transition: background 0.3s ease;
   }
   input[type="range"]:hover::-moz-range-thumb {
-    background: #366836;
+    background: #e5e5ea;
   }
   /* Track styling Firefox */
   input[type="range"]::-moz-range-track {
-    background: #366836;
+    background: #e5e5ea;
     height: 3px;
     border-radius: 5px;
   }
@@ -1181,7 +1182,7 @@ input[type="range"]::-webkit-slider-runnable-track {
   input[type="range"]::-webkit-slider-runnable-track {
     height: 3px;
     border-radius: 5px;
-    background: #366836;
+    background: #e5e5ea;
   }
   .panel {
     overflow: auto;
@@ -1199,12 +1200,12 @@ input[type="range"]::-webkit-slider-runnable-track {
   }
 }
 button {
-  background-color: #000000;
+  background-color: #dddddd;
   border-radius: 5px;
-  border: 1px solid #000000;
+  border: 1px solid #c4c4c4;
   display: inline-block;
   cursor: pointer;
-  color: #78ff78;
+  color: #303030;
   font-family: Arial;
   font-size: 11px;
   padding: 6px;
@@ -1212,26 +1213,26 @@ button {
   margin: 2px;
 }
 button:hover {
-  background-color: #1a1a1a;
+  background-color: #f7f7f7;
 }
 button:active {
   position: relative;
   top: 1px;
 }
 .input::placeholder {
-  color: rgba(120, 255, 120, 0.4) !important;
+  color: #8e8e93 !important;
   box-shadow: none;
 }
 .placeholder-color {
-  color: rgba(120, 255, 120, 0.4) !important;
+  color: #8e8e93 !important;
 }
 .input:focus::placeholder {
-  color: rgba(120, 255, 120, 0.4) !important;
+  color: #8e8e93 !important;
   box-shadow: none;
 }
 .bi-search {
-  color: #78ff78;
-  fill: #78ff78;
+  color: #1d1d1f;
+  fill: #1d1d1f;
 }
 .svg_icon {
   position: absolute;
@@ -1242,7 +1243,7 @@ button:active {
 .for-player {
   border-bottom: none;
   background-color: transparent;
-  color: #78ff78;
+  color: #1d1d1f;
 }
 .player-buttons {
   margin-top: -8px;
@@ -1260,9 +1261,9 @@ button:active {
   width: 40px;
   border-radius: 5px;
   cursor: pointer;
-  color: #78ff78;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 255, 255, 0.1);
 }
 .player-button:hover {
   background-color: #7573732e;
@@ -1344,7 +1345,7 @@ button:active {
   /* directly below the loader */
   left: 50%;
   font-size: 12px;
-  color: #78ff78;
+  color: #3a3a3c;
   width: 200px;
   font-size: 10px;
   text-align: center;
@@ -1377,10 +1378,10 @@ button:active {
   border-radius: 50%;
   transform: rotateX(70deg);
   animation: 1s spin linear infinite;
-  color: #78ff78;
+  color: #ff2d55;
 }
 .loader:after {
-  color: rgba(120, 255, 120, 0.25);
+  color: #ff9aa9;
   transform: rotateY(70deg);
   animation-delay: 0.4s;
 }
@@ -1452,24 +1453,24 @@ button:active {
 }
 ::-webkit-scrollbar-track {
   background-color: transparent;
-  border: 0px solid #000000;
+  border: 0px solid #e5e5ea;
   /* creates padding around thumb */
 }
 ::-webkit-scrollbar-thumb {
-  background: #50c850;
+  background: #c7c7cc;
   cursor: pointer;
   border-radius: 5px;
 }
 .player {
-  background-color: #000000;
-  color: #78ff78;
+  background-color: #ffffff;
+  color: #1d1d1f;
   /* Background color */
   /* Space between lines */
-  font-family: "Doto", "Courier New", Monospace;
+  font-family: monospace, Sans-serif;
   font-size: 20px;
 }
 .selected-track-label {
-  color: #78ff78;
+  color: #303030;
 }
 .selected-track-container {
   height: 45px;
@@ -1477,22 +1478,22 @@ button:active {
 }
 .selected-track-bulb-on {
   display: inline-block;
-  background-color: #78ff78;
-  border: 1px solid #45ff45;
-  color: rgba(120, 255, 120, 0.3);
+  background-color: #ff2d55;
+  border: 1px solid #f9002f;
+  color: #d1d1d6;
   margin: 2px;
   border-radius: 5px;
   font-size: 12px;
   padding: 3px;
   cursor: pointer;
-  box-shadow: 0 0 5px 1px #abffab;
-  text-shadow: 2 2 rgba(222, 255, 222, 0.3);
+  box-shadow: 0 0 5px 1px #ff607e;
+  text-shadow: 2 2 #ffffff;
 }
 .selected-track-bulb-off {
   display: inline-block;
-  background-color: #000000;
-  border: 1px solid #000000;
-  color: #78ff78;
+  background-color: #dddddd;
+  border: 1px solid #c4c4c4;
+  color: #303030;
   margin: 2px;
   border-radius: 5px;
   font-size: 12px;
@@ -1500,16 +1501,16 @@ button:active {
   cursor: pointer;
 }
 .selected-track-bulb-off:hover {
-  background-color: #1a1a1a;
+  background-color: #f7f7f7;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root {
-  color: #78ff78;
+  color: #303030;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root.Mui-selected {
-  color: #78ff78;
+  color: #000000;
 }
 .css-1qltlow-MuiTabs-indicator {
-  background-color: #78ff78;
+  background-color: #ff2d55;
 }
 .css-hmk518-MuiButtonBase-root-MuiTab-root:hover {
   background-color: transparent;
@@ -1576,20 +1577,20 @@ button:active {
   margin-left: 5px;
 }
 .player-progress-bar {
-  background-color: #000000;
+  background-color: #ededed;
   width: 100%;
   height: 15px;
   border-radius: 5px 5px 5px 5px;
-  background-image: linear-gradient(to right, #333333 1px, #000000 1px), linear-gradient(to bottom, #333333 1px, #000000 1px);
+  background-image: linear-gradient(to right, #ffffff 1px, #ffffff 1px), linear-gradient(to bottom, #ffffff 1px, #ffffff 1px);
   background-size: 2px 2px;
   cursor: pointer;
   /* Space between lines */
 }
 .player-progress-bar-fill {
-  background-color: #78ff78;
+  background-color: #ff2d55;
   height: 15px;
   border-radius: 5px 5px 5px 5px;
-  background-image: linear-gradient(to right, #78ff78 1px, #000000 1px), linear-gradient(to bottom, #78ff78 1px, #000000 1px);
+  background-image: linear-gradient(to right, #ff2d55 1px, #ffffff 1px), linear-gradient(to bottom, #ff2d55 1px, #ffffff 1px);
   background-size: 2px 2px;
   /* Space between lines */
 }
@@ -1600,13 +1601,13 @@ button:active {
   padding: 3px;
 }
 .player-progress-bar-fill-mobile {
-  background-color: #78ff78;
+  background-color: #ff2d55;
   height: 2px;
   border-radius: 5px 5px 5px 5px;
 }
 .player-progress-bar-fill-empty-mobile {
   margin-top: 4px;
-  background-color: #000000;
+  background-color: #74748f;
   height: 2px;
   border-radius: 5px 5px 5px 5px;
   width: 100%;
@@ -1615,12 +1616,12 @@ button:active {
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  background-color: #78ff78;
+  background-color: #ff2d55;
   position: relative;
   margin-top: -4px;
 }
 .top-bar-mobile {
-  background-color: #000000;
+  background-color: #dddddd;
   height: 20px;
   border-radius: 5px 5px 5px 5px;
   padding: 5px;
@@ -1638,8 +1639,8 @@ button:active {
 .snackbar {
   visibility: hidden;
   min-width: 250px;
-  background-color: #78ff78;
-  color: rgba(120, 255, 120, 0.3);
+  background-color: #ff2d55;
+  color: #d1d1d6;
   text-align: center;
   border-radius: 8px;
   padding: 10px;
@@ -1661,7 +1662,7 @@ button:active {
   --borderWidth: 7px;
   --height: 24px;
   --width: 12px;
-  --borderColor: #78ff78;
+  --borderColor: #ff2d55;
 }
 .check {
   display: inline-block;
@@ -1670,7 +1671,7 @@ button:active {
   width: var(--width);
   border-bottom: var(--borderWidth) solid var(--borderColor);
   border-right: var(--borderWidth) solid var(--borderColor);
-  color: #78ff78;
+  color: #ff2d55;
 }
 .QueueMusicIcon {
   color: #79797969;
@@ -1694,12 +1695,12 @@ button:active {
   outline: none;
 }
 .icon-color {
-  color: #78ff78;
-  fill: #78ff78;
+  color: #303030;
+  fill: #303030;
 }
 .tab {
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #dddddd;
   text-align: center;
   height: 40px;
   vertical-align: middle;
@@ -1707,14 +1708,14 @@ button:active {
   border-radius: 10px;
 }
 .tab-selected {
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #dddddd;
   text-align: center;
   height: 40px;
   vertical-align: middle;
   font-size: 12px;
   border-radius: 10px;
-  background-color: #78ff78;
+  background-color: #ff2d55;
 }
 .input-search {
   width: 100%;
@@ -1722,24 +1723,24 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: "Doto", "Courier New", Monospace;
+  font-family: monospace, Sans-serif;
   box-sizing: border-box;
   color: #ffffff;
   background-color: #1e1e1e;
   outline: none;
   border: 1px solid #292929;
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #dddddd;
   height: 40px;
   font-size: 20px;
   border-radius: 10px;
-  border: 1px solid #000000;
+  border: 1px solid #c4c4c4;
 }
 .input-search:focus::placeholder {
   color: transparent;
 }
 .input-search::placeholder {
-  color: #78ff78;
+  color: #1d1d1f;
   box-shadow: none;
 }
 .search-icon {
@@ -1749,7 +1750,7 @@ button:active {
   transform: translateY(-50%);
   color: #888;
   font-size: 20px;
-  color: #78ff78;
+  color: #1d1d1f;
   box-shadow: none;
 }
 .menu-container {
@@ -1762,7 +1763,7 @@ button:active {
   /* space between buttons */
 }
 .player {
-  background: radial-gradient(ellipse at bottom, #000000 0%, #000000 100%);
+  background: radial-gradient(ellipse at bottom, #ececec 0%, #ffffff 100%);
   overflow: hidden;
 }
 #stars {
@@ -1889,23 +1890,23 @@ button:active {
   color: #ffffff;
   border-radius: 12px;
   border-radius: 1px;
-  background-color: #78ff78;
-  box-shadow: 0 0 5px 1px #abffab;
+  background-color: #ff2d55;
+  box-shadow: 0 0 5px 1px #ff607e;
   font-weight: bold;
   color: black;
 }
 .playlist-divider {
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #dddddd;
 }
 .playlist-divider-playlists {
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #dddddd;
   background-color: #893e22;
 }
 .playlist-divider-albums {
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #dddddd;
   background-color: #225589;
 }
 .hideScrollbar {
@@ -2036,7 +2037,7 @@ button:active {
   cursor: pointer;
   font-weight: 500;
   list-style: none;
-  color: #78ff78;
+  color: #303030;
   /* remove default list styles */
   border-bottom: 2px solid transparent;
   /* default underline */
@@ -2079,7 +2080,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: "Doto", "Courier New", Monospace;
+  font-family: monospace, Sans-serif;
 }
 .reconnecting-dots span {
   color: white;
@@ -2166,7 +2167,7 @@ button:active {
   box-sizing: border-box;
   gap: 10px;
   gap: 0.5rem;
-  color: #78ff78;
+  color: #303030;
   height: 30px;
 }
 .toolbar-search {
@@ -2175,7 +2176,7 @@ button:active {
   flex: 1;
   /* takes remaining space */
   gap: 8px;
-  color: #78ff78;
+  color: #303030;
 }
 .toolbar-input-search {
   flex: 1;
@@ -2183,17 +2184,17 @@ button:active {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family: "Doto", "Courier New", Monospace;
+  font-family: monospace, Sans-serif;
   box-sizing: border-box;
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #ededf0;
   background-color: transparent;
   outline: none;
   border: none;
   padding: 6px;
 }
 .toolbar-input-search::placeholder {
-  color: rgba(120, 255, 120, 0.4) !important;
+  color: #8e8e93 !important;
 }
 .toolbar-icons {
   display: flex;
@@ -2206,10 +2207,10 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #00de00;
+  color: #000000;
   border-radius: 0.5rem;
   cursor: pointer;
-  fill: #78ff78;
+  fill: #303030;
 }
 .toolbar-button-disabled {
   width: 20px;
@@ -2217,15 +2218,15 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #00de00;
+  color: #000000;
   border-radius: 0.5rem;
   cursor: pointer;
-  fill: #78ff78;
+  fill: #303030;
   opacity: 0.3;
 }
 .toolbar-button:hover {
-  color: #78ff78;
-  fill: #78ff78;
+  color: #000000;
+  fill: #000000;
 }
 .trash-container {
   position: fixed;
@@ -2251,18 +2252,18 @@ button:active {
   background-color: red !important;
 }
 .trash-icon {
-  color: #366836;
-  fill: #366836;
+  color: #e5e5ea;
+  fill: #e5e5ea;
 }
 ::selection {
-  background: #78ff78;
+  background: #ff2d55;
   /* yellow highlight */
-  color: #000000;
+  color: #ffffff;
   /* black text */
 }
 .MuiPaper-root {
-  background-color: #78ff78 !important;
-  color: #000000 !important;
+  background-color: #ff2d55 !important;
+  color: #ffffff !important;
 }
 .dialog-backdrop {
   position: fixed;
@@ -2285,7 +2286,7 @@ button:active {
 .dialog-window {
   position: absolute;
   width: 400px;
-  background: #000000;
+  background: #f5f5f7;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
   overflow: hidden;
@@ -2294,8 +2295,8 @@ button:active {
   padding: 10px;
 }
 .dialog-header {
-  background: #000000;
-  color: #78ff78;
+  background: #f5f5f7;
+  color: #303030;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -2319,8 +2320,8 @@ button:active {
 }
 .dialog-body {
   font-size: 14px;
-  color: #78ff78;
-  background-color: #000000;
+  color: #303030;
+  background-color: #f5f5f7;
   overflow-y: scroll;
 }
 .dialog-footer {
@@ -2332,27 +2333,27 @@ button:active {
 .dialog-footer .dialog-btn {
   padding: 6px 12px;
   border: none;
-  background: #000000;
+  background: #f5f5f7;
   border-radius: 6px;
   cursor: pointer;
   font-size: 14px;
 }
 .dialog-footer .dialog-btn:hover {
-  background: #000000;
+  background: #dddddd;
 }
 .dialog-footer .dialog-btn.primary {
   border: none;
-  background: #000000;
-  color: #78ff78;
+  background: #dddddd;
+  color: #303030;
 }
 .dialog-footer .dialog-btn.primary:hover {
-  background: #000000;
+  background: #dddddd;
 }
 .plc-button-off {
   display: inline-block;
-  background-color: #000000;
-  border: 1px solid #000000;
-  color: #78ff78;
+  background-color: #dddddd;
+  border: 1px solid #c4c4c4;
+  color: #303030;
   margin: 2px;
   border-radius: 5px;
   font-size: 12px;
@@ -2360,7 +2361,7 @@ button:active {
   cursor: pointer;
 }
 .plc-button-off:hover {
-  background-color: #1a1a1a;
+  background-color: #f7f7f7;
 }
 .plc-button-on {
   display: inline-block;
@@ -2382,17 +2383,3 @@ button:active {
 .fade-img.loaded {
   opacity: 1;
 }
-/* === Core === */
-/* === Typography === */
-/* === Logo === */
-/* === Track rows === */
-/* === Buttons === */
-/* === Scrollbar === */
-/* === Indicator bulbs === */
-/* === Player === */
-/* === Loader === */
-/* === Search === */
-/* === Selection === */
-/* === Selected rows === */
-/* === Panels === */
-/* === Placeholder === */

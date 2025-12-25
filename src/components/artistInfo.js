@@ -10,7 +10,7 @@ import PlaylistRow from "./playlistRow";
 // - Has a button to edit (opens Dialog)
 // - Dialog contains name + description inputs
 
-export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick, onArtistAlbumContextMenu, onArtistTrackContextMenu }) {
+export default function ArtistInfo({ onClose, onBulbsClick, onAlbumClick, onTrackDoubleClick, onArtistAlbumContextMenu, onArtistTrackContextMenu }) {
     const { selectedArtistTrackIndex, setSelectedArtistTrackIndex, selectedArtistAlbumIndex, setSelectedArtistAlbumIndex, artistInfoPosition, setArtistInfoPosition, menuAnchor, setMenuAnchor, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
 
     const isLocked = () => {
@@ -72,7 +72,7 @@ export default function ArtistInfo({ onClose, onAlbumClick, onTrackDoubleClick, 
                                 <div style={{ overflowY: "auto", height: "45vh" }}>
                                     {selectedArtist && selectedArtist.tracks.map((tr, index) => {
                                         // return <TrackRow id={"atr" + tr.id} index={index} track={tr} onMouseDown={() => { setDragSource("tracks"); setDragTrack(tr); setDragSourceIndex(index); setSelectedTrack(tr); }} onDoubleClick={() => { if (isLocked()) { return; } setPlayIndex(index); setPlayPosition("main"); play(tr) }} />
-                                        return <TrackRow onContextMenu={onArtistTrackContextMenu} onClick={() => { setSelectedTrack(tr); setSelectedArtistTrackIndex(index) }} selected={selectedArtistTrackIndex === index} source={"artist-info-track"} forInfo id={"atr" + tr.id} index={index} track={tr} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
+                                        return <TrackRow onBulbsClick={onBulbsClick} onContextMenu={onArtistTrackContextMenu} onClick={() => { setSelectedTrack(tr); setSelectedArtistTrackIndex(index) }} selected={selectedArtistTrackIndex === index} source={"artist-info-track"} forInfo id={"atr" + tr.id} index={index} track={tr} onMouseUp={() => { setDragTrack(null); setDragSource(null); setDragSourceIndex(null); }} onDoubleClick={() => { if (isLocked()) { return; }; onTrackDoubleClick?.(tr) }} />
                                     })}
                                 </div>
 

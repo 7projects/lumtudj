@@ -65,6 +65,8 @@ import { useLongPress } from 'use-long-press';
 import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
 
+import { Splitter, SplitterPanel } from 'primereact/splitter';
+        
 import PanelLibrary from './components/panelLibrary';
 import PanelMain from './components/panelMain';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -78,7 +80,6 @@ import LiquorIcon from '@mui/icons-material/Liquor';
 import ArtistInfo from './components/artistInfo';
 
 import UserAgreement from './components/userAgreement';
-
 
 // import { unstable_Activity, Activity as ActivityStable } from 'react';
 import {
@@ -367,7 +368,7 @@ function App() {
 
   const refreshAccessToken = async () => {
 
-    debugger;
+
     let data = await api.refreshAccessToken();
     if (data.access_token) {
       setToken(data.access_token);
@@ -876,8 +877,6 @@ function App() {
   const addToPlaylist = async (track, position, id) => {
 
 
-    debugger;
-
     // if(dragSource == "playlist") 
     //   return;
     setDragSource(null);
@@ -966,7 +965,7 @@ function App() {
     setPLCSelected(sel);
     //need all tracks from library that are in every playlist in plcSelected
     const result = getCommonTracks(sel);
-    debugger;
+    
 
     setSelectedPlaylistTracks(result);
 
@@ -1043,7 +1042,7 @@ function App() {
   const removeTrackFromSpotifyPlaylist = async () => {
 
 
-    debugger;
+    
     if (dragSource == "plprev") {
 
 
@@ -1080,7 +1079,7 @@ function App() {
     //remove selectedPlaylistTrackindex from playlist
 
 
-    debugger;
+    
     if (isMobile()) {
       flyToPlaylist(tr);
       setTimeout(() => {
@@ -1532,7 +1531,7 @@ function App() {
         loadPlaylistPrev({ id: "TopTracks", name: "Top Tracks", type: "toptracks" });
         break;
       case "search":
-        debugger;
+        
         loadPlaylistPrev({ id: "search", name: "", type: "search" });
         break;
     }
@@ -1677,7 +1676,7 @@ function App() {
   }
 
   const savePlaylistAs = async (pl, name, description, isPublic, collaborative) => {
-    debugger;
+    
     const newPl = await api.createPlaylist(name, description, isPublic, collaborative);
     const result = await api.addTracksToPlaylist(newPl, playlistTracks);
     if (result) {
@@ -1739,7 +1738,7 @@ function App() {
   }
 
   const followAlbum = async (album) => {
-    debugger;
+    
     const newAlbum = await api.followAlbum(album);
     if (newAlbum.ok) {
       let simplifiedAlbum = api.simplifiAlbum(album);
@@ -1770,7 +1769,7 @@ function App() {
   }
 
   const onArtistTrackContextMenu = (e, track, index) => {
-    debugger;
+    
     let items = [];
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
     setContextMenuItems(items);
@@ -2177,7 +2176,7 @@ function App() {
 
 
         {showArtistInfo ?
-          <ArtistInfo onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={loadPlaylistPrev} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
+          <ArtistInfo onBulbsClick={(track) => { setSelectedTrack(track); setShowPickers(true); }} onArtistAlbumContextMenu={onArtistAlbumContextMenu} onArtistTrackContextMenu={onArtistTrackContextMenu} onAlbumClick={loadPlaylistPrev} onTrackDoubleClick={(tr) => play(tr)} onClose={() => setShowArtistInfo(false)}></ArtistInfo> : null
         }
 
         {
@@ -2562,7 +2561,7 @@ function App() {
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onBulbsClick={(tr) => setShowPickers(true) } onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}
@@ -2584,7 +2583,7 @@ function App() {
 
                     {
                       playlistTracks.length > 0 ?
-                        <ReordableTrackList enableDrag={!locked} onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
+                        <ReordableTrackList onBulbsClick={(track) => { setSelectedTrack(track); setShowPickers(true); }} enableDrag={!locked} onClick={(tr, index) => { setSelectedTrack(tr); setPlaylistIndex(index) }} onContextMenu={onPlaylistContextMenu} selectedIndex={playlistIndex} source="playlist" onDoubleClick={onPlaylistTrackDoubleClick} trackList={playlistTracks} dragEndHandler={handlePlaylistDragEnd} keys={"pl"} onSwipedRight={onTracksSwipedRight} onDrop={addToPlaylist}></ReordableTrackList>
 
                         :
                         <div className='QueueMusicIcon'>
@@ -2716,7 +2715,7 @@ function App() {
 
 
                 : null} */}
-                  <SpotifyPlayer isLocked={isLocked} onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                  <SpotifyPlayer onBulbsClick={(track) => { setSelectedTrack(track); setShowPickers(true); }} isLocked={isLocked} onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.type == "playlist" && pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
                 </div>
               </div>
 

@@ -126,7 +126,6 @@ const search = async (query) => {
 
 const simplifiPlaylist = (item) => {
 
-  debugger;
   return {
     id: item.id,
     name: item.name,
@@ -204,10 +203,7 @@ const getAlbums = async () => {
     }
 
     const data = await response.json();
-
-    debugger;
     const simplified = data.items.map(item => simplifiAlbum(item));
-    debugger;
     albums.push(...simplified);
 
     url = data.next; // Spotify gives the next page URL, or null
@@ -658,7 +654,7 @@ const getAccessTokenByAuthorizationCode = async (code) => {
 
 const savePlaylistInfo = async (playlist, name, description, isPublic = true, isCollaborative = true) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}`;
- debugger;
+
   const response = await fetch(url, {
     method: 'PUT',
     headers: {
@@ -729,7 +725,7 @@ const createPlaylist = async (name, description) => {
 const deletePlaylist = async (playlist) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}/followers`;
 
-  debugger;
+
   const response = await fetch(url, {
     method: "DELETE",
     headers: {
@@ -738,7 +734,7 @@ const deletePlaylist = async (playlist) => {
     }
   });
 
-  debugger;
+
   if (!response.ok) {
     errorHandler();
     const error = await response.json();

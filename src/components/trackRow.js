@@ -7,9 +7,10 @@ import { useSwipeable } from 'react-swipeable';
 import PlaylistPlayIcon from '@mui/icons-material/PlaylistPlay';
 import Marquee from 'react-fast-marquee';
 import useAppStore from '../AppStore';
+import BulbContainer from './bulbContainer';
 
 
-const TrackRow = ({view, draggable, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({ view, onBulbsClick, draggable, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const { library, dragTrack, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
@@ -146,13 +147,8 @@ const TrackRow = ({view, draggable, source, track, forPlaylist, forInfo, onClick
                                                 <td style={{ fontSize: 12 }}>
                                                     {track && track.artists && track.artists.map(a => a.name).join(", ")} - {track && track.name}
                                                 </td>
-                                                <td style={{ fontSize: 12, textAlign: "left", width: 100 }}>
-                                                    {playlists && playlists.map((p) =>
-                                                        <div key={p.id} className='littleBulbOn'>
-
-                                                        </div>
-                                                    )
-                                                    }
+                                                <td style={{ fontSize: 12, textAlign: "left", width: 100, paddingRight: 7 }}>
+                                                    <BulbContainer onClick={() => onBulbsClick(track)} playlists={playlists} track={track} ></BulbContainer>
                                                 </td>
                                                 <td style={{ fontSize: 12, textAlign: "left", width: 40 }}>
                                                     {/* {track?.album?.name} &nbsp; */}
@@ -178,6 +174,12 @@ const TrackRow = ({view, draggable, source, track, forPlaylist, forInfo, onClick
                                                         }
                                                     </span>
                                                 </td>
+                                                <td style={{ textAlign: "right", fontSize: 10 }}>
+                                                    {!forPlayer && formatTime(track.duration_ms)}
+
+                                                    {!forPlayer && <>&nbsp;</>}
+                                                </td>
+
                                                 {onAddToPlaylistButton ?
                                                     <td className='song-add-to-playlist' onClick={(e) => { e.stopPropagation(); onAddToPlaylistButton(track); }}>
 
@@ -185,6 +187,8 @@ const TrackRow = ({view, draggable, source, track, forPlaylist, forInfo, onClick
                                                         <PlaylistAddIcon ></PlaylistAddIcon>
 
                                                     </td> : null}
+
+
                                             </tr>
                                             {!forInfo ?
                                                 <tr>
@@ -220,15 +224,9 @@ const TrackRow = ({view, draggable, source, track, forPlaylist, forInfo, onClick
                                             <tr>
                                                 <td colSpan={2} style={{ float: "left" }} >
                                                     <div className="song-duration">
-                                                        {!forPlayer && formatTime(track.duration_ms)}
 
-                                                        {!forPlayer && <>&nbsp;</>}
-                                                        {playlists && playlists.map((p) =>
-                                                            <div key={p.id} className='littleBulbOn'>
+                                                        <BulbContainer playlists={playlists} track={track} onClick={() => onBulbsClick(track)} ></BulbContainer>
 
-                                                            </div>
-                                                        )
-                                                        }
                                                     </div>
                                                 </td>
                                             </tr>
