@@ -290,7 +290,7 @@ const PanelMain = ({ onBack, onBulbsClick, onForward, onToolBarClick, onChange, 
             {/* <img src={track && track.album && track.album.images && track.album.images[0].url} alt="Search" className="panel-image" />  */}
             {true ? <div className="toolbar-wrapper">
 
-                {mode == "normal" ?
+                {true ?
                     <>
                         <div className='toolbar-search'> 
                             <ArrowBackIosIcon className={onBack ? 'toolbar-button' : 'toolbar-button-disabled'} onClick={onBack}></ArrowBackIosIcon>

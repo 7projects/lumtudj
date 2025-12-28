@@ -816,6 +816,24 @@ code {
   width: 40px;
   object-fit: cover;
 }
+.bulb-container {
+  background-color: #ffffff;
+  display: flex;
+  align-items: center;
+  /* padding: 4px; */
+  border-radius: 6px;
+  height: 16px;
+  padding-left: 5px;
+  width: 100px;
+}
+.bulb-container-text {
+  font-size: 10px;
+  color: #000000;
+  margin: auto;
+}
+.bulb-container:hover {
+  background-color: #ffffff;
+}
 .littleBulbOn {
   width: 4px;
   height: 4px;

@@ -2433,7 +2433,7 @@ function App() {
                           <div style={{ display: 'flex', alignItems: 'center', padding: 5 }}>
 
 
-                            {mode != "compact" ?
+                            {mode != "compact1" ?
                               <div onContextMenu={handleMenu} className='app-title'>
                                 <span>LUMTU</span>
                                 <span style={{ opacity: 0.5 }} className='app-title-dj'>MANAGER</span><br></br>
@@ -2441,7 +2441,7 @@ function App() {
                               </div> : null}
 
 
-                            {mode == "compact" ?
+                            {mode == "compact1" ?
                               <div className="toolbar-wrapper" style={{ paddingLeft: 0 }}>
                                 {/* <SearchIcon className="search-icon" /> */}
                                 <input className="input-search" placeholder="Search..." onFocus={(e) => e.target.select()} value={searchText} onKeyDown={handleKeyDown} onChange={onSearchTextChanged} />
