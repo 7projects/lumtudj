@@ -24,6 +24,7 @@ import MaximizeIcon from '@mui/icons-material/Maximize';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import StarsIcon from '@mui/icons-material/Stars';
 
+
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
@@ -66,7 +67,7 @@ import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
 
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-        
+
 import PanelLibrary from './components/panelLibrary';
 import PanelMain from './components/panelMain';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -949,7 +950,7 @@ function App() {
 
     // pl.tracks.map(x => x.uid = newGuid());
 
-    let pls = [...playlistTracks, ...pl.tracks];
+    let pls = [...pl.tracks];
     setPlaylistTracks(pls);
   };
 
@@ -965,7 +966,7 @@ function App() {
     setPLCSelected(sel);
     //need all tracks from library that are in every playlist in plcSelected
     const result = getCommonTracks(sel);
-    
+
 
     setSelectedPlaylistTracks(result);
 
@@ -1042,7 +1043,7 @@ function App() {
   const removeTrackFromSpotifyPlaylist = async () => {
 
 
-    
+
     if (dragSource == "plprev") {
 
 
@@ -1079,7 +1080,7 @@ function App() {
     //remove selectedPlaylistTrackindex from playlist
 
 
-    
+
     if (isMobile()) {
       flyToPlaylist(tr);
       setTimeout(() => {
@@ -1401,9 +1402,20 @@ function App() {
     const { active, over } = event;
     if (!over) return;
     if (active.id !== over.id) {
-      const oldIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === active.id);
-      const newIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === over.id);
-      setPlaylistTracks((prev) => arrayMove(prev, oldIndex, newIndex));
+      const dragIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === active.id);
+      const dropIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === over.id);
+
+      if (playlistIndex == dragIndex) {
+        setPlaylistIndex(dropIndex);
+      } else {
+
+        if (dragIndex < playlistIndex && dropIndex >= playlistIndex)
+          setPlaylistIndex(playlistIndex - 1);
+        else if (dragIndex > playlistIndex && dropIndex <= playlistIndex)
+          setPlaylistIndex(playlistIndex + 1);
+      }
+
+      setPlaylistTracks((prev) => arrayMove(prev, dragIndex, dropIndex));
     }
   }
 
@@ -1531,7 +1543,7 @@ function App() {
         loadPlaylistPrev({ id: "TopTracks", name: "Top Tracks", type: "toptracks" });
         break;
       case "search":
-        
+
         loadPlaylistPrev({ id: "search", name: "", type: "search" });
         break;
     }
@@ -1676,7 +1688,7 @@ function App() {
   }
 
   const savePlaylistAs = async (pl, name, description, isPublic, collaborative) => {
-    
+
     const newPl = await api.createPlaylist(name, description, isPublic, collaborative);
     const result = await api.addTracksToPlaylist(newPl, playlistTracks);
     if (result) {
@@ -1738,7 +1750,7 @@ function App() {
   }
 
   const followAlbum = async (album) => {
-    
+
     const newAlbum = await api.followAlbum(album);
     if (newAlbum.ok) {
       let simplifiedAlbum = api.simplifiAlbum(album);
@@ -1769,7 +1781,7 @@ function App() {
   }
 
   const onArtistTrackContextMenu = (e, track, index) => {
-    
+
     let items = [];
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
     setContextMenuItems(items);
@@ -1863,6 +1875,7 @@ function App() {
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
+    items.push({ label: "Add all to queue", onClick: () => { addPlaylistToToPlaylist(lastMainActivity, null, 0) }, icon: <PlaylistAddCircleIcon /> });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
 
     // items[1].items = [
@@ -2561,13 +2574,13 @@ function App() {
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onBulbsClick={(tr) => setShowPickers(true) } onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}
 
                   </div>
-                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }} id="playlist">
+                  <div className="panel" onDragOver={dragSource != "playlist" ? allowDrop : null} onDrop={() => { addToPlaylist(dragTrack) }} id="playlist">
 
                     <div className="toolbar-wrapper">
                       <div className='toolbar-search'>
