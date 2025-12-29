@@ -368,43 +368,45 @@ export default function SpotifyPlayer({
         <div className="parent">
           <div className="div1" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
             <table>
-              <tr>
-                <td style={{ width: 100 }}>
+              <tbody>
+                <tr>
+                  <td style={{ width: 100 }}>
 
-                  {!artist ?
-                    <img
-                      src={process.env.PUBLIC_URL + '/logo.png'}
-                      style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent" }}
+                    {!artist ?
+                      <img
+                        src={process.env.PUBLIC_URL + '/logo.png'}
+                        style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent" }}
 
-                    />
-                    // <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent", opacity: 0.1 }}>
-                    //   {/* <AccountCircleIcon style={{ width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70 }} /> */}
-                    // </div>
-                    :
-                    <img
-                      className={`fade-img ${artistLoaded ? 'loaded' : ''}`}
-                      key={artist?.images?.[0]?.url}
-                      onLoad={() => setArtistLoaded(true)}
-                      src={artist?.images?.[0]?.url}
-                      style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
+                      />
+                      // <div style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent", opacity: 0.1 }}>
+                      //   {/* <AccountCircleIcon style={{ width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70 }} /> */}
+                      // </div>
+                      :
+                      <img
+                        className={`fade-img ${artistLoaded ? 'loaded' : ''}`}
+                        key={artist?.images?.[0]?.url}
+                        onLoad={() => setArtistLoaded(true)}
+                        src={artist?.images?.[0]?.url}
+                        style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
 
-                    />}
-                </td>
+                      />}
+                  </td>
 
-                <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", alignSelf: "center", width: "fit-content" }}>
-                  <Marquee speed={0} style={{ fontSize: 16, fontWeight: "bold", maxWidth: "20vw" }}>{track && track.artists && track.artists.map(a => a.name).join(", ")}</Marquee>
-                  <Marquee speed={0} style={{ fontSize: 14, maxWidth: "20vw" }}>
-                    {track && track.name}
-                  </Marquee>
-                  {track && track.name ?
-                    <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
-                    : null}
-                  <div style={{ fontSize: 10, height: 16 }}>
-                    {playedFrom ?
-                      <>playing from {playedFrom}</> : null}
-                  </div>
-                </td>
-              </tr>
+                  <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", alignSelf: "center", width: "fit-content" }}>
+                    <Marquee speed={0} style={{ fontSize: 16, fontWeight: "bold", maxWidth: "20vw" }}>{track && track.artists && track.artists.map(a => a.name).join(", ")}</Marquee>
+                    <Marquee speed={0} style={{ fontSize: 14, maxWidth: "20vw" }}>
+                      {track && track.name}
+                    </Marquee>
+                    {track && track.name ?
+                      <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
+                      : null}
+                    <div style={{ fontSize: 10, height: 16 }}>
+                      {playedFrom ?
+                        <>playing from {playedFrom}</> : null}
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
             </table>
           </div>
           <div className="div2">

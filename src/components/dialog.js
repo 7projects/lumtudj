@@ -142,19 +142,21 @@ export default function Dialog({
           >
             <div className="dialog-header" onMouseDown={onMouseDown}>
               <table style={{ width: "100%" }}>
-                <tr>
-                  <td style={{ display: "inline-block", width: "90%" }}>         
-                      {title}    
-                  </td>
-                  <td style={{ display: "inline-block", width: "40px" }}>
-                    <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}>×</button>
-                  </td>
-                </tr>
-                <tr>
-                  <td colSpan={2}>
-                    {header}
-                  </td>
-                </tr>
+                <tbody>
+                  <tr>
+                    <td style={{ display: "inline-block", width: "90%" }}>
+                      {title}
+                    </td>
+                    <td style={{ display: "inline-block", width: "40px" }}>
+                      <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}>×</button>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td colSpan={2}>
+                      {header}
+                    </td>
+                  </tr>
+                </tbody>
               </table>
 
             </div>

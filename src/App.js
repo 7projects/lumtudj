@@ -878,7 +878,7 @@ function App() {
   const addToPlaylist = async (track, position, id) => {
 
 
-    // if(dragSource == "playlist") 
+    // if(dragSource == "playlist")
     //   return;
     setDragSource(null);
     setDragTrack(null);
@@ -1642,6 +1642,16 @@ function App() {
     if (playlist.type == "playlist") {
       addToSpotifyPlaylist(playlist);
     }
+
+    if(selectedLibraryItem && selectedLibraryItem.type == "playlist"){
+      let tracks = [...selectedPlaylistTracks];
+      tracks.push(dragTrack);
+      setSelectedPlaylistTracks(tracks);
+      
+      // let act = [...mainActivities];
+      // act[mainActivityIndex].tracks.push(dragTrack);
+      // setMainActivities(act);
+    }
   }
 
   const onTrash = () => {
@@ -2277,7 +2287,7 @@ function App() {
                 {/* <div className='app-title' style={{fontSize:40}}>
                   <span>LUMTU</span>
                   <span style={{ opacity: 0.5 }} className='app-title-dj'>MANAGER</span><br></br>
-                  
+
                 </div> */}
                 <button style={{ fontSize: 20, padding: 10, border: "2px solid white", padding: 20 }} onClick={handleLogin}>Login with Spotify</button>
               </div>
@@ -2564,7 +2574,8 @@ function App() {
                       <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                     </div>
                     : null}
-                  <div id="panel-main" className="panel-main">
+
+                  <div id="panel-main" className="panel-main"  onDragOver={dragSource != "library" && dragSource != "plprev" ? allowDrop : null} onDrop={() => { onLibrayRowDrop(selectedLibraryItem)  }}  >
 
                     {mainActivities.map((pl, index) => {
                       // const isTop = index === mainActivities.length - 1;
@@ -2572,7 +2583,7 @@ function App() {
 
                       return (
                         <Activity
-                          key={`${pl.type}-${pl.id}`}
+                          key={`${pl.type + index}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
                           <PanelMain onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
@@ -2593,6 +2604,7 @@ function App() {
                         <MoreVertIcon onClick={handleMenu} menu-target="playlist" className='toolbar-button'></MoreVertIcon>
                       </div>
                     </div>
+
 
                     {
                       playlistTracks.length > 0 ?
