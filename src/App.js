@@ -487,7 +487,7 @@ function App() {
         await loadThemeCSS(theme);
       } else {
 
-        await loadThemeCSS("bluescreen");
+        await loadThemeCSS("mono");
       }
 
       const oldCode = localStorage.getItem('code');

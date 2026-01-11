@@ -91,15 +91,14 @@ export default function UserAgreement({ onAgree }) {
                 <ul style={{ marginLeft: "20px" }}>
                     <li>
                         The Lumtu Manager does <strong>not</strong> collect or store your personal
-                        data on external servers by default.
+                        data on external servers.
                     </li>
                     <li>
                         All settings, cached data, or user preferences are stored{" "}
-                        <strong>locally in your browser</strong> unless you enable server
-                        features.
+                        <strong>locally in your browser</strong>.
                     </li>
-                    <li>You may clear this data through your browser settings.</li>
-                    <li>No data is sold, shared, or transferred without consent.</li>
+                    <li>You may clear this data through your browser settings or by logging out.</li>
+                    <li>No data is sold, shared, or transferred.</li>
                 </ul>
 
                 {/* ============================ */}
