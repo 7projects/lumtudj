@@ -279,7 +279,6 @@ namespace LumtuDJ
         // -----------------------------------------------------
         private void BtnFullscreen_Click(object sender, EventArgs e)
         {
-
             if (!isFullscreen)
             {
                 previousBounds = this.Bounds;
@@ -288,18 +287,22 @@ namespace LumtuDJ
                 this.WindowState = FormWindowState.Normal;
                 this.FormBorderStyle = FormBorderStyle.None;
 
-                this.Bounds = Screen.PrimaryScreen.Bounds;
+                // Get the screen where the form currently is
+                Screen currentScreen = Screen.FromControl(this);
+                this.Bounds = currentScreen.Bounds;
+
                 this.Padding = new Padding(0);
             }
             else
             {
                 isFullscreen = false;
 
-                this.FormBorderStyle = FormBorderStyle.None;
+                this.FormBorderStyle = FormBorderStyle.Sizable;
                 this.Bounds = previousBounds;
                 this.Padding = new Padding(ResizeBorder);
             }
         }
+
 
         // -----------------------------------------------------
         // Resize Handling
@@ -362,59 +365,53 @@ namespace LumtuDJ
         private void LoadFormSettings()
         {
             var settings = Properties.Settings.Default;
-            if (settings == null) return;
 
             Size size = settings.FormSize;
             if (size.Width <= 0 || size.Height <= 0)
                 size = new Size(800, 600);
 
             Point location = settings.FormLocation;
-            if (location.X < 0 || location.Y < 0)
-                location = new Point(100, 100);
 
-            if(location.X == 0 && location.Y == 0 && settings.FormState == FormWindowState.Normal)
-            {
-                this.StartPosition = FormStartPosition.CenterScreen;
-            }
+            Rectangle desiredBounds = new Rectangle(location, size);
+
+            // Find the screen that contains the saved bounds
+            Screen targetScreen = Screen.FromRectangle(desiredBounds);
+            Rectangle workingArea = targetScreen.WorkingArea;
+
+            // Clamp the window so it stays visible
+            int x = Math.Max(workingArea.Left,
+                    Math.Min(desiredBounds.X, workingArea.Right - desiredBounds.Width));
+            int y = Math.Max(workingArea.Top,
+                    Math.Min(desiredBounds.Y, workingArea.Bottom - desiredBounds.Height));
+
+            this.StartPosition = FormStartPosition.Manual;
+            this.Bounds = new Rectangle(new Point(x, y), size);
+
+            // Apply window state AFTER bounds
+            if (Enum.IsDefined(typeof(FormWindowState), settings.FormState))
+                this.WindowState = settings.FormState;
             else
-            {
-                Rectangle screenBounds = Screen.PrimaryScreen.WorkingArea;
-
-                this.StartPosition = FormStartPosition.Manual;
-                this.Bounds = new Rectangle(location, size);
-
-                if (Enum.IsDefined(typeof(FormWindowState), settings.FormState))
-                    this.WindowState = settings.FormState;
-                else
-                    this.WindowState = FormWindowState.Normal;
-            }
-
-
+                this.WindowState = FormWindowState.Normal;
         }
+
 
         private void SaveFormSettings()
         {
+            if (isFullscreen) return;
+
             var settings = Properties.Settings.Default;
-            if (settings == null) return;
 
-            if (!isFullscreen)
-            {
-                if (this.WindowState == FormWindowState.Normal)
-                {
-                    settings.FormLocation = this.Location;
-                    settings.FormSize = this.Size;
-                }
-                else
-                {
-                    settings.FormLocation = this.RestoreBounds.Location;
-                    settings.FormSize = this.RestoreBounds.Size;
-                }
+            Rectangle bounds = this.WindowState == FormWindowState.Normal
+                ? this.Bounds
+                : this.RestoreBounds;
 
-                settings.FormState = this.WindowState;
+            settings.FormLocation = bounds.Location;
+            settings.FormSize = bounds.Size;
+            settings.FormState = this.WindowState;
 
-                try { settings.Save(); } catch { }
-            }
+            try { settings.Save(); } catch { }
         }
+
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {

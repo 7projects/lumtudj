@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Marquee from "react-fast-marquee";
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 // Dialog component using CSS classes (LESS-friendly)
 // No inline styles — all styling moved to classes
 // You can now style everything in dialog.less
@@ -147,7 +148,7 @@ export default function Dialog({
                       {title}    
                   </td>
                   <td style={{ display: "inline-block", width: "40px" }}>
-                    <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}>×</button>
+                    <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}><DisabledByDefaultIcon></DisabledByDefaultIcon></button>
                   </td>
                 </tr>
                 <tr>

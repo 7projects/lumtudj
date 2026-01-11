@@ -66,7 +66,7 @@ import SortableItem from './components/sortableItem';
 import ReordableTrackList from './components/reordableTrackList';
 
 import { Splitter, SplitterPanel } from 'primereact/splitter';
-        
+
 import PanelLibrary from './components/panelLibrary';
 import PanelMain from './components/panelMain';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
@@ -965,7 +965,7 @@ function App() {
     setPLCSelected(sel);
     //need all tracks from library that are in every playlist in plcSelected
     const result = getCommonTracks(sel);
-    
+
 
     setSelectedPlaylistTracks(result);
 
@@ -1042,7 +1042,7 @@ function App() {
   const removeTrackFromSpotifyPlaylist = async () => {
 
 
-    
+
     if (dragSource == "plprev") {
 
 
@@ -1079,7 +1079,7 @@ function App() {
     //remove selectedPlaylistTrackindex from playlist
 
 
-    
+
     if (isMobile()) {
       flyToPlaylist(tr);
       setTimeout(() => {
@@ -1531,7 +1531,7 @@ function App() {
         loadPlaylistPrev({ id: "TopTracks", name: "Top Tracks", type: "toptracks" });
         break;
       case "search":
-        
+
         loadPlaylistPrev({ id: "search", name: "", type: "search" });
         break;
     }
@@ -1676,7 +1676,7 @@ function App() {
   }
 
   const savePlaylistAs = async (pl, name, description, isPublic, collaborative) => {
-    
+
     const newPl = await api.createPlaylist(name, description, isPublic, collaborative);
     const result = await api.addTracksToPlaylist(newPl, playlistTracks);
     if (result) {
@@ -1738,7 +1738,7 @@ function App() {
   }
 
   const followAlbum = async (album) => {
-    
+
     const newAlbum = await api.followAlbum(album);
     if (newAlbum.ok) {
       let simplifiedAlbum = api.simplifiAlbum(album);
@@ -1769,7 +1769,7 @@ function App() {
   }
 
   const onArtistTrackContextMenu = (e, track, index) => {
-    
+
     let items = [];
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
     setContextMenuItems(items);
@@ -1936,7 +1936,20 @@ function App() {
   const [lastMainActivity, setLastMainActivity] = useState(null);
 
   const onMainActivitiesChange = (Item) => {
-    setLastMainActivity(Item);
+    let mainActivitiesCopy = [...mainActivities];
+    mainActivitiesCopy[mainActivityIndex] = Item;
+    setMainActivities(mainActivitiesCopy);
+  }
+
+  const onNewActivity = (pl) => {
+
+    let acts = [...mainActivities];
+    acts = acts.slice(0, mainActivityIndex + 1);
+
+    acts[mainActivityIndex + 1] = pl;
+    setMainActivityIndex(mainActivityIndex + 1);
+    setMainActivities(acts);
+
   }
 
   const steps = [{
@@ -2561,7 +2574,7 @@ function App() {
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onBulbsClick={(tr) => setShowPickers(true) } onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}
@@ -2615,8 +2628,11 @@ function App() {
                             </Marquee>
                           }
                         </td>
-                        <td style={{ width: "20%", padding: 5 }}>
+                      </tr>
+                      <tr>
+                        <td style={{ width: "20%", padding: 5, textAlign: "left" }}>
                           <input value={plcFilter} placeholder='filter...' onChange={(e) => setPlcFilter(e.target.value)} type='text'></input>
+                           <button className="dialog-close" onClick={() => setPlcFilter("")}>x</button>
                           {/* <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
                             <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
                           </Tooltip> */}
