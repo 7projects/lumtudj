@@ -874,11 +874,25 @@ function App() {
 
   const allowDrop = (e) => e.preventDefault();
 
+
+
+  const onPlPrevDrop = async () => {
+    let res = await addToSpotifyPlaylist(mainActivities[mainActivityIndex]);
+
+    debugger;
+    if (res.ok) {
+      let act = { ...mainActivities[mainActivityIndex] };
+      // act.tracks.push(dragTrack);
+      let mas = [...mainActivities];
+      mas[mainActivityIndex] = act;
+      setMainActivities(mas);
+    }
+  }
+
   const addToPlaylist = async (track, position, id) => {
-
-
     // if(dragSource == "playlist") 
     //   return;
+
     setDragSource(null);
     setDragTrack(null);
 
@@ -1007,6 +1021,7 @@ function App() {
 
   const addToSpotifyPlaylist = async (pl, bulbOn) => {
 
+    debugger;
     if (showingPlaylistPicker) {
       setShowingPlaylistPicker(false);
       return;
@@ -1018,6 +1033,8 @@ function App() {
     let tr = dragTrack || selectedTrack;
 
     let res = null;
+
+
 
     if (pl.id && tr) {
       if (bulbOn) {
@@ -1037,38 +1054,41 @@ function App() {
       // setFilteredLibrary(pls);
       saveLibrary(pls);
     }
+
+    return res;
   }
 
   const removeTrackFromSpotifyPlaylist = async () => {
 
-
-
     if (dragSource == "plprev") {
+      // if (selectedLibraryItem && selectedLibraryItem.id == "LastListened" || selectedLibraryItem.id == "MyShazamedTracks" || selectedLibraryItem.type == "album")
+      //   return;
 
+      let pl = { ...mainActivities[mainActivityIndex] };
 
-      if (selectedLibraryItem && selectedLibraryItem.id == "LastListened" || selectedLibraryItem.id == "MyShazamedTracks" || selectedLibraryItem.type == "album")
-        return;
+      // if (selectedLibraryIndex > -1) {
+      const tr = pl.tracks[dragSourceIndex];
+      pl.tracks.splice(dragSourceIndex, 1);
+      setSelectedTrackIndex(-1);
+      const res = await api.removeTrackFromPlaylist(pl, tr);
 
+      let pls = [...library];
+      let oldPl = pls.find(x => x.id == pl.id);
+      oldPl.count = pl.tracks.length;
+      oldPl.snapshot_id = res.snapshot_id;
+      oldPl.tracks = pl.tracks;
+      setSelectedPlaylistTracks(pl.tracks);
+      setLibrary(pls);
+      // setFilteredLibrary(pls); ovo ne treba jer se filtered sam updatea u panelMain u useEffectu za library
+      saveLibrary([oldPl]);
+      closeContextMenu();
+      debugger;
 
-      if (selectedLibraryIndex) {
-
-        let pl = filteredLibrary[selectedLibraryIndex];
-        const tr = pl.tracks[dragSourceIndex];
-        pl.tracks.splice(dragSourceIndex, 1);
-        setSelectedTrackIndex(-1);
-        const res = await api.removeTrackFromPlaylist(pl, tr);
-
-        let pls = [...library];
-        let oldPl = pls.find(x => x.id == pl.id);
-        oldPl = pl;
-        oldPl.count = pl.tracks.length;
-        oldPl.snapshot_id = res.snapshot_id;
-        setSelectedPlaylistTracks(pl.tracks);
-        setLibrary(pls);
-        // setFilteredLibrary(pls);
-        saveLibrary([pl]);
-        closeContextMenu();
-      }
+      //todo: rerfreshati mainActivities
+      let acts = [...mainActivities];
+      acts[mainActivityIndex] = pl;
+      setMainActivities(acts);
+      // }
     }
   }
 
@@ -1623,7 +1643,7 @@ function App() {
 
   const saveSelectedPlaylist = () => {
 
-    setPlaylistChanged(false);
+    // setPlaylistChanged(false);
   }
 
   const onLibrayRowDrop = (playlist) => {
@@ -2181,7 +2201,7 @@ function App() {
         }
 
         {
-          (dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && selectedLibraryItem?.type != "album" && selectedLibraryItem?.type != "featured") || dragTrack && dragSource == "playlist" ?
+          (dragTrack && dragSource != "artist-info-track" && dragSource != "artist-info-album" && dragSource != "player" && mainActivities[mainActivityIndex]?.type != "album" && mainActivities[mainActivityIndex]?.type != "featured" && mainActivities[mainActivityIndex]?.type != "search") || dragTrack && dragSource == "playlist" ?
             <div className='trash-container' onDragOver={(e) => { e.currentTarget.classList.add('drag-over'); e.preventDefault() }} onDragLeave={(e) => { e.currentTarget.classList.remove('drag-over'); }} onDrop={onTrash}>
               <DeleteIcon className="trash-icon" style={{ fontSize: 60 }} />
             </div> : null
@@ -2574,7 +2594,7 @@ function App() {
                         <Activity
                           key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain allowDrop={dragSource == "playlist" && mainActivities[mainActivityIndex].type != "album" && mainActivities[mainActivityIndex].type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
                         </Activity>);
                     }
                     )}
@@ -2632,7 +2652,7 @@ function App() {
                       <tr>
                         <td style={{ width: "20%", padding: 5, textAlign: "left" }}>
                           <input value={plcFilter} placeholder='filter...' onChange={(e) => setPlcFilter(e.target.value)} type='text'></input>
-                           <button className="dialog-close" onClick={() => setPlcFilter("")}>x</button>
+                          <button className="dialog-close" onClick={() => setPlcFilter("")}>x</button>
                           {/* <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
                             <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
                           </Tooltip> */}

@@ -97,9 +97,14 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
       }}
 
       onDrop={(e) => {
+
+
         e.preventDefault();
         e.stopPropagation();
         dragCounter.current = 0;
+        if (dragSource == "library")
+          return;
+
         setIsDragOver(false);
         onDrop?.(playlist);
       }}

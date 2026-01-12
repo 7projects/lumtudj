@@ -498,9 +498,12 @@ const addTrackToPlaylist = async (playlist, track) => {
     const error = await response.json();
     console.error('Failed to add track:', error);
   } else {
-    return await response.json();
+    let rtrn = await response.json();
+    rtrn.ok = "true";
+    return rtrn;
     console.log('Track added successfully!');
   }
+
 };
 
 const addTracksToPlaylist = async (playlist, tracks) => {
