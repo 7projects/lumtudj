@@ -24,7 +24,6 @@ import MaximizeIcon from '@mui/icons-material/Maximize';
 import LibraryMusicIcon from '@mui/icons-material/LibraryMusic';
 import StarsIcon from '@mui/icons-material/Stars';
 
-
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
@@ -488,7 +487,7 @@ function App() {
         await loadThemeCSS(theme);
       } else {
 
-        await loadThemeCSS("bluescreen");
+        await loadThemeCSS("mono");
       }
 
       const oldCode = localStorage.getItem('code');
@@ -878,7 +877,7 @@ function App() {
   const addToPlaylist = async (track, position, id) => {
 
 
-    // if(dragSource == "playlist")
+    // if(dragSource == "playlist") 
     //   return;
     setDragSource(null);
     setDragTrack(null);
@@ -950,7 +949,7 @@ function App() {
 
     // pl.tracks.map(x => x.uid = newGuid());
 
-    let pls = [...pl.tracks];
+    let pls = [...playlistTracks, ...pl.tracks];
     setPlaylistTracks(pls);
   };
 
@@ -1402,20 +1401,9 @@ function App() {
     const { active, over } = event;
     if (!over) return;
     if (active.id !== over.id) {
-      const dragIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === active.id);
-      const dropIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === over.id);
-
-      if (playlistIndex == dragIndex) {
-        setPlaylistIndex(dropIndex);
-      } else {
-
-        if (dragIndex < playlistIndex && dropIndex >= playlistIndex)
-          setPlaylistIndex(playlistIndex - 1);
-        else if (dragIndex > playlistIndex && dropIndex <= playlistIndex)
-          setPlaylistIndex(playlistIndex + 1);
-      }
-
-      setPlaylistTracks((prev) => arrayMove(prev, dragIndex, dropIndex));
+      const oldIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === active.id);
+      const newIndex = playlistTracks.findIndex((i, index) => "pl" + index + "-" + i.id === over.id);
+      setPlaylistTracks((prev) => arrayMove(prev, oldIndex, newIndex));
     }
   }
 
@@ -1641,16 +1629,6 @@ function App() {
   const onLibrayRowDrop = (playlist) => {
     if (playlist.type == "playlist") {
       addToSpotifyPlaylist(playlist);
-    }
-
-    if(selectedLibraryItem && selectedLibraryItem.type == "playlist"){
-      let tracks = [...selectedPlaylistTracks];
-      tracks.push(dragTrack);
-      setSelectedPlaylistTracks(tracks);
-      
-      // let act = [...mainActivities];
-      // act[mainActivityIndex].tracks.push(dragTrack);
-      // setMainActivities(act);
     }
   }
 
@@ -1885,7 +1863,6 @@ function App() {
   const onTrackContextMenu = (e, track, index) => {
     let items = [];
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
-    items.push({ label: "Add all to queue", onClick: () => { addPlaylistToToPlaylist(lastMainActivity, null, 0) }, icon: <PlaylistAddCircleIcon /> });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
 
     // items[1].items = [
@@ -1959,7 +1936,20 @@ function App() {
   const [lastMainActivity, setLastMainActivity] = useState(null);
 
   const onMainActivitiesChange = (Item) => {
-    setLastMainActivity(Item);
+    let mainActivitiesCopy = [...mainActivities];
+    mainActivitiesCopy[mainActivityIndex] = Item;
+    setMainActivities(mainActivitiesCopy);
+  }
+
+  const onNewActivity = (pl) => {
+
+    let acts = [...mainActivities];
+    acts = acts.slice(0, mainActivityIndex + 1);
+
+    acts[mainActivityIndex + 1] = pl;
+    setMainActivityIndex(mainActivityIndex + 1);
+    setMainActivities(acts);
+
   }
 
   const steps = [{
@@ -2287,7 +2277,7 @@ function App() {
                 {/* <div className='app-title' style={{fontSize:40}}>
                   <span>LUMTU</span>
                   <span style={{ opacity: 0.5 }} className='app-title-dj'>MANAGER</span><br></br>
-
+                  
                 </div> */}
                 <button style={{ fontSize: 20, padding: 10, border: "2px solid white", padding: 20 }} onClick={handleLogin}>Login with Spotify</button>
               </div>
@@ -2574,8 +2564,7 @@ function App() {
                       <PanelLibrary onContextMenu={onLibraryItemContextMenu} onDrop={onLibrayRowDrop} onMenuClick={handleMenu} onClick={(p) => { loadPlaylistPrev(p) }}></PanelLibrary>
                     </div>
                     : null}
-
-                  <div id="panel-main" className="panel-main"  onDragOver={dragSource != "library" && dragSource != "plprev" ? allowDrop : null} onDrop={() => { onLibrayRowDrop(selectedLibraryItem)  }}  >
+                  <div id="panel-main" className="panel-main">
 
                     {mainActivities.map((pl, index) => {
                       // const isTop = index === mainActivities.length - 1;
@@ -2583,15 +2572,15 @@ function App() {
 
                       return (
                         <Activity
-                          key={`${pl.type + index}-${pl.id}`}
+                          key={`${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
+                          <PanelMain onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={addToPlaylist}></PanelMain>
                         </Activity>);
                     }
                     )}
 
                   </div>
-                  <div className="panel" onDragOver={dragSource != "playlist" ? allowDrop : null} onDrop={() => { addToPlaylist(dragTrack) }} id="playlist">
+                  <div className="panel" onDragOver={allowDrop} onDrop={() => { addToPlaylist(dragTrack) }} id="playlist">
 
                     <div className="toolbar-wrapper">
                       <div className='toolbar-search'>
@@ -2604,7 +2593,6 @@ function App() {
                         <MoreVertIcon onClick={handleMenu} menu-target="playlist" className='toolbar-button'></MoreVertIcon>
                       </div>
                     </div>
-
 
                     {
                       playlistTracks.length > 0 ?
@@ -2640,8 +2628,11 @@ function App() {
                             </Marquee>
                           }
                         </td>
-                        <td style={{ width: "20%", padding: 5 }}>
+                      </tr>
+                      <tr>
+                        <td style={{ width: "20%", padding: 5, textAlign: "left" }}>
                           <input value={plcFilter} placeholder='filter...' onChange={(e) => setPlcFilter(e.target.value)} type='text'></input>
+                           <button className="dialog-close" onClick={() => setPlcFilter("")}>x</button>
                           {/* <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
                             <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
                           </Tooltip> */}

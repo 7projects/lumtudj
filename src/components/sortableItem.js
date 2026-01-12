@@ -58,12 +58,12 @@ const SortableItem = ({ view, onBulbsClick, enableDrag, source, track, forInfo, 
     }
 
     return (
-        <li ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`} onClick={() => onClick?.(track)} onContextMenu={onContextMenu} onMouseDown={onMouseDown} onDoubleClick={onDoubleClick}>
+        <li key={id} ref={setNodeRef} style={style} className={`list-item ${isDragging ? "dragging" : ""}`} onClick={() => onClick?.(track)} onContextMenu={onContextMenu} onMouseDown={onMouseDown} onDoubleClick={onDoubleClick}>
             <table style={{ width: "100%" }}>
                 <tbody>
                     <tr>
                         {/* Main content cell */}
-                        <td className={getTrackRowClass()} style={{ width: "auto"}} draggable={isMobile() ? false : true} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  >
+                        <td className={getTrackRowClass()} style={{ width: "auto" }} draggable={isMobile() ? false : true} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  >
                             <TrackRow
                                 onBulbsClick={onBulbsClick}
                                 view={view}

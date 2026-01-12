@@ -824,8 +824,10 @@ code {
   /* padding: 4px; */
   border-radius: 6px;
   height: 16px;
+  padding: 0%;
   padding-left: 5px;
   width: 100px;
+  border: none;
 }
 .bulb-container-text {
   font-size: 10px;
@@ -834,6 +836,9 @@ code {
 }
 .bulb-container:hover {
   background-color: #ffffff;
+}
+.bulb-container:active {
+  background-color: #fcfcfc;
 }
 .littleBulbOn {
   width: 4px;
@@ -1262,9 +1267,6 @@ button:active {
   border-bottom: none;
   background-color: transparent;
   color: #1d1d1f;
-}
-.player-buttons {
-  margin-top: -8px;
 }
 .player-button {
   margin: 0px;
@@ -2400,4 +2402,7 @@ button:active {
 }
 .fade-img.loaded {
   opacity: 1;
+}
+.drag-over {
+  background-color: #4eccf3;
 }

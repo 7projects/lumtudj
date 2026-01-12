@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Marquee from "react-fast-marquee";
+import DisabledByDefaultIcon from '@mui/icons-material/DisabledByDefault';
 // Dialog component using CSS classes (LESS-friendly)
 // No inline styles — all styling moved to classes
 // You can now style everything in dialog.less
@@ -142,21 +143,19 @@ export default function Dialog({
           >
             <div className="dialog-header" onMouseDown={onMouseDown}>
               <table style={{ width: "100%" }}>
-                <tbody>
-                  <tr>
-                    <td style={{ display: "inline-block", width: "90%" }}>
-                      {title}
-                    </td>
-                    <td style={{ display: "inline-block", width: "40px" }}>
-                      <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}>×</button>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={2}>
-                      {header}
-                    </td>
-                  </tr>
-                </tbody>
+                <tr>
+                  <td style={{ display: "inline-block", width: "90%" }}>         
+                      {title}    
+                  </td>
+                  <td style={{ display: "inline-block", width: "40px" }}>
+                    <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}><DisabledByDefaultIcon></DisabledByDefaultIcon></button>
+                  </td>
+                </tr>
+                <tr>
+                  <td colSpan={2}>
+                    {header}
+                  </td>
+                </tr>
               </table>
 
             </div>

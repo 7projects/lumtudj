@@ -60,10 +60,53 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
     }
   }
 
+  const [isDragOver, setIsDragOver] = useState(false)
+  const dragCounter = useRef(0);
 
   return (
     playlist &&
-    <div onContextMenu={(e) => { e.preventDefault(); onContextMenu?.(e, playlist, index) }} draggable={draggable} onDragStart={() => { setDragSource(source); setDragSourceIndex(index) }} onDragOver={(e) => { if (dragSource != "library" && playlist.type == "playlist") e.preventDefault() }} onDrop={(e) => { e.stopPropagation(); onDrop && onDrop(playlist) }} id={id} {...longPressHandler()} {...swipeHandler} className={selected ? 'item-row-selected' : 'item-row'} key={playlist.id} onClick={() => { onClick && onClick(playlist.id) }} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}>
+    <div
+      onContextMenu={(e) => { e.preventDefault(); onContextMenu?.(e, playlist, index) }} id={id} {...longPressHandler()} {...swipeHandler} onClick={() => { onClick && onClick(playlist.id) }} onDoubleClick={() => onDoubleClick && onDoubleClick(playlist.id)}
+      draggable={draggable}
+
+      onDragStart={(e) => {
+        e.dataTransfer.setData("source", source);
+        setDragSource(source);
+        setDragSourceIndex(index);
+      }}
+
+      onDragEnter={(e) => {
+        e.preventDefault();
+        dragCounter.current++;
+
+        const src = e.dataTransfer.getData("source");
+        if (src !== "library" && playlist.type === "playlist") {
+          setIsDragOver(true);
+        }
+      }}
+
+      onDragLeave={() => {
+        dragCounter.current--;
+        if (dragCounter.current === 0) {
+          setIsDragOver(false);
+        }
+      }}
+
+      onDragOver={(e) => {
+        e.preventDefault(); // REQUIRED for drop
+      }}
+
+      onDrop={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        dragCounter.current = 0;
+        setIsDragOver(false);
+        onDrop?.(playlist);
+      }}
+
+      className={`${selected ? 'item-row-selected' : 'item-row'} ${isDragOver ? 'drag-over' : ''}`}
+    >
+
       <table style={{ width: "100%" }}>
         <tbody>
           <tr>
@@ -81,7 +124,7 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
                 <tbody>
                   <tr>
                     <td>
-                      <div className={isMobile() ? "playlists-name-mobile" : "playlist-name"} style={{ fontWeight:  "bold"  }}>
+                      <div className={isMobile() ? "playlists-name-mobile" : "playlist-name"} style={{ fontWeight: "bold" }}>
                         {playlist.name}
                       </div>
                     </td>
@@ -100,8 +143,8 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
                           <div className="playlists-count">
                             {/* {(playlist.count ? playlist.count : playlist.tracks?.total || playlist.total_tracks)} tracks {playlist.tracks && ("(" + playlist.tracks.filter(x => x.datePlayed).length + " played)")} */}
                             ({(playlist.count ? playlist.count : playlist.tracks?.total || playlist.total_tracks)} tracks)
-                         
-                         </div>}
+
+                          </div>}
                       </td> : null}
                   </tr>
                 </tbody>
