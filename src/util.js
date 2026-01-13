@@ -193,7 +193,7 @@ export const changeTheme = async () => {
   const currentTheme = localStorage.getItem("theme");
 
   switch (currentTheme) {
-    case "retro":
+    case "neon":
       localStorage.setItem("theme", "light");
       await loadThemeCSS("light");
       break;
@@ -227,6 +227,21 @@ export const changeTheme = async () => {
       localStorage.setItem("theme", "retro");
       await loadThemeCSS("retro");
       break;
+
+    case "retro":
+      localStorage.setItem("theme", "newspaper");
+      await loadThemeCSS("newspaper");
+      break
+
+    case "newspaper":
+      localStorage.setItem("theme", "cool");
+      await loadThemeCSS("cool");
+      break
+
+    case "cool":
+      localStorage.setItem("theme", "neon");
+      await loadThemeCSS("neon");
+      break
 
     default:
       localStorage.setItem("theme", "spotify");

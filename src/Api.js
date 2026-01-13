@@ -555,8 +555,13 @@ const changeTrackPosition = async (playlistId, oldIndex, newIndex) => {
   return await res.json(); // will include snapshot_id
 };
 
-const removeTrackFromPlaylist = async (playlist, track) => {
+const removeTrackFromPlaylist = async (playlist, track, atIndex) => {
   const url = `https://api.spotify.com/v1/playlists/${playlist.id}/tracks`;
+
+  const trUri = atIndex !== undefined ? { uri: track.uri, positions: [atIndex] } : { uri: track.uri };
+
+  debugger;
+  
   const response = await fetch(url, {
     method: 'DELETE',
     headers: {
@@ -565,9 +570,7 @@ const removeTrackFromPlaylist = async (playlist, track) => {
     },
     body: JSON.stringify({
       tracks: [
-        {
-          uri: track.uri // Example: 'spotify:track:4uLU6hMCjMI75M1A2tKUQC'
-        }
+        trUri
       ]
     })
   });
@@ -579,6 +582,7 @@ const removeTrackFromPlaylist = async (playlist, track) => {
     return await response.json();
   }
 };
+
 
 const refreshAccessToken = async () => {
 

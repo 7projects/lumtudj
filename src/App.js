@@ -1021,7 +1021,7 @@ function App() {
 
   const addToSpotifyPlaylist = async (pl, bulbOn) => {
 
-    debugger;
+
     if (showingPlaylistPicker) {
       setShowingPlaylistPicker(false);
       return;
@@ -1035,7 +1035,23 @@ function App() {
     let res = null;
 
 
+    //for each activities in mainActivities with same id as pl.id, add or remove tr
+    // let ma = [...mainActivities];
+    // for (let i = 0; i < ma.length; i++) {
+    //   if (ma[i].id == pl.id) {
+    //     let act = { ...ma[i] };
+    //     if (bulbOn) {
+    //       act.tracks = act.tracks.filter(x => x.id != tr.id);
+    //     } else {
+    //       act.tracks.push(tr);
+    //     }
+    //     ma[i] = act;
+    //   }
+    // }
 
+    // setMainActivities(ma);
+    
+    debugger;
     if (pl.id && tr) {
       if (bulbOn) {
         res = await api.removeTrackFromPlaylist(pl, tr);
@@ -1070,7 +1086,9 @@ function App() {
       const tr = pl.tracks[dragSourceIndex];
       pl.tracks.splice(dragSourceIndex, 1);
       setSelectedTrackIndex(-1);
-      const res = await api.removeTrackFromPlaylist(pl, tr);
+
+      debugger;
+      const res = await api.removeTrackFromPlaylist(pl, tr, dragSourceIndex);
 
       let pls = [...library];
       let oldPl = pls.find(x => x.id == pl.id);
@@ -1646,9 +1664,20 @@ function App() {
     // setPlaylistChanged(false);
   }
 
-  const onLibrayRowDrop = (playlist) => {
+  const onLibrayRowDrop = async (playlist) => {
     if (playlist.type == "playlist") {
-      addToSpotifyPlaylist(playlist);
+      await addToSpotifyPlaylist(playlist);
+ 
+      let ma = [...mainActivities];
+      for (let i = 0; i < ma.length; i++) {
+        if (ma[i].id == playlist.id) {
+          let upl = library.find(x => x.id == playlist.id);
+          ma[i] = upl;
+        }
+      }
+
+      setMainActivities(ma);
+
     }
   }
 
@@ -2592,9 +2621,9 @@ function App() {
 
                       return (
                         <Activity
-                          key={`${pl.type}-${pl.id}`}
+                          key={`${index}-${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain allowDrop={dragSource == "playlist" && mainActivities[mainActivityIndex].type != "album" && mainActivities[mainActivityIndex].type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
+                          <PanelMain activityIndex={index} allowDrop={(dragSource == "playlist" || dragSource == "player") && mainActivities[mainActivityIndex].type != "album" && mainActivities[mainActivityIndex].type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
                         </Activity>);
                     }
                     )}
