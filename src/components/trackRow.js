@@ -144,7 +144,7 @@ const TrackRow = ({ view, onBulbsClick, draggable, source, track, forPlaylist, f
                                     {view == "details" && !forInfo ?
                                         <tbody>
                                             <tr>
-                                                <td style={{ fontSize: 12 }}>
+                                                <td style={{ fontSize: 14 }}>
                                                     {track && track.artists && track.artists.map(a => a.name).join(", ")} - {track && track.name}
                                                 </td>
                                                 <td style={{ fontSize: 12, textAlign: "left", width: 100, paddingRight: 7 }}>

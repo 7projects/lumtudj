@@ -577,7 +577,7 @@
 }
 body {
   margin: 0;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, Georgia, "Times New Roman", serif;
   font-size: 10px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -1482,7 +1482,7 @@ button:active {
   color: #1a1a1a;
   /* Background color */
   /* Space between lines */
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, Georgia, "Times New Roman", serif;
   font-size: 20px;
 }
 .selected-track-label {
@@ -1739,7 +1739,7 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, Georgia, "Times New Roman", serif;
   box-sizing: border-box;
   color: #ffffff;
   background-color: #1e1e1e;
@@ -2096,7 +2096,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, Georgia, "Times New Roman", serif;
 }
 .reconnecting-dots span {
   color: white;
@@ -2200,7 +2200,7 @@ button:active {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, Georgia, "Times New Roman", serif;
   box-sizing: border-box;
   color: #1a1a1a;
   background-color: #f5f5f5;
@@ -2401,6 +2401,12 @@ button:active {
 }
 .drag-over {
   background-color: #161616;
+}
+@font-face {
+  font-family: 'SpecialElite';
+  src: url('fonts/SpecialElite.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
 }
 .littleBulbOn {
   width: 4px;
