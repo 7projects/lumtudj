@@ -430,7 +430,7 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
     }
 
     const startUniverse = () => {
-        
+
         return; // disabling for now
         const box = document.querySelector('#universe');
         box.style.animation = 'fadeIn 5s forwards';
@@ -546,6 +546,9 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
                                 <tr>
                                     <td style={{ width: "30%", textAlign: "left" }}>
                                         <TrackRow playlists={playlists} hideImage forPlayer track={track} />
+                                        <div class="visualizer">
+                                            <span></span><span></span><span></span><span></span><span></span>
+                                        </div>
                                     </td>
                                     <td>
                                         <table style={{ width: '100%' }}>

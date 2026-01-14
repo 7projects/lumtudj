@@ -8,6 +8,9 @@ const useAppStore = create((set) => ({
   menuAnchor: null,
   setMenuAnchor: (anchor) => set({ menuAnchor: anchor }),
 
+  loadingTracks: false,
+  setLoadingTracks: (loading) => set({ loadingTracks: loading }),
+
   // --- Library state ---
   library: [],
   setLibrary: (lib) => set({ library: lib }),

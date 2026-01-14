@@ -109,7 +109,7 @@ function useConstructor(callback) {
 
 
 function App() {
-  const { menuAnchor, playedFrom, setSelectedArtistTrackIndex, selectedArtistTrackIndex, setSelectedArtistAlbumIndex, setPlayedFrom, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
+  const { menuAnchor, loadingTracks, setLoadingTracks, playedFrom, setSelectedArtistTrackIndex, selectedArtistTrackIndex, setSelectedArtistAlbumIndex, setPlayedFrom, setMenuAnchor, setArtistInfoPosition, selectedArtist, setSelectedArtist, loadingArtistInfo, setLoadingArtistInfo, locked, setLocked, selectedLibraryIndex, setSelectedLibraryIndex, dragTrack, setDragTrack, dragSourceIndex, setDragSourceIndex, dragSource, setDragSource, library, filteredLibrary, setFilteredLibrary, selectedLibraryItem, setSelectedLibraryItem, setLibrary, loadingLibrary, setLoadingLibrary, menuPosition, selectedPlaylistTrackIndex, setSelectedPlaylistTrackIndex, setMenuPosition, selectedTrack, setSelectedTrack, selectedTrackIndex, setSelectedTrackIndex, playlistIndex, setPlaylistIndex } = useAppStore();
   const [contextMenu, setContextMenu] = useState(null);
 
   const [pickerPosition, setPickerPosition] = useState(JSON.parse(localStorage.getItem("pickerPosition")) || { x: 100, y: 100 });
@@ -137,7 +137,7 @@ function App() {
   const [searchText, setSearchText] = useState();
   const [playlistsFilterText, setPlaylistsFilterText] = useState();
 
-  const [loadingTracks, setLoadingTracks] = useState(false);
+
 
   const [loadingToken, setLoadingToken] = useState(urlParams.get('code') ? true : false);
 
@@ -1021,36 +1021,15 @@ function App() {
 
   const addToSpotifyPlaylist = async (pl, bulbOn) => {
 
-
     if (showingPlaylistPicker) {
       setShowingPlaylistPicker(false);
       return;
     }
-    // console.log(pl);
-    // console.log(selectedTrack);
-    // console.log(bulbOn);
 
     let tr = dragTrack || selectedTrack;
 
     let res = null;
 
-
-    //for each activities in mainActivities with same id as pl.id, add or remove tr
-    // let ma = [...mainActivities];
-    // for (let i = 0; i < ma.length; i++) {
-    //   if (ma[i].id == pl.id) {
-    //     let act = { ...ma[i] };
-    //     if (bulbOn) {
-    //       act.tracks = act.tracks.filter(x => x.id != tr.id);
-    //     } else {
-    //       act.tracks.push(tr);
-    //     }
-    //     ma[i] = act;
-    //   }
-    // }
-
-    // setMainActivities(ma);
-    
     debugger;
     if (pl.id && tr) {
       if (bulbOn) {
@@ -1062,12 +1041,12 @@ function App() {
       }
 
       let pls = [...library];
-      let p = pls.find(x => x.id == pl.id);
+      let pIndex = pls.findIndex(x => x.id == pl.id);
       pl.count = pl.tracks.length;
       pl.snapshot_id = res.snapshot_id;
-      p = pl;
+      pls[pIndex] = { ...pl };
+      //here  always when i find p in pls , p count is not updated
       setLibrary(pls);
-      // setFilteredLibrary(pls);
       saveLibrary(pls);
     }
 
@@ -1569,8 +1548,7 @@ function App() {
         loadPlaylistPrev({ id: "TopTracks", name: "Top Tracks", type: "toptracks" });
         break;
       case "search":
-
-        loadPlaylistPrev({ id: "search", name: "", type: "search" });
+        onNewActivity({ id: "searchResults", name: "", type: "search", tracks: [] });
         break;
     }
   }
@@ -1636,18 +1614,21 @@ function App() {
 
     let newActs = [...mainActivities];
 
-    if (lastMainActivity) {
-      newActs[newActs.length - 1] = lastMainActivity;
-    }
+    // if (lastMainActivity) {
+    //   newActs[newActs.length - 1] = lastMainActivity;
+    // }
 
     //if newActs lenght > 10 remove first
-    if (newActs.length > 10) {
-      newActs.shift();
-    }
 
-    newActs.push(pl);
-    setMainActivities(newActs);
-    setMainActivityIndex(newActs.length - 1);
+
+    onNewActivity(pl);
+    // if (newActs.length > 10) {
+    //   newActs.shift();
+    // }
+
+    // newActs.push(pl);
+    // setMainActivities(newActs);
+    // setMainActivityIndex(newActs.length - 1);
   }
 
   const [playlistChanged, setPlaylistChanged] = useState();
@@ -1667,7 +1648,7 @@ function App() {
   const onLibrayRowDrop = async (playlist) => {
     if (playlist.type == "playlist") {
       await addToSpotifyPlaylist(playlist);
- 
+
       let ma = [...mainActivities];
       for (let i = 0; i < ma.length; i++) {
         if (ma[i].id == playlist.id) {
@@ -1967,8 +1948,16 @@ function App() {
   // }
 
   const onPanelMainActivitiesBack = () => {
+
+
+    debugger;
     if (mainActivityIndex > 0) {
       let newActs = [...mainActivities];
+      if (lastMainActivity) {
+        newActs[mainActivityIndex] = lastMainActivity;
+        setMainActivities(newActs);
+      }
+
       let newIndex = mainActivityIndex - 1;
       if (newIndex < 0) newIndex = 0;
       setMainActivityIndex(newIndex);
@@ -1976,7 +1965,15 @@ function App() {
   }
 
   const onPanelMainActivitiesForward = () => {
+
     if (mainActivityIndex < mainActivities.length - 1) {
+
+      if (lastMainActivity) {
+        let newActs = [...mainActivities];
+        newActs[mainActivityIndex] = lastMainActivity;
+        setMainActivities(newActs);
+      }
+
       let newIndex = mainActivityIndex + 1;
       setMainActivityIndex(newIndex);
     }
@@ -1984,15 +1981,22 @@ function App() {
 
   const [lastMainActivity, setLastMainActivity] = useState(null);
 
-  const onMainActivitiesChange = (Item) => {
-    let mainActivitiesCopy = [...mainActivities];
-    mainActivitiesCopy[mainActivityIndex] = Item;
-    setMainActivities(mainActivitiesCopy);
+
+  const onMainActivitiesChange = (item) => {
+    setLastMainActivity(item);
+    // let mainActivitiesCopy = [...mainActivities];
+    // mainActivitiesCopy[mainActivityIndex] = Item;
+    // setMainActivities(mainActivitiesCopy);
   }
 
   const onNewActivity = (pl) => {
 
+    debugger;
     let acts = [...mainActivities];
+
+    if (lastMainActivity)
+      acts[mainActivityIndex] = lastMainActivity;
+
     acts = acts.slice(0, mainActivityIndex + 1);
 
     acts[mainActivityIndex + 1] = pl;
@@ -2144,6 +2148,56 @@ function App() {
             transformOrigin={{ horizontal: 'right', vertical: 'top' }}
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("blue")}>
+                blue
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("bluescreen")}>
+                blue screen
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("cool")}>
+                cool
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("light")}>
+                light
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("mono")}>
+                mono
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("neon")}>
+                neon
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("newspaper")}>
+                newspapers
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("retro")}>
+                retro
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("slate")}>
+                slate
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("spotify")}>
+                spotify
+              </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "library" ?
               <MenuItem onClick={() => setShowNewPlaylistInfo(true)}>
@@ -2457,7 +2511,7 @@ function App() {
                       {tab == 4 ? <td colSpan={4} className='tab-panel'>
                         <button style={{ float: "right" }}>{time}</button>
                         <button style={{ float: "right" }} onClick={logout}>Logout</button>
-                        <button style={{ float: "right" }} onClick={nextTheme}>Change theme</button>
+                        <button menu-target="theme" style={{ float: "right" }} onClick={handleMenu}>Change theme</button>
                         <button style={{ float: "right" }} onClick={() => setIsFullscreen(fullscreen())}>
 
                           {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
@@ -2534,7 +2588,7 @@ function App() {
                         </div> */}
                             {/* <button onClick={getRecentTracks}>Recently played</button> */}
                           </td> : null}
-                        <td>
+                        <td style={{paddingRight:"5px" }}>
                           <div onContextMenu={handleMenu} className='app-title2'>
                             {/* {mode == "compact" ? <span>QUEUE</span> : null} */}
                             {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
@@ -2545,41 +2599,41 @@ function App() {
 
                           {isDesktop() && <>
                             <Tooltip enterDelay={500} title="Exit">
-                              <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onclose") }}>
+                              <button  className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onclose") }}>
                                 <DisabledByDefaultIcon></DisabledByDefaultIcon>
                               </button>
                             </Tooltip>
 
                             <Tooltip enterDelay={500} title="Maximize window">
-                              <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onmaximize") }}>
+                              <button className='header-button-small'  style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onmaximize") }}>
                                 <MaximizeIcon></MaximizeIcon>
                               </button>
                             </Tooltip>
 
                             <Tooltip enterDelay={500} title="Minimize window">
-                              <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onminimize") }}>
+                              <button className='header-button-small'  style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onminimize") }}>
                                 <MinimizeIcon></MinimizeIcon>
                               </button>
                             </Tooltip>
                           </>}
 
                           <Tooltip enterDelay={500} title="Toggle fullscreen mode">
-                            <button style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
+                            <button  className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
                               {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
                                 <FullscreenIcon></FullscreenIcon>}
                             </button>
                           </Tooltip>
 
-                          <button onMouseDown={e => e.stopPropagation()} style={{ float: "right", marginRight: "30px" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
+                          <button onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ float: "right", marginRight: "30px" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
 
                           <Tooltip enterDelay={500} title="Toggle lock mode">
                             {locked ?
-                              <button id="button-lock" onMouseDown={e => e.stopPropagation()} style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                              : <button id="button-lock" onMouseDown={e => e.stopPropagation()} style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                              <button id="button-lock" onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                              : <button id="button-lock" onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ float: "right"}} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Change theme">
-                            <button id="button-theme" onMouseDown={e => e.stopPropagation()} style={{ float: "right" }} onClick={nextTheme}><ColorLensIcon></ColorLensIcon></button>
+                            <button id="button-theme" menu-target="theme" onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ float: "right" }} onClick={handleMenu}><ColorLensIcon></ColorLensIcon></button>
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Toggle playlist controller">
@@ -2623,7 +2677,7 @@ function App() {
                         <Activity
                           key={`${index}-${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain activityIndex={index} allowDrop={(dragSource == "playlist" || dragSource == "player") && mainActivities[mainActivityIndex].type != "album" && mainActivities[mainActivityIndex].type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
+                          <PanelMain activityIndex={index} allowDrop={(dragSource == "playlist" || dragSource == "player") && mainActivities[mainActivityIndex]?.type != "album" && mainActivities[mainActivityIndex]?.type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
                         </Activity>);
                     }
                     )}

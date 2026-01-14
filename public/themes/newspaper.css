@@ -2424,5 +2424,5 @@ button:active {
   margin: 1px;
 }
 img {
-  filter: grayscale(100%);
+  filter: grayscale(90%);
 }
