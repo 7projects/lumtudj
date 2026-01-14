@@ -166,6 +166,7 @@ export const formatTime = (ms) => {
 };
 
 export const loadThemeCSS = (themeName) => {
+  localStorage.setItem("theme", themeName);
   return new Promise((resolve, reject) => {
     const id = 'theme-css-link'
     const href = `./themes/${themeName}.css`

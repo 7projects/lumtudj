@@ -348,6 +348,8 @@ const updateLibrary = async (playlists, callback) => {
     if (callback)
       callback(index, playlists.length);
 
+    playlist.count = tracks.length;
+
     fullPlaylists.push({ ...playlist, tracks });
   }
 

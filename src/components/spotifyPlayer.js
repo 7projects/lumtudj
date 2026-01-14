@@ -404,6 +404,9 @@ export default function SpotifyPlayer({
                       {playedFrom ?
                         <>playing from {playedFrom}</> : null}
                     </div>
+                    <div class="visualizer">
+                      <span></span><span></span><span></span><span></span><span></span>
+                    </div>
                   </td>
                 </tr>
               </tbody>
