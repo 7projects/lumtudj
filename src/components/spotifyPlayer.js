@@ -398,15 +398,32 @@ export default function SpotifyPlayer({
                       {track && track.name}
                     </Marquee>
                     {track && track.name ?
-                      <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
+                      <div style={{marginLeft:-5}}>
+                        <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
+
+                      </div>
                       : null}
                     <div style={{ fontSize: 10, height: 16 }}>
                       {playedFrom ?
                         <>playing from {playedFrom}</> : null}
                     </div>
-                    <div class="visualizer">
-                      <span></span><span></span><span></span><span></span><span></span>
+                    <div className="visualizer-container">
+                      {paused ?
+                        <div class="visualizer-off">
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                        </div> :
+                        <div class="visualizer-on">
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                        </div>}
                     </div>
+
+
                   </td>
                 </tr>
               </tbody>
