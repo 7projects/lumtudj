@@ -372,8 +372,13 @@ const PanelMain = ({ enableDrag, activityIndex, allowDrop, onNewActivity, onBack
                         </div>
                     </> : null}
             </div> : null}
+
+            {loadingTracks ? <div className='top-loader'></div> : null}
+
             {
-                loadingTracks ? <div className='loader'></div> :
+
+            
+                // loadingTracks ? <div className='loader'></div> :
                     <ReordableTrackList keys={"spl" + activityIndex} allowDrop={allowDrop} onBulbsClick={onBulbsClick} view={"details"} onClick={(tr, index) => { setSelectedTrack(tr); setSelectedTrackIndex(index) }} ref={tracksRef} selectedIndex={selectedTrackIndex} onContextMenu={onContextMenu} enableDrag={libraryItem && libraryItem.type == "playlist"} source="plprev" onDoubleClick={onDoubleClick} trackList={selectedPlaylistTracks} dragEndHandler={handleSelectedPlaylistDragEnd} onDrop={onDrop}></ReordableTrackList>
 
                 // getTracksPanel()

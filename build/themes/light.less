@@ -1,42 +1,135 @@
 @import "main.less";
+
 // Modern Light Blue Theme (Ice Blue + White + Soft Gray)
+@font-face {
+  font-family: 'Beon-Regular';
+  /* wrap in quotes */
+  src: url('./fonts/Beon-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
-@primary-color: #ffffff;                       // pure white base
-@background-color: #f3f8ff;                    // very light ice-blue wash
+@primary-color: #4f7fbf; // Cool Winamp blue accent
 
-@logo-color: #0d3b66;                          // deep ocean blue
-@logo-shadow-color: #7cc8ff;                   // bright icy glow
+@background-color: #c9ccd1; // Brushed silver base
 
-@track-row-background-color: #ffffff;
-@track-row-color: #1c1c1c;                     // crisp readable text
-@track-row-border-bottom-color: #d8e6f5;       // soft blue-gray divider
+@logo-color: #1c3d7d;
+@logo-shadow-color: rgba(209, 209, 209, 0.25);
 
-@button-background-color: #e7f2ff;             // pale sky-blue
-@button-color: #0d3b66;                        // deep blue text
+@track-row-background-color: #e6e8eb; // Light silver
+@track-row-color: #f7f7f7;
+@track-row-border-bottom-color: #546782;
 
-@scrollbar-background-color: #e0ecf7;
-@scrollbar-thumb-color: #b7d4ee;               // frosty blue-gray
+@button-background-color: #d0d3d8; // Metallic button base
+@button-color: #ebe8e8;
 
-@bulb-off-color: #2e2e2e;
-@bulb-on-color: #4dbbff;                       // bright ice blue
+@scrollbar-background-color: #c0c4ca;
+@scrollbar-thumb-color: #8f949b;
 
-@player-background-color: #ffffff;
-@player-slider-background-color: #4dbbff;      // ice blue slider
-@player-color: #1c1c1c;
-@player-gradient1: #d8eefe;                    // subtle top gradient
-@player-gradient2: #f3f8ff;                    // lighter bottom blend
+@bulb-off-color: #f3f3f3;
+@bulb-on-color: #4f7fbf; // Blue LED
 
-@loader-color1: #4dbbff;
-@loader-color2: #c7dff3;
-@loader-text-color: #8ea3b8;
+@player-background-color: #d7d9dd;
+@player-slider-background-color: #a9adb3;
+@player-color: rgb(49, 49, 49);
+@player-gradient1: #f7f8fa; // Metal shine
+@player-gradient2: #b6bac0; // Metal shadow
 
-@search-input-background-color: #ffffff;
-@search-input-color: #0d3b66;
+@loader-color1: #4f7fbf;
+@loader-color2: #8bb2e6;
+@loader-text-color: #f0f0f0;
 
-@selected-background-color: #e7f2ff;           // light blue highlight
-@selected-color: @track-row-color;
+@search-input-background-color: #eef0f3;
+@search-input-color: #1a1a1a;
 
-@panel-background-color: #eef5ff;              // panel blue-tinted white
-@panel-color: @track-row-color;
+@font-family: 'Beon-Regular', Tahoma, Arial, "MS Sans Serif", sans-serif;
 
-@font-family: monospace, Sans-serif;
+@selection-color: #ffffff;
+@selection-background-color: #4f7fbf;
+
+@selected-background-color: #435d86;
+@selected-color: #ececec;
+
+@panel-background-color: #2f5398;
+@panel-color: #ececec;
+
+@panel-main-background-color: #2f5398;
+@panel-main-color: #f1f1f1;
+
+@placeholder-color: #d1d1d1 !important;
+
+body {
+  background: linear-gradient(to bottom,
+      #f7f8fa 0%,
+      #e2e4e8 45%,
+      #c0c4ca 55%,
+      #b6bac0 100%);
+  ;
+}
+
+.player {
+  background: linear-gradient(to bottom,
+      #f7f8fa 0%,
+      #e2e4e8 45%,
+      #c0c4ca 55%,
+      #b6bac0 100%);
+  ;
+}
+
+.player-button {
+  background: linear-gradient(to bottom,
+      #ffffff 0%,
+      #d0d3d8 50%,
+      #a9adb3 100%);
+  ;
+}
+
+.header-button-small {
+  background: linear-gradient(to bottom,
+      #ffffff 0%,
+      #d0d3d8 50%,
+      #a9adb3 100%);
+  ;
+  color: #1a1a1a;
+}
+
+.bulb-container {
+  background: linear-gradient(to bottom,
+      #ffffff 0%,
+      #d0d3d8 50%,
+      #a9adb3 100%);
+  ;
+
+  color: white;
+
+  .bulb-container-text {
+    color: black;
+  }
+}
+
+.selected-track-bulb-off.selected-track-bulb-off {
+  color: #0c0c0c;
+}
+
+.panel-dialog {
+  background: linear-gradient(to bottom,
+      #f7f8fa 0%,
+      #e2e4e8 45%,
+      #c0c4ca 55%,
+      #b6bac0 100%);
+  ;
+}
+
+.dialog-header .dialog-close {
+  color: #1a1a1a!important;
+}
+
+.dialog-window {
+  input {
+    background: #c9ccd1;
+    border: 1px solid gray;
+    border-radius: 4px;
+    padding: 5px;
+    color: black;
+  }
+}
