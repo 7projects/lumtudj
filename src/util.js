@@ -315,7 +315,11 @@ export const getTotalDurationString = (tracks) => {
 
 export const startUniverse = () => {
 
-  return; // disabling for now
+  // if (localStorage.getItem("theme") !== "spotify")
+  
+  return;
+
+  // return; // disabling for now
   const field = document.getElementById("field");
   const f = field.getContext("2d");
 

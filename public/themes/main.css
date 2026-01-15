@@ -1353,7 +1353,38 @@ button:active {
 .pulse {
   animation: pulseOpacity 2s infinite ease-in-out;
 }
-/* HTML: <div class="loader"></div> */
+.top-loader {
+  transform: rotateZ(45deg);
+  perspective: 1000px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  color: #fff;
+  left: 50%;
+  top: 50%;
+  margin-left: -24px;
+  margin-top: -24px;
+  position: absolute;
+}
+.top-loader:before,
+.top-loader:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  transform: rotateX(70deg);
+  animation: 1s spin linear infinite;
+  color: #1ff076;
+}
+.top-loader:after {
+  color: #4d4d4d;
+  transform: rotateY(70deg);
+  animation-delay: 0.4s;
+}
 .loader-text {
   position: relative;
   top: 50%;

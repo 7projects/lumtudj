@@ -929,7 +929,12 @@ function App() {
 
     }
 
-
+    if (track.type == "album") {
+      const trcks = await api.getAlbumTracks(track.id);
+      pl = [...playlistTracks, ...trcks];
+      setPlaylistTracks(pl);
+      return;
+    }
 
     if (dragSource == "artist-info-album" && !locked) {
       const selPl = selectedArtist.albums[dragSourceIndex];
@@ -1482,6 +1487,34 @@ function App() {
     setLoadingArtistInfo(false);
   }
 
+  const loadArtistTopTracks = async (track) => {
+    setLoadingTracks(true);
+    let pl = {
+      id: "artistTopTracks-",
+      name: `${track?.artists?.[0]?.name} Top Tracks`,
+      type: "artistTopTracks",
+      tracks: []
+    }
+    const tracks = await api.getArtistTopTracks(track?.artists?.[0]?.id);
+    pl.tracks = tracks;
+    onNewActivity(pl);
+    setLoadingTracks(false);
+  }
+
+  const loadArtistAlbums = async (track) => {
+    setLoadingTracks(true);
+    let pl = {
+      id: "artistAlbums-",
+      name: `${track?.artists?.[0]?.name} Albums`,
+      type: "artistAlbums",
+      tracks: []
+    }
+    const albums = await api.getArtistAlbums(track?.artists?.[0]?.id);
+    pl.tracks = albums;
+    onNewActivity(pl);
+    setLoadingTracks(false);
+  }
+
   useEffect(() => {
     if (selectedTrack) {
 
@@ -1891,9 +1924,21 @@ function App() {
   }
 
   const onTrackContextMenu = (e, track, index) => {
+
+    setSelectedTrackIndex(index);
+    setSelectedTrack(track);
+    
+    if(track.type == "album"){
+      onArtistAlbumContextMenu(e, track, index);
+      return;
+    }
+
     let items = [];
     items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
+    items.push({ label: "Top tracks", onClick: () => { setSelectedTrack(track); loadArtistTopTracks(track); }, icon: <PersonIcon /> });
+    items.push({ label: "Albums", onClick: () => { setSelectedTrack(track); loadArtistAlbums(track); }, icon: <PersonIcon /> });
+
 
     // items[1].items = [
     //   { label: "Top tracks", onClick: () => { loadArtistInfo(track); } },
@@ -1903,9 +1948,6 @@ function App() {
     // items[1].items[1].items = ctxAlbums;
 
     setContextMenuItems(items);
-
-    setSelectedTrackIndex(index);
-    setSelectedTrack(track);
     handleContextMenu(e);
   }
 
@@ -2018,6 +2060,16 @@ function App() {
     link.click();
     link.remove();
   };
+
+  const onPanelMainDoubleClick = (tr) => {
+    if (tr.type == "track") {
+      if (!isLocked()) play(tr);
+    }
+
+    if (tr.type == "album") {
+      loadPlaylistPrev(tr);
+    }
+  }
 
   return (
 
@@ -2588,7 +2640,7 @@ function App() {
                         </div> */}
                             {/* <button onClick={getRecentTracks}>Recently played</button> */}
                           </td> : null}
-                        <td style={{paddingRight:"5px" }}>
+                        <td style={{ paddingRight: "5px" }}>
                           <div onContextMenu={handleMenu} className='app-title2'>
                             {/* {mode == "compact" ? <span>QUEUE</span> : null} */}
                             {/* <span style={{ opacity: 0.5 }} className='app-title-dj'>DJ</span><br></br> */}
@@ -2599,41 +2651,41 @@ function App() {
 
                           {isDesktop() && <>
                             <Tooltip enterDelay={500} title="Exit">
-                              <button  className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onclose") }}>
+                              <button className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onclose") }}>
                                 <DisabledByDefaultIcon></DisabledByDefaultIcon>
                               </button>
                             </Tooltip>
 
                             <Tooltip enterDelay={500} title="Maximize window">
-                              <button className='header-button-small'  style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onmaximize") }}>
+                              <button className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onmaximize") }}>
                                 <MaximizeIcon></MaximizeIcon>
                               </button>
                             </Tooltip>
 
                             <Tooltip enterDelay={500} title="Minimize window">
-                              <button className='header-button-small'  style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onminimize") }}>
+                              <button className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => { sendMsgToDesktop("onminimize") }}>
                                 <MinimizeIcon></MinimizeIcon>
                               </button>
                             </Tooltip>
                           </>}
 
                           <Tooltip enterDelay={500} title="Toggle fullscreen mode">
-                            <button  className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
+                            <button className='header-button-small' style={{ float: "right" }} onMouseDown={e => e.stopPropagation()} onClick={() => isDesktop() ? sendMsgToDesktop("onfullscreen") : setIsFullscreen(fullscreen())}>
                               {isFullscreen ? <FullscreenExitIcon></FullscreenExitIcon> :
                                 <FullscreenIcon></FullscreenIcon>}
                             </button>
                           </Tooltip>
 
-                          <button onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ float: "right", marginRight: "30px" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
+                          <button onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right", marginRight: "30px" }} menu-target="settings" onClick={handleMenu}><MoreVertIcon></MoreVertIcon></button>
 
                           <Tooltip enterDelay={500} title="Toggle lock mode">
                             {locked ?
-                              <button id="button-lock" onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
-                              : <button id="button-lock" onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ float: "right"}} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
+                              <button id="button-lock" onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ color: "red", float: "right" }} onClick={lock}><LockOutlineIcon id="lockIcon" /></button>
+                              : <button id="button-lock" onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={lock}><LockOpenIcon id="lockIcon" /></button>}
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Change theme">
-                            <button id="button-theme" menu-target="theme" onMouseDown={e => e.stopPropagation()} className='header-button-small'  style={{ float: "right" }} onClick={handleMenu}><ColorLensIcon></ColorLensIcon></button>
+                            <button id="button-theme" menu-target="theme" onMouseDown={e => e.stopPropagation()} className='header-button-small' style={{ float: "right" }} onClick={handleMenu}><ColorLensIcon></ColorLensIcon></button>
                           </Tooltip>
 
                           <Tooltip enterDelay={500} title="Toggle playlist controller">
@@ -2677,7 +2729,7 @@ function App() {
                         <Activity
                           key={`${index}-${pl.type}-${pl.id}`}
                           mode={isTop ? 'visible' : 'hidden'}>
-                          <PanelMain activityIndex={index} allowDrop={(dragSource == "playlist" || dragSource == "player") && mainActivities[mainActivityIndex]?.type != "album" && mainActivities[mainActivityIndex]?.type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={(tr) => { if (!isLocked()) play(tr); }} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
+                          <PanelMain activityIndex={index} allowDrop={(dragSource == "playlist" || dragSource == "player") && mainActivities[mainActivityIndex]?.type != "album" && mainActivities[mainActivityIndex]?.type != "search" ? (e) => e.preventDefault() : null} enableDrag={dragSource != "plprev"} onNewActivity={onNewActivity} onBulbsClick={(tr) => setShowPickers(true)} onToolBarClick={onPanelMainToolbarButtonClick} onChange={onMainActivitiesChange} onBack={mainActivityIndex > 0 ? onPanelMainActivitiesBack : null} onForward={mainActivityIndex < mainActivities.length - 1 ? onPanelMainActivitiesForward : null} mode={mode} isLocked={isLocked} onDoubleClick={onPanelMainDoubleClick} handleMenu={handleMenu} selectedLibraryItem={mainActivities[index]} onContextMenu={onTrackContextMenu} onDrop={onPlPrevDrop}></PanelMain>
                         </Activity>);
                     }
                     )}

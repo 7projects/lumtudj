@@ -124,7 +124,7 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
                   </div>
                 }
               </td> : null}
-            <td style={{ width: "70%" }}>
+            <td style={{ paddingLeft: 8}}>
               <table style={{ width: "100%", padding: 4 }}>
                 <tbody>
                   <tr>

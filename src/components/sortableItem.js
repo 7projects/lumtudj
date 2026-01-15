@@ -3,6 +3,8 @@ import React, { useEffect, useState, useRef } from "react";
 
 import TrackRow from '../components/trackRow';
 
+import PlaylistRow from "./playlistRow";
+
 import { loadThemeCSS, isMobile, fullscreen, startUniverse, newGuid, flyToPlayer, flyToPlaylist } from '../util';
 
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
@@ -64,30 +66,40 @@ const SortableItem = ({ view, onBulbsClick, enableDrag, source, track, forInfo, 
                     <tr>
                         {/* Main content cell */}
                         <td className={getTrackRowClass()} style={{ width: "auto" }} draggable={isMobile() ? false : true} onDragStart={() => { setDragSource(source); setDragTrack(track); setDragSourceIndex(index); }} onDragEnd={() => { setDragTrack(null); setDragSourceIndex(-1); setDragSource(null) }}  >
-                            <TrackRow
-                                onBulbsClick={onBulbsClick}
-                                view={view}
-                                source={source}
-                                track={track}
-                                forInfo={forInfo}
-                                draggable={false}
-                                onArtistClick={onArtistClick}
+                            {track.type == "track" ?
 
-                                index={index}
-                                onDrop={onDrop}
-                                selected={selected}
+                                <TrackRow
+                                    onBulbsClick={onBulbsClick}
+                                    view={view}
+                                    source={source}
+                                    track={track}
+                                    forInfo={forInfo}
+                                    draggable={false}
+                                    onArtistClick={onArtistClick}
+
+                                    index={index}
+                                    onDrop={onDrop}
+                                    selected={selected}
 
 
-                                forPlayer={forPlayer}
-                                hideImage={hideImage}
-                                playing={playing}
-                                onPlClick={onPlClick}
-                                id={id}
-                                onAddToPlaylistButton={onAddToPlaylistButton}
-                                onLongPress={onLongPress}
-                                onSwipedLeft={onSwipedLeft}
-                                onSwipedRight={onSwipedRight}
-                            />
+                                    forPlayer={forPlayer}
+                                    hideImage={hideImage}
+                                    playing={playing}
+                                    onPlClick={onPlClick}
+                                    id={id}
+                                    onAddToPlaylistButton={onAddToPlaylistButton}
+                                    onLongPress={onLongPress}
+                                    onSwipedLeft={onSwipedLeft}
+                                    onSwipedRight={onSwipedRight}
+                                /> :
+                                <PlaylistRow
+                                    forActivity
+                                    view={view}
+                                    playlist={track}
+                                    index={index}
+                                    selected={selected}
+                                />
+                            }
                         </td>
 
                         {/* Drag handle cell */}

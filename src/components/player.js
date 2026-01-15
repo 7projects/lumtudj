@@ -430,8 +430,8 @@ const Player = ({ locked, token, trackid, onClick, playlists, stateChanged, onEr
     }
 
     const startUniverse = () => {
-
-        return; // disabling for now
+        
+        // return; // disabling for now
         const box = document.querySelector('#universe');
         box.style.animation = 'fadeIn 5s forwards';
     }
