@@ -61,7 +61,7 @@ export default function ArtistInfo({ onClose, onBulbsClick, onAlbumClick, onTrac
                         <Tabs style={{ width: "100%" }}>
                             <TabList className="custom-tablist">
                                 <Tab className="custom-tab">
-                                    Top Tracks
+                                    Top 10 Tracks
                                 </Tab>
                                 <Tab className="custom-tab">
                                     Albums

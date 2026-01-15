@@ -181,7 +181,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
 
                         {!isMobile() || true ? <div className="toolbar-wrapper">
 
-                            <input ref={inputRef} className="toolbar-input-search" placeholder="filter library..." onFocus={(e) => e.target.select()} value={filter} onChange={(e) => onFilterChange(e.target.value)} onKeyDown={onLibrarySearchEnter} />
+                            <input ref={inputRef} className="toolbar-input-search" placeholder="search library and albums..." onFocus={(e) => e.target.select()} value={filter} onChange={(e) => onFilterChange(e.target.value)} onKeyDown={onLibrarySearchEnter} />
 
 
                             <MoreVertIcon onClick={onMenuClick} menu-target="library" className='toolbar-button'></MoreVertIcon>
@@ -207,6 +207,7 @@ const PanelLibrary = ({ onContextMenu, onClick, onMenuClick, onSwipedRight, onBu
         </>
     )
 }
+
 
 export default PanelLibrary;
 

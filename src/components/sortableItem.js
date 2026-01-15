@@ -31,7 +31,8 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 
-const SortableItem = ({ view, onBulbsClick, enableDrag, source, track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+
+const SortableItem = ({ view, onAlbumClick, onBulbsClick, enableDrag, source, track, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const { selectedLibraryItem, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
@@ -69,6 +70,7 @@ const SortableItem = ({ view, onBulbsClick, enableDrag, source, track, forInfo, 
                             {track.type == "track" ?
 
                                 <TrackRow
+                                    onAlbumClick={onAlbumClick}
                                     onBulbsClick={onBulbsClick}
                                     view={view}
                                     source={source}

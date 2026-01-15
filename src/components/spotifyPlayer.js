@@ -67,7 +67,7 @@ export default function SpotifyPlayer({
       if (playerRef.current) return;
 
       const player = new window.Spotify.Player({
-        name: "React Web Player",
+        name: "Lumtu Manager",
         getOAuthToken: (cb) => cb(tokenRef.current),
         volume: 0.5,
       });
@@ -387,10 +387,11 @@ export default function SpotifyPlayer({
                         key={artist?.images?.[0]?.url}
                         onLoad={() => setArtistLoaded(true)}
                         src={artist?.images?.[0]?.url}
-                        style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid whitesmoke" }}
+                        style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "8px", border: true ? "none" : "2px solid whitesmoke" }}
 
                       />}
                   </td>
+
 
                   <td style={{ textAlign: "left", paddingLeft: 10, height: 100, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", alignSelf: "center", width: "fit-content" }}>
                     <Marquee speed={0} style={{ fontSize: 16, fontWeight: "bold", maxWidth: "20vw" }}>{track && track.artists && track.artists.map(a => a.name).join(", ")}</Marquee>
@@ -398,15 +399,32 @@ export default function SpotifyPlayer({
                       {track && track.name}
                     </Marquee>
                     {track && track.name ?
-                      <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
+                      <div style={{marginLeft:-5}}>
+                        <BulbContainer onClick={(tr, e) => { e.stopPropagation(); onBulbsClick(track); }} playlists={playlists} track={track} ></BulbContainer>
+
+                      </div>
                       : null}
                     <div style={{ fontSize: 10, height: 16 }}>
                       {playedFrom ?
                         <>playing from {playedFrom}</> : null}
                     </div>
-                    <div class="visualizer">
-                      <span></span><span></span><span></span><span></span><span></span>
+                    <div className="visualizer-container">
+                      {paused ?
+                        <div class="visualizer-off">
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                        </div> :
+                        <div class="visualizer-on">
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                          <span></span><span></span><span></span><span></span><span></span>
+                        </div>}
                     </div>
+
+
                   </td>
                 </tr>
               </tbody>

@@ -10,7 +10,7 @@ import useAppStore from '../AppStore';
 import BulbContainer from './bulbContainer';
 
 
-const TrackRow = ({ view, onBulbsClick, draggable, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
+const TrackRow = ({ view, onAlbumClick, onBulbsClick, draggable, source, track, forPlaylist, forInfo, onClick, onArtistClick, onDoubleClick, onMouseDown, index, onDrop, selected, onContextMenu, forPlayer, hideImage, playing, onPlClick, id, onAddToPlaylistButton, onLongPress, onSwipedLeft, onSwipedRight }) => {
 
     const { library, dragTrack, setDragTrack, setDragSourceIndex, setDragSource } = useAppStore();
 
@@ -62,6 +62,7 @@ const TrackRow = ({ view, onBulbsClick, draggable, source, track, forPlaylist, f
         trackMouse: true,
         delta: 50
     });
+
 
     return (
         track &&
@@ -145,7 +146,12 @@ const TrackRow = ({ view, onBulbsClick, draggable, source, track, forPlaylist, f
                                         <tbody>
                                             <tr>
                                                 <td style={{ fontSize: 14 }}>
-                                                    {track && track.artists && track.artists.map(a => a.name).join(", ")} - {track && track.name}
+                                                    {track && track.artists && track.artists.map(a => a.name).join(", ")} - {track && track.name} <br></br>
+                                                    
+                                                    {/* onClick={() => onAlbumClick && onAlbumClick(track)}  */}
+                                                    {track?.album ?
+                                                    <span className='clickable-label'>{track?.album?.name} &nbsp;
+                                                        ({track?.album?.release_date?.substring(0, 4)}) </span> : null}
                                                 </td>
                                                 <td style={{ fontSize: 12, textAlign: "left", width: 100, paddingRight: 7 }}>
                                                     <BulbContainer onClick={() => onBulbsClick(track)} playlists={playlists} track={track} ></BulbContainer>
@@ -204,7 +210,7 @@ const TrackRow = ({ view, onBulbsClick, draggable, source, track, forPlaylist, f
                                                                 <div className="song-release-date">
 
                                                                     {track?.album?.name} &nbsp;
-                                                                    {track?.album?.release_date?.substring(0, 4)}
+                                                                    ({track?.album?.release_date?.substring(0, 4)})
 
                                                                 </div> : null}
                                                         </span>

@@ -160,6 +160,7 @@ export default function Dialog({
 
             </div>
 
+
             <div className="dialog-body">{children}</div>
 
             {buttons && buttons.length !== 0 ?

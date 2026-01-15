@@ -99,6 +99,7 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
       onDrop={(e) => {
 
 
+        
         e.preventDefault();
         e.stopPropagation();
         dragCounter.current = 0;
@@ -110,6 +111,7 @@ const PlaylistRow = ({ onContextMenu, liked, showLiked, id, draggable, source, s
       }}
 
       className={`${selected ? 'item-row-selected' : 'item-row'} ${isDragOver ? 'drag-over' : ''}`}
+      style={{borderBottom: "none"}}
     >
 
       <table style={{ width: "100%" }}>
