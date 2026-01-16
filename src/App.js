@@ -1,6 +1,6 @@
 import logo from './logo.svg';
 
-import React, { useEffect, useState, useRef, cache } from "react";
+import React, { useEffect, useState, useRef, cache, useLayoutEffect } from "react";
 import axios from "axios";
 import Player from './components/player';
 import TrackRow from './components/trackRow';
@@ -29,6 +29,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 import PlaylistAddCircleIcon from '@mui/icons-material/PlaylistAddCircle';
 import PreviewIcon from '@mui/icons-material/Preview';
+import ClearIcon from '@mui/icons-material/Clear';
 
 import FavoriteIcon from '@mui/icons-material/Favorite';
 
@@ -180,6 +181,14 @@ function App() {
       setPlcFilterTerms([]);
     }
   }, [plcFilter]);
+
+  useEffect(() => {
+
+    console.log(selectedTrack);
+  }, [selectedTrack]);
+
+
+
 
   const inputBuffer = useRef();
 
@@ -879,7 +888,6 @@ function App() {
   const onPlPrevDrop = async () => {
     let res = await addToSpotifyPlaylist(mainActivities[mainActivityIndex]);
 
-    debugger;
     if (res.ok) {
       let act = { ...mainActivities[mainActivityIndex] };
       // act.tracks.push(dragTrack);
@@ -985,8 +993,22 @@ function App() {
     //need all tracks from library that are in every playlist in plcSelected
     const result = getCommonTracks(sel);
 
+    const pln = {
+      id: "common",
+      name: "Common Tracks",
+      tracks: result,
+      type: "common"
+    }
 
-    setSelectedPlaylistTracks(result);
+    if (mainActivities[mainActivityIndex].id == "common") {
+      let mas = [...mainActivities];
+      mas[mainActivityIndex] = pln;
+      setMainActivities(mas);
+    } else {
+      onNewActivity(pln);
+    }
+
+    // setSelectedPlaylistTracks(result);
 
   }
 
@@ -1035,7 +1057,6 @@ function App() {
 
     let res = null;
 
-    debugger;
     if (pl.id && tr) {
       if (bulbOn) {
         res = await api.removeTrackFromPlaylist(pl, tr);
@@ -1070,8 +1091,6 @@ function App() {
       const tr = pl.tracks[dragSourceIndex];
       pl.tracks.splice(dragSourceIndex, 1);
       setSelectedTrackIndex(-1);
-
-      debugger;
       const res = await api.removeTrackFromPlaylist(pl, tr, dragSourceIndex);
 
       let pls = [...library];
@@ -1084,7 +1103,6 @@ function App() {
       // setFilteredLibrary(pls); ovo ne treba jer se filtered sam updatea u panelMain u useEffectu za library
       saveLibrary([oldPl]);
       closeContextMenu();
-      debugger;
 
       //todo: rerfreshati mainActivities
       let acts = [...mainActivities];
@@ -1521,8 +1539,15 @@ function App() {
       if (selectedArtist?.id != selectedTrack?.artists?.[0]?.id) {
         if (showArtistInfo) { }
         // loadArtistInfo(selectedTrack);
-      }
 
+        async function fetchArtistInfo() {
+          let ai = await api.getArtistInfo(selectedTrack?.artists?.[0]?.id);
+          setSelectedArtist(ai);
+        }
+
+        fetchArtistInfo()
+
+      }
     }
   }, [selectedTrack]);
 
@@ -1635,7 +1660,7 @@ function App() {
     }
 
     setSearchText(pl.name + (pl.release_date?.substring(0, 4)));
-    
+
     setSelectedLibraryItem(pl);
     setPlaylistChanged(false);
     setSelectedPlaylistTracks(pl.tracks || []);
@@ -1869,7 +1894,7 @@ function App() {
       items.push({ label: "Preview", onClick: () => { loadPlaylistPrev(playlist) }, icon: <PreviewIcon /> });
 
     if (playlist.owner_id == userID)
-      items.push({ label: "Edit playlist", onClick: () => setShowPlaylistInfo(true), icon: <EditIcon /> });
+      items.push({ label: "Edit playlist", onClick: () => { setShowPlaylistInfo(true); setSelectedLibraryItem(playlist) }, icon: <EditIcon /> });
 
     if (playlist.type == "album" && library.some(p => p.id == playlist.id))
       items.push({ label: "Unfollow album", onClick: () => unfollowAlbum(playlist), icon: <BlockIcon /> });
@@ -1881,10 +1906,10 @@ function App() {
       items.push({ label: "Add to queue", onClick: () => { if (!isLocked()) addPlaylistToToPlaylist(playlist) }, icon: <PlaylistAddIcon /> });
 
     if (playlist.type != "featured")
-      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist) }, icon: <PlayCircleIcon /> });
+      items.push({ label: "Play in queue", onClick: () => { if (!isLocked()) nextTrack(null, playlist) }, icon: <PlayCircleIcon />, separator: true });
     // selectedLibraryItem.type == "artist" &&
     //   items.push({ label: "Unfollow artist", onClick: () => removeArtistFromLibrary(selectedLibraryItem) });
-    items.push({ label: "-" });
+    // items.push({ label: "-" });
 
     if (playlist.type == "playlist")
       items.push({ label: "Delete playlist", onClick: () => deletePlaylist(playlist), icon: <DeleteIcon /> });
@@ -1925,19 +1950,19 @@ function App() {
   }
 
   const onTrackContextMenu = (e, track, index) => {
-
-
     if (track.type == "album") {
       onArtistAlbumContextMenu(e, track, index);
       return;
     }
 
     let items = [];
-    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon /> });
+    items.push({ label: "Add to queue", onClick: () => { addToPlaylist(track, null, 0) }, icon: <PlaylistAddIcon />, separator: true });
     items.push({ label: "Artist info", onClick: () => { setSelectedTrack(track); loadArtistInfo(track); setShowArtistInfo(true) }, icon: <PersonIcon /> });
     items.push({ label: "Top 10 tracks", onClick: () => { setSelectedTrack(track); loadArtistTopTracks(track); }, icon: <StarsIcon /> });
-    items.push({ label: "All albums", onClick: () => { setSelectedTrack(track); loadArtistAlbums(track); }, icon: <Album /> });
-    items.push({ label: "Track album", onClick: () => { setSelectedTrack(track); loadPlaylistPrev(track.album); }, icon: <Album /> });
+    items.push({ label: "Albums", onClick: () => { setSelectedTrack(track); loadArtistAlbums(track); }, icon: <Album />, separator: track.album ? true : false });
+
+    track.album &&
+      items.push({ label: "Track album", onClick: () => { setSelectedTrack(track); loadPlaylistPrev(track.album); }, icon: <Album /> });
 
 
     // items[1].items = [
@@ -1997,8 +2022,6 @@ function App() {
 
   const onPanelMainActivitiesBack = () => {
 
-
-    debugger;
     if (mainActivityIndex > 0) {
       let newActs = [...mainActivities];
       if (lastMainActivity) {
@@ -2039,7 +2062,6 @@ function App() {
 
   const onNewActivity = (pl) => {
 
-    debugger;
     let acts = [...mainActivities];
 
     if (lastMainActivity)
@@ -2076,6 +2098,31 @@ function App() {
       loadPlaylistPrev(tr);
     }
   }
+
+
+  const menuRef = useRef(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(menuPosition);
+
+  useLayoutEffect(() => {
+    if (menuRef.current && menuPosition) {
+      const { offsetWidth, offsetHeight } = menuRef.current;
+      const { innerWidth, innerHeight } = window;
+
+      let { x, y } = menuPosition;
+
+      // Flip horizontally if it goes off-screen
+      if (x + offsetWidth > innerWidth) {
+        x = x - offsetWidth;
+      }
+
+      // Flip vertically if it goes off-screen
+      if (y + offsetHeight > innerHeight) {
+        y = y - offsetHeight;
+      }
+
+      setAdjustedPosition({ x, y });
+    }
+  }, [menuPosition]);
 
   return (
 
@@ -2177,23 +2224,27 @@ function App() {
       </CtxMenu > */}
 
         {menuPosition && (
-          <div className="context-menu"
+          <div
+            ref={menuRef}
+            className="context-menu"
             style={{
-              top: menuPosition.y,
-              left: menuPosition.x,
+              top: adjustedPosition?.y ? adjustedPosition.y : 0,
+              left: adjustedPosition?.x ? adjustedPosition.x : 0,
+              visibility: adjustedPosition === menuPosition ? 'hidden' : 'visible' // Prevents "flicker" during calculation
             }}
           >
             {contextMenuItems.map((item, index) => (
-
-              item.label == "-" ?
-                <span key={index}></span> :
-                <div style={{ display: "flex", alignItems: "center", gap: 6 }} key={index} onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }} >
-                  {item.icon ? item.icon : null} {item.label}
-                </div>
+              <div
+                key={index}
+                className={item.separator ? 'context-menu-separator' : ''}
+                onMouseDown={(e) => { item.onClick(); e.stopPropagation(); closeContextMenu(); }}
+                style={{ display: "flex", alignItems: "center", gap: 6 }}
+              >
+                {item.icon || null} {item.label}
+              </div>
             ))}
           </div>
-        )
-        }
+        )}
 
         {
           menuAnchor &&
@@ -2207,54 +2258,60 @@ function App() {
             anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
           >
 
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("mono")}>
+                Default
+              </MenuItem> : null}
+
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("blue")}>
-                blue
-              </MenuItem> : null}
-
-            {menuAnchor.getAttribute("menu-target") == "theme" ?
-              <MenuItem onClick={() => loadThemeCSS("bluescreen")}>
-                blue screen
-              </MenuItem> : null}
-
-            {menuAnchor.getAttribute("menu-target") == "theme" ?
-              <MenuItem onClick={() => loadThemeCSS("cool")}>
-                cool
+                Winamp
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("light")}>
-                light
+                Winamp modern
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
-              <MenuItem onClick={() => loadThemeCSS("mono")}>
-                mono
+              <MenuItem onClick={() => loadThemeCSS("bluescreen")}>
+                Blue screen of death
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("cool")}>
+                Ice
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("neon")}>
-                neon
+                Neon
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("newspaper")}>
-                newspapers
+                Daily news
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("retro")}>
-                retro
+                Retro
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("slate")}>
-                slate
+                Slate
+              </MenuItem> : null}
+
+            {menuAnchor.getAttribute("menu-target") == "theme" ?
+              <MenuItem onClick={() => loadThemeCSS("spaceshuttle")}>
+                Space shuttle
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "theme" ?
               <MenuItem onClick={() => loadThemeCSS("spotify")}>
-                spotify
+                Spotify
               </MenuItem> : null}
 
             {menuAnchor.getAttribute("menu-target") == "library" ?
@@ -2433,14 +2490,14 @@ function App() {
               <div className='menu-container' style={{ height: "100vh" }}>
                 <img
                   src={process.env.PUBLIC_URL + '/logo.png'}
-                  style={{ display: "block", width: isMobile() ? 100 : 270, objectFit: 'cover' }}
+                  style={{ display: "block", width: isMobile() ? 100 : 240, objectFit: 'cover' }}
                 />
                 {/* <div className='app-title' style={{fontSize:40}}>
                   <span>LUMTU</span>
                   <span style={{ opacity: 0.5 }} className='app-title-dj'>MANAGER</span><br></br>
 
                 </div> */}
-                <button style={{ fontSize: 20, padding: 10, border: "2px solid white", padding: 20 }} onClick={handleLogin}>Login with Spotify</button>
+                <button style={{ fontSize: 20, padding: 10, border: "2px solid rgb(60,60,60)", color: "#8b8b8b", padding: 20 }} onClick={handleLogin}>Login with Spotify</button>
               </div>
 
           ) : (
@@ -2614,8 +2671,11 @@ function App() {
                                 {/* <span style={{fontSize:9, marginTop:-10}}>since 2001</span> */}
                               </div> : null}
 
-                            <div style={{ opacity: 0.8, fontSize: 12 }}>powered by</div> &nbsp;
-                            <img src={process.env.PUBLIC_URL + '/Spotify_Full_Logo_RGB_Green.png'} style={{ height: 30 }}></img>
+                            {/* <>
+                              <div style={{ opacity: 0.8, fontSize: 12 }}>powered by</div> &nbsp;
+                              <img src={process.env.PUBLIC_URL + '/Spotify_Full_Logo_RGB_Green.png'} style={{ height: 30 }}></img>
+                            </> */}
+
                             {/* <table>
                               <tbody>
                                 <tr>
@@ -2798,25 +2858,45 @@ function App() {
                     <tbody style={{ width: "100%" }}>
                       <tr>
                         <td style={{ width: "80%", padding: 5, textAlign: "left" }}>
-                          {plcMode == "tagger" ? <>
-                            <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
-                              {selectedTrack ? (selectedTrack?.artists?.map(a => a.name).join(", ") + " - " + selectedTrack?.name) : null}
-                            </Marquee>
+                          <table>
+                            <tbody>
+                              <tr>
+                                <td>
+                                  {plcMode == "tagger" ?
+                                    <img
+                                      style={{ width: 80, height: 80, objectFit: "cover", borderRadius: "50%", border: "2px solid whitesmoke" }}
+                                      src={selectedArtist && (selectedArtist.images?.[2]?.url || selectedArtist.images?.[1]?.url || selectedArtist.images?.[0]?.url)}
+                                    ></img> :
 
-                          </> :
-                            <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
-                              Combine playlists
-                            </Marquee>
-                          }
+                                    <img
+                                      style={{ width: 80, height: 80, objectFit: "cover", borderRadius: "50%", border: "2px solid whitesmoke" }}
+                                      src={process.env.PUBLIC_URL + "/logo-head.png"}
+                                    ></img>}
+
+                                </td>
+                                <td style={{ padding: 20 }}>
+                                  {plcMode == "tagger" ? <>
+                                    <Marquee speed={0} style={{ fontSize: 18, width: "100%" }}>
+                                      {selectedTrack?.artists?.[0].name}
+                                    </Marquee>
+                                    <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
+                                      {selectedTrack?.name}
+                                    </Marquee>
+                                  </> :
+                                    <Marquee speed={0} style={{ fontSize: 11, width: "100%" }}>
+                                      Combine playlists
+                                    </Marquee>
+                                  }
+                                </td>
+                              </tr>
+                            </tbody>
+                          </table>
                         </td>
                       </tr>
                       <tr>
                         <td style={{ width: "20%", padding: 5, textAlign: "left" }}>
-                          <input value={plcFilter} placeholder='filter...' onChange={(e) => setPlcFilter(e.target.value)} type='text'></input>
-                          <button className="dialog-close" onClick={() => setPlcFilter("")}>x</button>
-                          {/* <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} >
-                            <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
-                          </Tooltip> */}
+
+
                         </td>
                       </tr>
                     </tbody>
@@ -2874,8 +2954,35 @@ function App() {
 
                         {plcMode == "and" ?
                           <td className='selected-track-container'>
-                            {library.filter(l => l.type == "playlist").map(p => plcSelected.some(s => s == p.id) ? <span onClick={() => { addToPLCSelected(p.id, false) }} className='plc-button-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToPLCSelected(p.id, true) }} className='plc-button-off' key={p.id}>{p.name}</span>)}
+                            {library.filter(l => {
+                              if (l.type !== "playlist") return false;
+
+                              if (!plcFilterTerms.length) return true;
+                              const name = l.name?.toLowerCase() || "";
+                              return plcFilterTerms.some(term => name.includes(term));
+
+                            }
+
+                            ).map(p => plcSelected.some(s => s == p.id) ? <span onClick={() => { addToPLCSelected(p.id, false) }} className='plc-button-on' key={p.id}>{p.name}</span> : <span onClick={() => { addToPLCSelected(p.id, true) }} className='plc-button-off' key={p.id}>{p.name}</span>)}
                           </td> : null}
+                      </tr>
+                    </tbody>
+                  </table>
+                  <table style={{ width: "100%" }}>
+                    <tbody>
+                      <tr>
+                        <td>
+                          <input value={plcFilter} placeholder='filter...' onChange={(e) => setPlcFilter(e.target.value)} type='text'></input>
+
+                          <button>
+                            <ClearIcon style={{ fontSize: 12 }} onClick={() => setPlcFilter("")}></ClearIcon>
+
+                          </button>
+
+                          {/* <Tooltip style={{ zIndex: 9999 }} enterDelay={500} title={"Combine playlists and tag tracks for more precise control! Select playlists below to filter tracks that exist in all chosen playlists."} > */}
+                          <span onClick={() => { setPLCMode(plcMode == "and" ? "tagger" : "and") }} style={{ float: "right" }} className={plcMode == "and" ? "plc-button-on" : "plc-button-off"}><ManageSearchIcon></ManageSearchIcon></span>
+                          {/* </Tooltip> */}
+                        </td>
                       </tr>
                     </tbody>
                   </table>
@@ -2912,7 +3019,7 @@ function App() {
 
 
                 : null} */}
-                  <SpotifyPlayer onBulbsClick={(track) => { setSelectedTrack(track); setShowPickers(true); }} isLocked={isLocked} onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.type == "playlist" && pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
+                  <SpotifyPlayer onContextMenu={(e, tr) => onTrackContextMenu(e, tr)} onBulbsClick={(track) => { setSelectedTrack(track); setShowPickers(true); }} isLocked={isLocked} onNext={nextTrack} onArtistClick={(tr) => { loadArtistInfo(tr); setShowArtistInfo(true); }} locked={locked} onError={playerError} stateChanged={playerStateChanged} token={token} track={track} onClick={() => { setSelectedTrack(track); }} playlists={library.filter((pl) => pl.type == "playlist" && pl.tracks && pl.tracks.some((t) => t.id == track.id))} ></SpotifyPlayer>
                 </div>
               </div>
 

@@ -577,7 +577,7 @@
 }
 body {
   margin: 0;
-  font-family: SpecialElite, Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, "Times New Roman", serif;
   font-size: 10px;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -639,11 +639,13 @@ td {
   padding: 10px;
   color: #1a1a1a;
   cursor: pointer;
-  border-radius: 4px;
   font-size: 16px;
 }
 .context-menu div:hover {
   background-color: #ffffff;
+}
+.context-menu-separator {
+  border-bottom: 1px solid #ffffff;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -1354,7 +1356,38 @@ button:active {
 .pulse {
   animation: pulseOpacity 2s infinite ease-in-out;
 }
-/* HTML: <div class="loader"></div> */
+.top-loader {
+  transform: rotateZ(45deg);
+  perspective: 1000px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  color: #fff;
+  left: 50%;
+  top: 50%;
+  margin-left: -24px;
+  margin-top: -24px;
+  position: absolute;
+}
+.top-loader:before,
+.top-loader:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  transform: rotateX(70deg);
+  animation: 1s spin linear infinite;
+  color: #1a1a1a;
+}
+.top-loader:after {
+  color: #555555;
+  transform: rotateY(70deg);
+  animation-delay: 0.4s;
+}
 .loader-text {
   position: relative;
   top: 50%;
@@ -1482,7 +1515,7 @@ button:active {
   color: #1a1a1a;
   /* Background color */
   /* Space between lines */
-  font-family: SpecialElite, Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, "Times New Roman", serif;
   font-size: 20px;
 }
 .selected-track-label {
@@ -1739,7 +1772,7 @@ button:active {
   padding-left: 32px;
   border: 1px solid #ccc;
   font-weight: bold;
-  font-family: SpecialElite, Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, "Times New Roman", serif;
   box-sizing: border-box;
   color: #ffffff;
   background-color: #1e1e1e;
@@ -2096,7 +2129,7 @@ button:active {
   border-radius: 20px;
   color: white;
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-  font-family: SpecialElite, Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, "Times New Roman", serif;
 }
 .reconnecting-dots span {
   color: white;
@@ -2200,7 +2233,7 @@ button:active {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  font-family: SpecialElite, Georgia, "Times New Roman", serif;
+  font-family: SpecialElite, "Times New Roman", serif;
   box-sizing: border-box;
   color: #1a1a1a;
   background-color: #f5f5f5;
@@ -2241,8 +2274,8 @@ button:active {
   opacity: 0.3;
 }
 .toolbar-button:hover {
-  color: #1a1a1a;
-  fill: #1a1a1a;
+  color: #9b9b9b;
+  fill: #9b9b9b;
 }
 .trash-container {
   position: fixed;
@@ -2304,7 +2337,7 @@ button:active {
   width: 400px;
   background: #fdfdfd;
   border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
   overflow: hidden;
   pointer-events: auto;
   user-select: none;
@@ -2339,6 +2372,7 @@ button:active {
   color: #1a1a1a;
   background-color: #fdfdfd;
   overflow-y: scroll;
+  padding: 10px;
 }
 .dialog-footer {
   padding: 12px 16px;
@@ -2564,6 +2598,36 @@ button:active {
   50% {
     height: 10%;
   }
+}
+.clickable-label {
+  color: #000000;
+  font-size: 9px;
+}
+.dialog-window input {
+  background: #161616;
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: #eaeaea;
+  color: #1a1a1a;
+}
+.dialog-window input:active,
+.dialog-window input:focus {
+  outline: none;
+  border: none;
+}
+.dialog-window textarea {
+  background: #161616;
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: #eaeaea;
+  color: #1a1a1a;
+}
+.dialog-window textarea:active,
+.dialog-window textarea:focus {
+  outline: none;
+  border: none;
 }
 @font-face {
   font-family: 'SpecialElite';

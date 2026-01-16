@@ -148,7 +148,7 @@ export default function Dialog({
                       {title}    
                   </td>
                   <td style={{ display: "inline-block", width: "40px" }}>
-                    <button className="dialog-close" style={{ display: "inline-block", float: "right" }} onClick={onClose}><DisabledByDefaultIcon></DisabledByDefaultIcon></button>
+                    <button className="dialog-close" style={{ display: "inline-block", float: "right", position:"absolute", top: 20 }} onClick={onClose}><DisabledByDefaultIcon></DisabledByDefaultIcon></button>
                   </td>
                 </tr>
                 <tr>

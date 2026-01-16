@@ -141,13 +141,18 @@ td {
         padding: 10px;
         color: @track-row-color;
         cursor: pointer;
-        border-radius: 4px;
+        // border-radius: 4px;
         font-size: 16px;
     }
 
     div:hover {
         background-color: lighten(@track-row-background-color, 10%);
     }
+}
+
+
+.context-menu-separator {
+    border-bottom: 1px solid lighten(@background-color, 20%);
 }
 
 
@@ -1765,10 +1770,10 @@ button:active {
     width: 150px;
     height: 150px;
     object-fit: cover;
-    // border-radius: 50%;
-    border-radius: 8px;
+    border-radius: 50%;
+    border-radius: 50%;
     margin-bottom: 15px;
-    // border: 3px solid whitesmoke;
+    border: 3px solid whitesmoke;
 }
 
 .artist-info-name {
@@ -2188,7 +2193,7 @@ button:active {
     width: 400px;
     background: @background-color;
     border-radius: 10px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
     overflow: hidden;
     pointer-events: auto;
     user-select: none;
@@ -2230,6 +2235,7 @@ button:active {
     color: @button-color;
     background-color: @background-color;
     overflow-y: scroll;
+    padding: 10px;
 }
 
 .dialog-footer {
@@ -2526,4 +2532,34 @@ button:active {
 
 .clickable-label:hover {
     // color: @track-row-color;
+}
+
+
+.dialog-window {
+    input {
+        background: #161616;
+        border: none;
+        border-radius: 4px;
+        padding: 5px;
+        background-color: @selected-background-color;
+        color: @track-row-color;
+    }
+    input:active, input:focus {
+        outline: none;
+        border: none;
+
+
+    }
+    textarea {
+        background: #161616;
+        border: none;
+        border-radius: 4px;
+        padding: 5px;
+        background-color: @selected-background-color;
+        color: @track-row-color;
+    }
+    textarea:active, textarea:focus {
+        outline: none;
+        border: none;
+    }
 }

@@ -349,6 +349,10 @@ const PanelMain = ({ enableDrag, onAlbumClick, activityIndex, allowDrop, onNewAc
                         </div>
 
                         {/* {playlistChanged ? <SaveIcon onClick={saveSelectedPlaylist} className='toolbar-button'></SaveIcon> : null} */}
+                            
+                        <div>
+                            Tracks: {selectedPlaylistTracks ? selectedPlaylistTracks.length : 0}
+                        </div>
 
                         <div className='toolbar-icons'>
                             {/* <SwapVertIcon className='toolbar-button'></SwapVertIcon> */}

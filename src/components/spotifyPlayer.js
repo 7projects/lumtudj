@@ -25,6 +25,7 @@ export default function SpotifyPlayer({
   stateChanged,
   onLongPress,
   isLocked,
+  onContextMenu
 }) {
 
   const playerRef = useRef(null);
@@ -366,7 +367,7 @@ export default function SpotifyPlayer({
       ) : (
 
         <div className="parent">
-          <div className="div1" draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
+          <div className="div1" onContextMenu={(e) => onContextMenu(e, track)} draggable onDragStart={() => { setDragTrack(track); setDragSource("player") }} onDragEnd={() => { setDragTrack(null); setDragSource(null) }} style={{ textAlign: "left", cursor: "pointer" }} onClick={() => onArtistClick(track)} >
             <table>
               <tbody>
                 <tr>
@@ -374,7 +375,7 @@ export default function SpotifyPlayer({
 
                     {!artist ?
                       <img
-                        src={process.env.PUBLIC_URL + '/logo.png'}
+                        src={process.env.PUBLIC_URL + '/logo-head.png'}
                         style={{ marginLeft: 20, display: "block", width: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: "2px solid transparent" }}
 
                       />
@@ -387,7 +388,7 @@ export default function SpotifyPlayer({
                         key={artist?.images?.[0]?.url}
                         onLoad={() => setArtistLoaded(true)}
                         src={artist?.images?.[0]?.url}
-                        style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "8px", border: true ? "none" : "2px solid whitesmoke" }}
+                        style={{ marginLeft: 20, display: artistLoaded ? "block" : "none", width: isMobile() ? 30 : 70, height: isMobile() ? 30 : 70, objectFit: 'cover', borderRadius: "50%", border: false ? "none" : "2px solid whitesmoke" }}
 
                       />}
                   </td>

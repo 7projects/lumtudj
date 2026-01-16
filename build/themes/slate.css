@@ -639,11 +639,13 @@ td {
   padding: 10px;
   color: #e8e8e8;
   cursor: pointer;
-  border-radius: 4px;
   font-size: 16px;
 }
 .context-menu div:hover {
   background-color: #25252a;
+}
+.context-menu-separator {
+  border-bottom: 1px solid #3c4352;
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
@@ -1354,7 +1356,38 @@ button:active {
 .pulse {
   animation: pulseOpacity 2s infinite ease-in-out;
 }
-/* HTML: <div class="loader"></div> */
+.top-loader {
+  transform: rotateZ(45deg);
+  perspective: 1000px;
+  border-radius: 50%;
+  width: 48px;
+  height: 48px;
+  color: #fff;
+  left: 50%;
+  top: 50%;
+  margin-left: -24px;
+  margin-top: -24px;
+  position: absolute;
+}
+.top-loader:before,
+.top-loader:after {
+  content: '';
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: inherit;
+  height: inherit;
+  border-radius: 50%;
+  transform: rotateX(70deg);
+  animation: 1s spin linear infinite;
+  color: #3aaaff;
+}
+.top-loader:after {
+  color: #2b2b2b;
+  transform: rotateY(70deg);
+  animation-delay: 0.4s;
+}
 .loader-text {
   position: relative;
   top: 50%;
@@ -2240,8 +2273,8 @@ button:active {
   opacity: 0.3;
 }
 .toolbar-button:hover {
-  color: #e8e8e8;
-  fill: #e8e8e8;
+  color: #3aaaff;
+  fill: #3aaaff;
 }
 .trash-container {
   position: fixed;
@@ -2303,7 +2336,7 @@ button:active {
   width: 400px;
   background: #111317;
   border-radius: 10px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 10px 25px rgba(255, 255, 255, 0.3);
   overflow: hidden;
   pointer-events: auto;
   user-select: none;
@@ -2338,6 +2371,7 @@ button:active {
   color: #ffffff;
   background-color: #111317;
   overflow-y: scroll;
+  padding: 10px;
 }
 .dialog-footer {
   padding: 12px 16px;
@@ -2563,4 +2597,34 @@ button:active {
   50% {
     height: 10%;
   }
+}
+.clickable-label {
+  color: #b5b5b5;
+  font-size: 9px;
+}
+.dialog-window input {
+  background: #161616;
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: #25252a;
+  color: #e8e8e8;
+}
+.dialog-window input:active,
+.dialog-window input:focus {
+  outline: none;
+  border: none;
+}
+.dialog-window textarea {
+  background: #161616;
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
+  background-color: #25252a;
+  color: #e8e8e8;
+}
+.dialog-window textarea:active,
+.dialog-window textarea:focus {
+  outline: none;
+  border: none;
 }
